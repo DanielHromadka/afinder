@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM node:24-bookworm AS build
+FROM node:26-bookworm AS build
 ARG TARGETARCH
 # Clang accepts the visibility/deprecation attributes in current Electron/V8 headers.
 RUN apt-get update && apt-get install -y --no-install-recommends clang-19 && rm -rf /var/lib/apt/lists/*
