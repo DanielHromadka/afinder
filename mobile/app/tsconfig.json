@@ -3,7 +3,9 @@
   "compilerOptions": {
     "strict": true,
     "noUnusedLocals": true,
-    "noUnusedParameters": true
+    "noUnusedParameters": true,
+    // Shared files (../../src/shared) resolve @noble/* from this app, as in metro.config.js; CI has no root node_modules.
+    "paths": { "@noble/*": ["./node_modules/@noble/*"] }
   },
   "include": [
     "index.ts",
