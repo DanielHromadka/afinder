@@ -1,0 +1,6 @@
+{
+  "name": "cpu-features",
+  "version": "0.0.0-none",
+  "description": "Stands in for ssh2's optional cpu-features: its native addon does not build against Electron 44 on Linux, and ssh2 only uses it to order ciphers (require() failing is caught).",
+  "private": true
+}

@@ -1,0 +1,324 @@
+/* To-dos, notes on files and their popover. Loaded after xp.css, in the order main.tsx imports them. */
+
+/* ---- to-dos ------------------------------------------------------------------------------------ */
+
+.todo-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--list-bg);
+  color: var(--text);
+}
+
+.todo-add {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 6px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--face-dark);
+  background: var(--face);
+}
+
+/* Theme colours, not the browser's white field (the Todo and Stocks areas share it). */
+.todo-add > input {
+  flex: 1;
+  min-width: 0;
+  height: 22px;
+  padding: 0 4px;
+  border: 1px solid var(--face-dark);
+  background: var(--list-bg);
+  color: var(--text);
+}
+
+.todo-add > input::placeholder {
+  color: var(--muted);
+}
+
+.todo-add > input:focus {
+  outline: none;
+  border-color: var(--selection);
+}
+
+.todo-btn {
+  height: 22px;
+  padding: 0 8px;
+  border: 1px solid var(--face-dark);
+  border-radius: 3px;
+  background: var(--face-light);
+  white-space: nowrap;
+}
+
+.todo-btn:hover:not(:disabled) {
+  border-color: var(--selection);
+}
+
+.todo-btn:disabled {
+  color: var(--muted);
+}
+
+.todo-chip {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  max-width: 100%;
+  padding: 1px 2px 1px 5px;
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--selection) 18%, var(--list-bg));
+}
+
+.todo-chip-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.todo-chip-x,
+.todo-del {
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--muted);
+  line-height: 1;
+}
+
+.todo-chip-x:hover,
+.todo-del:hover {
+  background: var(--face-dark);
+  color: var(--text);
+}
+
+.todo-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--face-dark);
+}
+
+.todo-seg {
+  display: flex;
+  white-space: nowrap;
+}
+
+.todo-seg > button {
+  height: 20px;
+  padding: 0 8px;
+  border: 1px solid var(--face-dark);
+  background: var(--face-light);
+}
+
+.todo-seg > button + button {
+  border-left: 0;
+}
+
+.todo-seg > button:first-child {
+  border-radius: 3px 0 0 3px;
+}
+
+.todo-seg > button:last-child {
+  border-radius: 0 3px 3px 0;
+}
+
+.todo-seg > button.on {
+  background: var(--selection);
+  color: var(--selection-text);
+}
+
+.todo-count {
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.todo-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.todo-empty {
+  padding: 16px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.todo-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 4px 6px;
+  border-bottom: 1px solid color-mix(in srgb, var(--face-dark) 40%, transparent);
+}
+
+.todo-item:hover {
+  background: color-mix(in srgb, var(--selection) 8%, transparent);
+}
+
+.todo-item > input[type='checkbox'] {
+  margin: 2px 0 0;
+  flex-shrink: 0;
+}
+
+.todo-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.todo-text {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.todo-item.done .todo-text {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+
+.todo-edit {
+  width: 100%;
+  height: 20px;
+}
+
+.todo-link {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  align-self: flex-start;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--link, var(--selection));
+  font-size: 11px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.todo-link:hover > span {
+  text-decoration: underline;
+}
+
+.todo-del {
+  visibility: hidden;
+  flex-shrink: 0;
+}
+
+.todo-item:hover > .todo-del {
+  visibility: visible;
+}
+
+/* To-dos and the note pinned to a file: a badge after the name, opening a popover. */
+.memo-badge {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  height: 16px;
+  margin-left: 6px;
+  padding: 0 3px;
+  border: 1px solid color-mix(in srgb, var(--face-dark) 70%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--list-bg) 85%, var(--face));
+  color: var(--text);
+  font: bold 10px/14px var(--font);
+  cursor: pointer;
+}
+
+.memo-badge:hover {
+  border-color: var(--selection);
+}
+
+.memo-badge.all-done > svg:first-child {
+  opacity: 0.45;
+}
+
+.icons-tile .memo-badge {
+  position: absolute;
+  top: 4px;
+  left: 6px;
+  margin: 0;
+}
+
+.memo-popover {
+  position: fixed;
+  z-index: 100;
+  width: 320px;
+  max-height: min(480px, calc(100vh - 8px));
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--menu-border);
+  border-radius: 4px;
+  background: var(--menu-bg);
+  color: var(--text);
+  box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
+  user-select: text;
+}
+
+.memo-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 6px;
+  border-bottom: 1px solid var(--face-dark);
+  background: var(--face);
+  font-weight: bold;
+}
+
+.memo-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.memo-head > .memo-close {
+  visibility: visible;
+}
+
+.memo-section {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 6px 6px 2px;
+  color: var(--muted);
+  font-weight: bold;
+}
+
+.memo-hint {
+  font-weight: normal;
+  font-size: 10px;
+}
+
+.memo-todos {
+  overflow-y: auto;
+  min-height: 0;
+  flex-shrink: 1;
+}
+
+.memo-todos > .todo-add {
+  border-bottom: 0;
+  background: none;
+}
+
+.memo-note {
+  margin: 0 6px 6px;
+  min-height: 90px;
+  resize: vertical;
+  font: inherit;
+  padding: 4px;
+}
+
+.memo-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 6px 6px;
+}

@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>aFinder: Explorer as you remember it, built for how you work now</title>
+    <meta
+      name="description"
+      content="aFinder is a fast, keyboard-driven file manager for macOS, Windows and Linux. Tabs and up to four panes, a preview with the VS Code editor, git, archives, SFTP, S3 and SharePoint, Claude Code and Codex, automations and an MCP server. In a modern macOS look or ten others."
+    />
+    <meta property="og:title" content="aFinder: Explorer as you remember it, built for how you work now" />
+    <meta property="og:description" content="Tabs, split panes, git and Claude Code beside your files. In a modern macOS look or Windows XP." />
+    <meta property="og:image" content="img/hero.webp" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="img/favicon.png" />
+    <link rel="preload" as="image" href="img/hero.webp" imagesrcset="img/hero-1280.webp 1280w, img/hero.webp 2400w" imagesizes="(min-width: 1024px) 60vw, 100vw" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/geist@5.3.0/index.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/geist-mono@5.3.0/index.css" />
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.2/src/regular/style.css" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+
+    <header class="nav">
+      <div class="wrap nav-row">
+        <a class="brand" href="#top" aria-label="aFinder home">
+          <img src="img/icon.png" width="28" height="28" alt="" />
+          <span>aFinder</span>
+        </a>
+        <nav aria-label="Sections">
+          <ul class="nav-links">
+            <li><a href="#files">Files</a></li>
+            <li><a href="#git">Git</a></li>
+            <li><a href="#ai">AI</a></li>
+            <li><a href="#automations">Automations</a></li>
+            <li><a href="#themes">Themes</a></li>
+          </ul>
+        </nav>
+        <a class="btn btn-primary btn-small" href="#download" data-download-label>
+          <i class="ph ph-download-simple" aria-hidden="true"></i><span>Download</span>
+        </a>
+      </div>
+    </header>
+
+    <main id="main">
+      <!-- Hero: headline across, then the pitch beside the real app. -->
+      <section class="hero" id="top">
+        <div class="wrap hero-grid">
+          <h1>
+            Explorer as you remember it.
+            <span>Built for how you work now.</span>
+          </h1>
+          <div class="hero-copy">
+            <p class="lede">Tabs, split panes, git and Claude Code beside your files. In a modern macOS look or ten others.</p>
+            <div class="hero-actions">
+              <a class="btn btn-primary" href="#download" data-download-primary>
+                <i class="ph ph-download-simple" aria-hidden="true"></i><span data-download-text>Download</span>
+              </a>
+              <a class="btn btn-ghost" href="#files">See it in action</a>
+            </div>
+          </div>
+          <figure class="hero-shot">
+            <img
+              src="img/hero.webp"
+              srcset="img/hero-1280.webp 1280w, img/hero.webp 2400w"
+              sizes="(min-width: 1024px) 60vw, 100vw"
+              width="2400"
+              height="1463"
+              alt="aFinder with the folder tree, a project's files, the source control panel with staged changes and a terminal showing the git history"
+              fetchpriority="high"
+            />
+          </figure>
+        </div>
+      </section>
+
+      <section class="facts" aria-label="At a glance">
+        <div class="wrap facts-row">
+          <div><strong>4</strong><span>panes side by side, each with its own tabs</span></div>
+          <div><strong>11</strong><span>themes, from modern macOS to DOS</span></div>
+          <div><strong>3</strong><span>platforms with their own keymaps</span></div>
+          <div><strong>4</strong><span>languages: English, Czech, German, Spanish</span></div>
+        </div>
+      </section>
+
+      <!-- Files: a bento with five cells of different sizes. -->
+      <section class="features reveal" id="files">
+        <div class="wrap">
+          <h2>Working with files, without the friction.</h2>
+          <p class="section-lead">Everything you do a hundred times a day is one key or one drag away, on your disk and inside archives.</p>
+          <div class="bento">
+            <article class="cell cell-split">
+              <div class="cell-text">
+                <h3>Up to four panes, each with tabs</h3>
+                <p>Copy across with F5, move with F6, drag tabs between panes. Keep layouts you like as workspaces.</p>
+              </div>
+              <img src="img/split-1280.webp" width="1280" height="780" alt="Two panes, Documents with three tabs on the left and Downloads on the right" loading="lazy" />
+            </article>
+            <article class="cell cell-palette">
+              <div class="cell-text">
+                <h3>Every command, one shortcut away</h3>
+                <p>Press <kbd data-key="mod">⌘</kbd><kbd>K</kbd> and type. Actions, places, favourites and themes in one fuzzy list.</p>
+              </div>
+              <img src="img/palette-1280.webp" width="1280" height="780" alt="The command palette filtered to archive commands" loading="lazy" />
+            </article>
+            <article class="cell cell-third">
+              <div class="cell-text">
+                <h3>Search every subfolder</h3>
+                <p>Results stream in while you type, up to 5,000, with a Location column.</p>
+              </div>
+              <img src="img/search-1280.webp" width="1280" height="780" alt="Search results for invoice across Documents and Projects" loading="lazy" />
+            </article>
+            <article class="cell cell-third">
+              <div class="cell-text">
+                <h3>Rename a hundred files at once</h3>
+                <p>Replace text, regular expressions or numbering, with a live preview that catches collisions first.</p>
+              </div>
+              <img src="img/rename-1280.webp" width="1280" height="780" alt="Rename Items with Invoice replaced by Atlas invoice in four names" loading="lazy" />
+            </article>
+            <article class="cell cell-third">
+              <div class="cell-text">
+                <h3>Archives, in and out</h3>
+                <p>Open .zip and .tar.gz like folders. Pack any selection as ZIP, TAR.GZ or Zstandard.</p>
+              </div>
+              <img src="img/archive-1280.webp" width="1280" height="780" alt="The Create Archive dialog with four invoices selected and the TAR.ZST format chosen" loading="lazy" />
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- Preview: one wide screenshot, three short columns under it. -->
+      <section class="preview reveal" id="preview">
+        <div class="wrap">
+          <h2>Look inside without opening anything.</h2>
+          <figure class="wide-shot">
+            <img
+              src="img/preview.webp"
+              srcset="img/preview-1280.webp 1280w, img/preview.webp 2400w"
+              sizes="(min-width: 1280px) 1200px, 100vw"
+              width="2400"
+              height="1463"
+              alt="The preview area showing invoice.ts in the VS Code editor, with a change bar on the line added since the last commit"
+              loading="lazy"
+            />
+          </figure>
+          <div class="columns">
+            <div>
+              <i class="ph ph-code" aria-hidden="true"></i>
+              <h3>The editor from VS Code</h3>
+              <p>Code and text in Monaco with syntax colours. Edit in place and save with <kbd data-key="mod">⌘</kbd><kbd>S</kbd>.</p>
+            </div>
+            <div>
+              <i class="ph ph-git-diff" aria-hidden="true"></i>
+              <h3>Git where you read</h3>
+              <p>Change bars against the last commit, a side-by-side diff and blame for the line under the cursor.</p>
+            </div>
+            <div>
+              <i class="ph ph-files" aria-hidden="true"></i>
+              <h3>Documents and media</h3>
+              <p>Word, Excel, PDF, images, video and audio. Anything else through Quick Look. Press Space for the big view.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Servers: text and protocols on the left, the real dialog on the right. -->
+      <section class="split-section reveal" id="remote">
+        <div class="wrap split-grid">
+          <div class="split-copy">
+            <h2>Servers and clouds as ordinary folders.</h2>
+            <p class="section-lead">Browse, preview, copy, rename and edit on a server the way you do on your disk. Secrets stay in the system keychain.</p>
+            <ul class="protocols">
+              <li><i class="ph ph-terminal-window" aria-hidden="true"></i><span><b>SFTP</b> with a password, a key or the SSH agent</span></li>
+              <li><i class="ph ph-hard-drives" aria-hidden="true"></i><span><b>Amazon S3</b> and compatible: MinIO, Cloudflare R2, Wasabi, Backblaze B2</span></li>
+              <li><i class="ph ph-cloud" aria-hidden="true"></i><span><b>SharePoint and OneDrive</b> through Microsoft Graph, with MFA sign-in</span></li>
+            </ul>
+            <p class="addresses"><code>sftp://deploy@staging.atlas.dev/var/www</code><code>s3://atlas-backups/2026/</code></p>
+          </div>
+          <img class="framed" src="img/remote-1280.webp" srcset="img/remote-1280.webp 1280w, img/remote.webp 2400w" sizes="(min-width: 1024px) 50vw, 100vw" width="1280" height="780" alt="The Connect Remote Storage dialog filled in for an SFTP server" loading="lazy" />
+        </div>
+      </section>
+
+      <!-- Git: the steps scroll, the screenshot stays pinned and follows them. -->
+      <section class="dev" id="git">
+        <div class="wrap">
+          <p class="eyebrow">For developers</p>
+          <h2>Git, right beside your files.</h2>
+          <div class="story">
+            <ol class="steps">
+              <li class="step" data-shot="0">
+                <h3>Stage, commit, push</h3>
+                <p>The staging area is always in view. Commit with <kbd data-key="mod">⌘</kbd><kbd>↩</kbd>, pull, push, rebase and stash without leaving the window.</p>
+                <img class="step-shot" src="img/hero-1280.webp" width="1280" height="780" alt="The source control panel with one staged file and two changes" loading="lazy" />
+              </li>
+              <li class="step" data-shot="1">
+                <h3>Review every change</h3>
+                <p>Click a file to compare it side by side in the editor from VS Code. Stage it from the same window.</p>
+                <img class="step-shot" src="img/diff-1280.webp" width="1280" height="780" alt="A side-by-side diff of a staged TypeScript file" loading="lazy" />
+              </li>
+              <li class="step" data-shot="2">
+                <h3>Follow every branch</h3>
+                <p>The history graph draws branches and merges. Pick a commit to see its message and changed files.</p>
+                <img class="step-shot" src="img/graph-1280.webp" width="1280" height="780" alt="The history graph with a merged feature branch and an open one" loading="lazy" />
+              </li>
+            </ol>
+            <div class="story-stage" aria-hidden="true">
+              <img src="img/hero.webp" width="2400" height="1463" alt="" loading="lazy" class="active" />
+              <img src="img/diff.webp" width="2400" height="1463" alt="" loading="lazy" />
+              <img src="img/graph.webp" width="2400" height="1463" alt="" loading="lazy" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- AI agents: two screenshots side by side under one message. -->
+      <section class="ai reveal" id="ai">
+        <div class="wrap">
+          <h2>Claude Code and Codex, in the folder you are looking at.</h2>
+          <p class="section-lead">The AI Agent area runs your agents next to the file list. Changes they make show up immediately, and sessions keep running when you hide the area.</p>
+          <div class="duo">
+            <figure>
+              <img src="img/ai-menu-1280.webp" width="1280" height="780" alt="The context menu of a document with Open in Claude Code, Open in Codex, Ask AI, Summarize with AI and Suggest Names with AI" loading="lazy" />
+              <figcaption>Right-click any file or folder to start an agent there, summarise it or get name suggestions.</figcaption>
+            </figure>
+            <figure>
+              <img src="img/ai-ask-1280.webp" width="1280" height="780" alt="The Ask AI dialog with a question about a quarterly report" loading="lazy" />
+              <figcaption>Ask AI sends your question with the selected files. The answer arrives in the console, ready for follow-ups.</figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <!-- Automations: the real editor on the left, three verbs on the right. -->
+      <section class="split-section flip reveal" id="automations">
+        <div class="wrap split-grid">
+          <img class="framed" src="img/automations-1280.webp" srcset="img/automations-1280.webp 1280w, img/automations.webp 2400w" sizes="(min-width: 1024px) 50vw, 100vw" width="1280" height="780" alt="The Automations window with a folder sync set to run every 60 minutes" loading="lazy" />
+          <div class="split-copy">
+            <h2>Automations that check their own work.</h2>
+            <ul class="verbs">
+              <li>
+                <h3>Describe</h3>
+                <p>Say what should happen and when. Claude Code drafts a script and a separate check, and asks if something is missing.</p>
+              </li>
+              <li>
+                <h3>Review</h3>
+                <p>Read the plan and both scripts, edit them, save. No AI runs after that.</p>
+              </li>
+              <li>
+                <h3>Run and verify</h3>
+                <p>By hand, every few minutes, daily or at launch. A run only counts once the check passes.</p>
+              </li>
+            </ul>
+            <p class="note">The folder sync template needs no AI at all and verifies every file with SHA-256.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- MCP: a command and the tools on the left, the settings that start it on the right. -->
+      <section class="mcp reveal" id="mcp">
+        <div class="wrap mcp-grid">
+          <div class="mcp-copy">
+            <h2>Let your agents see what you see.</h2>
+            <p class="section-lead">Turn on the built-in MCP server and Claude Code, Codex or Cursor know the folder and files you have selected, and can browse, search and read.</p>
+            <pre class="code" aria-label="Command that adds aFinder to Claude Code"><code><span class="c-mute">$</span> claude mcp add --transport http afinder \
+    http://127.0.0.1:47321/mcp \
+    --header "Authorization: Bearer <span class="c-accent">&lt;token&gt;</span>"</code></pre>
+            <ul class="tools" aria-label="MCP tools">
+              <li>get_current_view</li>
+              <li>list_directory</li>
+              <li>get_file_info</li>
+              <li>read_text_file</li>
+              <li>search_files</li>
+              <li>list_places</li>
+              <li>open_in_afinder</li>
+            </ul>
+            <p class="note">Tools that write, rename, move or trash appear only after you allow changes. The server answers on 127.0.0.1 only and needs the token.</p>
+          </div>
+          <img class="framed" src="img/mcp-1280.webp" srcset="img/mcp-1280.webp 1280w, img/mcp.webp 2400w" sizes="(min-width: 1024px) 50vw, 100vw" width="1280" height="780" alt="The AI and privacy settings with the MCP server running at 127.0.0.1 port 47321" loading="lazy" />
+        </div>
+      </section>
+
+      <!-- Themes: one big screenshot, a row of theme chips. -->
+      <section class="themes reveal" id="themes">
+        <div class="wrap">
+          <h2>Eleven themes, from macOS to Matrix.</h2>
+          <p class="section-lead">The whole window changes, not just the accent colour. Start with today's <span translate="no">Finder</span> or Luna blue, then get carried away.</p>
+          <div class="theme-picker" role="tablist" aria-label="Themes">
+            <button role="tab" data-theme="apple" aria-selected="true">Modern macOS</button>
+            <button role="tab" data-theme="xp" translate="no">Windows XP</button>
+            <button role="tab" data-theme="classic">Classic</button>
+            <button role="tab" data-theme="dos">DOS</button>
+            <button role="tab" data-theme="matrix">Matrix</button>
+            <button role="tab" data-theme="jarvis">J.A.R.V.I.S.</button>
+            <button role="tab" data-theme="cyberpunk">Cyberpunk</button>
+            <button role="tab" data-theme="fbi">FBI</button>
+            <button role="tab" data-theme="batman">Batman</button>
+            <button role="tab" data-theme="bitcoin">Bitcoin</button>
+            <button role="tab" data-theme="barbie">Barbie</button>
+          </div>
+          <figure class="theme-stage" role="tabpanel" aria-live="polite">
+            <img
+              id="theme-shot"
+              src="img/theme-apple.webp"
+              srcset="img/theme-apple-1280.webp 1280w, img/theme-apple.webp 2400w"
+              sizes="(min-width: 1280px) 1200px, 100vw"
+              width="2400"
+              height="1463"
+              alt="aFinder in the Modern macOS theme"
+              loading="lazy"
+            />
+            <figcaption id="theme-note">Flat, airy and set in SF, light or dark with the system.</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <!-- Settings: the real settings window and two plain tiles. -->
+      <section class="settings reveal" id="settings">
+        <div class="wrap">
+          <h2>Make it yours.</h2>
+          <div class="settings-grid">
+            <img class="framed settings-shot" src="img/settings-1280.webp" srcset="img/settings-1280.webp 1280w, img/settings.webp 2400w" sizes="(min-width: 1024px) 66vw, 100vw" width="1280" height="780" alt="Settings open on Keyboard shortcuts, with a key field for each command" loading="lazy" />
+            <div class="tile">
+              <i class="ph ph-keyboard" aria-hidden="true"></i>
+              <h3>Every shortcut</h3>
+              <p>Click a command and press the keys. Up to four bindings each, and one button restores them all.</p>
+            </div>
+            <div class="tile tile-accent">
+              <i class="ph ph-sliders-horizontal" aria-hidden="true"></i>
+              <h3>Seven sections, applied at once</h3>
+              <p>General, appearance, icon sets, sound, files and search, AI and privacy, and shortcuts. Every open window follows instantly.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Privacy: a statement and four plain items, no cards. -->
+      <section class="privacy reveal" id="privacy">
+        <div class="wrap privacy-grid">
+          <h2>Private by default.</h2>
+          <ul class="privacy-list">
+            <li>
+              <i class="ph ph-toggle-left" aria-hidden="true"></i>
+              <h3>AI features start switched off</h3>
+              <p>Activity history, semantic search, the file assistant and the MCP server wait until you turn them on.</p>
+            </li>
+            <li>
+              <i class="ph ph-download" aria-hidden="true"></i>
+              <h3>Models download on request</h3>
+              <p>Nothing is fetched until you press the button, and only pinned model versions.</p>
+            </li>
+            <li>
+              <i class="ph ph-wifi-slash" aria-hidden="true"></i>
+              <h3>Local models run offline</h3>
+              <p>Embeddings and the file assistant run on your machine, in their own worker.</p>
+            </li>
+            <li>
+              <i class="ph ph-lock-key" aria-hidden="true"></i>
+              <h3>Secrets stay in the keychain</h3>
+              <p>Server passwords, keys and sign-in tokens are stored encrypted by the system.</p>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Shortcuts: the one marquee on the page, keys follow the visitor's platform. -->
+      <section class="keys" aria-labelledby="keys-title">
+        <div class="wrap">
+          <h2 id="keys-title">Your hands stay on the keyboard.</h2>
+          <p class="section-lead"><span translate="no">Finder</span> conventions on the Mac, <span translate="no">Explorer</span> conventions on <span translate="no">Windows</span> and Linux.</p>
+        </div>
+        <div class="marquee" tabindex="0" aria-label="Keyboard shortcuts">
+          <ul class="marquee-track" id="shortcuts"></ul>
+        </div>
+      </section>
+
+      <!-- Download: the build for this visitor first, every other build below. -->
+      <section class="download reveal" id="download">
+        <div class="wrap">
+          <div class="download-panel">
+            <img class="download-icon" src="img/icon.png" width="128" height="128" alt="" />
+            <div class="download-main">
+              <h2>Get aFinder.</h2>
+              <p class="section-lead" id="download-note">Free for macOS, <span translate="no">Windows</span> and Linux.</p>
+              <a class="btn btn-primary btn-large" href="https://github.com/DanielHromadka/afinder-downloads/releases/latest" data-download-primary>
+                <i class="ph ph-download-simple" aria-hidden="true"></i><span data-download-text>Download</span>
+              </a>
+              <p class="download-meta" id="download-meta">Latest release</p>
+            </div>
+          </div>
+          <div class="builds">
+            <h3>All downloads</h3>
+            <ul class="build-list" id="build-list" aria-live="polite">
+              <li class="build skeleton" aria-hidden="true"></li>
+              <li class="build skeleton" aria-hidden="true"></li>
+              <li class="build skeleton" aria-hidden="true"></li>
+            </ul>
+            <p class="build-foot">
+              <a href="https://github.com/DanielHromadka/afinder-downloads/releases/latest" id="release-link">Release notes</a>
+              <span id="mac-hint">The app is not notarized yet. On a Mac, open it the first time with right-click, Open.</span>
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="wrap footer-row">
+        <a class="brand" href="#top"><img src="img/icon.png" width="24" height="24" alt="" /><span>aFinder</span></a>
+        <ul class="footer-links">
+          <li><a href="support.html">Support</a></li>
+          <li><a href="privacy.html">Privacy</a></li>
+          <li><a href="https://github.com/DanielHromadka/afinder-downloads/releases">All releases</a></li>
+        </ul>
+        <p class="footer-note">Not affiliated with Microsoft or Apple. <span translate="no">Windows XP</span> and <span translate="no">Finder</span> are their trademarks.</p>
+      </div>
+    </footer>
+
+    <script src="site.js" defer></script>
+  </body>
+</html>

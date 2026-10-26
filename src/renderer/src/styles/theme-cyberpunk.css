@@ -1,0 +1,385 @@
+/* Cyberpunk theme: dark chrome, neon cyan / magenta / yellow, monospace, clipped corners, glow. */
+
+:root[data-theme='cyberpunk'] {
+  --font: 'JetBrains Mono', 'SF Mono', Menlo, Monaco, monospace;
+  --font-size: 12px;
+
+  --cp-bg: #0b0b14;
+  --cp-panel: #12121f;
+  --cp-panel-2: #181830;
+  --cp-cyan: #00f0ff;
+  --cp-magenta: #ff2a6d;
+  --cp-yellow: #fcee0a;
+  --cp-dim: #2a2a4a;
+
+  --face: var(--cp-bg);
+  --face-light: var(--cp-panel);
+  --face-dark: var(--cp-dim);
+  --text: #d1f7ff;
+  --muted: #6a7a9a;
+  --link: var(--cp-cyan);
+  --link-hover: var(--cp-yellow);
+  --window-border: var(--cp-cyan);
+  --title-gradient: var(--cp-yellow);
+  --taskpane-bg: var(--cp-panel);
+  --task-header: transparent;
+  --task-body: transparent;
+  --task-header-text: var(--cp-magenta);
+  --list-bg: var(--cp-bg);
+  --header-bg: var(--cp-panel);
+  --header-hover: var(--cp-magenta);
+  --selection: rgba(255, 42, 109, 0.28);
+  --selection-text: #fff;
+  --hit-bg: transparent;
+  --hit-text: var(--cp-yellow);
+  --menu-bg: #0e0e1a;
+  --menu-border: var(--cp-cyan);
+  --focus-ring: var(--cp-cyan);
+
+  --glow-cyan: 0 0 6px rgba(0, 240, 255, 0.7);
+  --glow-magenta: 0 0 8px rgba(255, 42, 109, 0.8);
+  --clip: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+
+  --check-bg: #07070d;
+  --check-border: var(--cp-cyan);
+  --check-on: var(--cp-magenta);
+  --check-mark: #fff;
+  --check-radius: 0;
+  --check-glow: var(--glow-magenta);
+}
+
+/* Scanlines over the whole window. */
+[data-theme='cyberpunk'] body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1000;
+  background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.18) 0 1px, transparent 1px 3px);
+}
+
+[data-theme='cyberpunk'] .xp-window.app {
+  border: 1px solid var(--cp-cyan);
+  box-shadow: inset 0 0 0 1px rgba(0, 240, 255, 0.15);
+}
+
+[data-theme='cyberpunk'] .titlebar {
+  height: 32px;
+  border-radius: 0;
+  color: #000;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 24px 100%, 0 calc(100% - 24px));
+}
+
+[data-theme='cyberpunk'] .titlebar-text {
+  text-shadow: 2px 0 var(--cp-magenta), -1px 0 var(--cp-cyan);
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-size: 14px;
+}
+
+[data-theme='cyberpunk'] .titlebar > svg {
+  filter: grayscale(1) brightness(0);
+}
+
+[data-theme='cyberpunk'] .tb-btn {
+  border: 1px solid #000;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+[data-theme='cyberpunk'] .tb-btn:hover {
+  background: #000;
+  filter: none;
+}
+
+[data-theme='cyberpunk'] .tb-btn .glyph-min {
+  background: #000;
+}
+
+[data-theme='cyberpunk'] .tb-btn .glyph-max {
+  border-color: #000;
+}
+
+[data-theme='cyberpunk'] .tb-btn .glyph-close {
+  color: #000;
+}
+
+[data-theme='cyberpunk'] .tb-btn:hover .glyph-min {
+  background: var(--cp-yellow);
+}
+
+[data-theme='cyberpunk'] .tb-btn:hover .glyph-max {
+  border-color: var(--cp-yellow);
+}
+
+[data-theme='cyberpunk'] .tb-btn:hover .glyph-close {
+  color: var(--cp-magenta);
+}
+
+[data-theme='cyberpunk'] .toolbar,
+[data-theme='cyberpunk'] .addressbar {
+  background: var(--cp-bg);
+  border-bottom: 1px solid var(--cp-dim);
+}
+
+[data-theme='cyberpunk'] .tool-btn,
+[data-theme='cyberpunk'] .go-btn {
+  border: 1px solid transparent;
+  border-radius: 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 11px;
+}
+
+[data-theme='cyberpunk'] .tool-btn svg,
+[data-theme='cyberpunk'] .go-btn svg,
+[data-theme='cyberpunk'] .task-link svg,
+[data-theme='cyberpunk'] .menu-icon svg {
+  filter: grayscale(1) brightness(1.6) drop-shadow(0 0 2px var(--cp-cyan)) sepia(1) hue-rotate(140deg) saturate(6);
+}
+
+[data-theme='cyberpunk'] .tool-btn:hover:not(:disabled),
+[data-theme='cyberpunk'] .go-btn:hover {
+  border-color: var(--cp-cyan);
+  background: rgba(0, 240, 255, 0.08);
+  box-shadow: var(--glow-cyan);
+  color: var(--cp-cyan);
+}
+
+[data-theme='cyberpunk'] .tool-btn:active:not(:disabled),
+[data-theme='cyberpunk'] .tool-btn.pressed {
+  border-color: var(--cp-magenta);
+  background: rgba(255, 42, 109, 0.15);
+  box-shadow: var(--glow-magenta);
+  color: var(--cp-magenta);
+}
+
+[data-theme='cyberpunk'] .tool-sep {
+  background: var(--cp-dim);
+  box-shadow: none;
+}
+
+[data-theme='cyberpunk'] .filter-box,
+[data-theme='cyberpunk'] .address-input {
+  border: 1px solid var(--cp-dim);
+  border-left: 3px solid var(--cp-cyan);
+  background: #07070d;
+}
+
+[data-theme='cyberpunk'] .filter-box:focus-within,
+[data-theme='cyberpunk'] .address-input:focus-within {
+  border-color: var(--cp-cyan);
+  box-shadow: var(--glow-cyan);
+}
+
+[data-theme='cyberpunk'] input {
+  caret-color: var(--cp-yellow);
+}
+
+[data-theme='cyberpunk'] input::placeholder {
+  color: var(--muted);
+}
+
+[data-theme='cyberpunk'] .address-label,
+[data-theme='cyberpunk'] .fuzzy-toggle {
+  color: var(--cp-cyan);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 10px;
+}
+
+[data-theme='cyberpunk'] .taskpane {
+  border-right: 1px solid var(--cp-dim);
+}
+
+[data-theme='cyberpunk'] .task-section {
+  border-radius: 0;
+  box-shadow: none;
+  border: 1px solid var(--cp-dim);
+  border-left: 2px solid var(--cp-magenta);
+  background: var(--cp-panel-2);
+  clip-path: var(--clip);
+}
+
+[data-theme='cyberpunk'] .task-header {
+  border-radius: 0;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 11px;
+  text-shadow: var(--glow-magenta);
+}
+
+[data-theme='cyberpunk'] .chevron {
+  border-color: var(--cp-magenta);
+  background: transparent;
+  color: var(--cp-magenta);
+  border-radius: 0;
+}
+
+[data-theme='cyberpunk'] .task-body {
+  border: 0;
+}
+
+[data-theme='cyberpunk'] .task-link:hover:not(:disabled) {
+  text-shadow: 0 0 6px var(--cp-yellow);
+}
+
+[data-theme='cyberpunk'] .foldertree {
+  background: var(--cp-bg);
+  border-right: 1px solid var(--cp-dim);
+}
+
+[data-theme='cyberpunk'] .pane-header,
+[data-theme='cyberpunk'] .col-header {
+  border-color: var(--cp-dim);
+  color: var(--cp-cyan);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-size: 10px;
+}
+
+[data-theme='cyberpunk'] .col-header.sorted {
+  background: var(--cp-panel-2);
+  color: var(--cp-yellow);
+}
+
+[data-theme='cyberpunk'] .sort-arrow {
+  color: var(--cp-yellow);
+}
+
+[data-theme='cyberpunk'] .row:hover:not(.selected) {
+  background: rgba(0, 240, 255, 0.05);
+}
+
+[data-theme='cyberpunk'] .row.selected {
+  box-shadow: inset 3px 0 0 var(--cp-magenta), inset 0 0 12px rgba(255, 42, 109, 0.35);
+}
+
+[data-theme='cyberpunk'] .row.focused:not(.selected) {
+  outline: 1px solid rgba(0, 240, 255, 0.4);
+}
+
+[data-theme='cyberpunk'] .hit,
+[data-theme='cyberpunk'] .row.selected .hit {
+  color: var(--cp-yellow);
+  background: transparent;
+  text-decoration-color: var(--cp-yellow);
+  text-shadow: 0 0 6px rgba(252, 238, 10, 0.8);
+}
+
+[data-theme='cyberpunk'] .cell.name svg,
+[data-theme='cyberpunk'] .tree-row svg {
+  filter: drop-shadow(0 0 2px rgba(0, 240, 255, 0.6)) saturate(1.4) hue-rotate(160deg);
+}
+
+[data-theme='cyberpunk'] .tree-row.current .tree-label {
+  background: var(--selection);
+  box-shadow: inset 2px 0 0 var(--cp-magenta);
+}
+
+[data-theme='cyberpunk'] .tree-toggle {
+  border-color: var(--cp-cyan);
+  background: transparent;
+  color: var(--cp-cyan);
+}
+
+[data-theme='cyberpunk'] .rename-input {
+  background: #000;
+  color: var(--cp-yellow);
+  border: 1px solid var(--cp-yellow);
+  box-shadow: 0 0 6px rgba(252, 238, 10, 0.6);
+}
+
+[data-theme='cyberpunk'] .statusbar {
+  border-top: 1px solid var(--cp-cyan);
+  background: var(--cp-bg);
+}
+
+[data-theme='cyberpunk'] .status-field {
+  border: 0;
+  border-left: 1px solid var(--cp-dim);
+  color: var(--cp-cyan);
+  font-size: 11px;
+}
+
+[data-theme='cyberpunk'] .status-field.grow::before {
+  content: '▮ ';
+  color: var(--cp-magenta);
+  animation: blink 1.1s steps(2) infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+[data-theme='cyberpunk'] .context-menu {
+  box-shadow: var(--glow-cyan);
+  clip-path: var(--clip);
+}
+
+[data-theme='cyberpunk'] .menu-item:hover:not(:disabled) {
+  background: var(--cp-magenta);
+  color: #000;
+}
+
+[data-theme='cyberpunk'] .menu-sep {
+  background: var(--cp-dim);
+}
+
+[data-theme='cyberpunk'] .modal-backdrop {
+  background: rgba(0, 0, 0, 0.55);
+}
+
+[data-theme='cyberpunk'] .xp-window.dialog {
+  border: 1px solid var(--cp-magenta);
+  border-radius: 0;
+  background: var(--cp-panel);
+  box-shadow: var(--glow-magenta);
+  clip-path: var(--clip);
+}
+
+[data-theme='cyberpunk'] .xp-button {
+  border: 1px solid var(--cp-cyan);
+  border-radius: 0;
+  background: transparent;
+  color: var(--cp-cyan);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+[data-theme='cyberpunk'] .xp-button:hover,
+[data-theme='cyberpunk'] .xp-button:focus-visible {
+  background: var(--cp-cyan);
+  color: #000;
+  box-shadow: var(--glow-cyan);
+  outline: 0;
+}
+
+[data-theme='cyberpunk'] .xp-progress {
+  border: 1px solid var(--cp-cyan);
+  border-radius: 0;
+  background: #000;
+}
+
+[data-theme='cyberpunk'] .xp-progress-fill {
+  background: linear-gradient(90deg, var(--cp-magenta), var(--cp-yellow));
+  box-shadow: var(--glow-magenta);
+}
+
+[data-theme='cyberpunk'] ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+[data-theme='cyberpunk'] ::-webkit-scrollbar-track {
+  background: var(--cp-bg);
+}
+
+[data-theme='cyberpunk'] ::-webkit-scrollbar-thumb,
+[data-theme='cyberpunk'] ::-webkit-scrollbar-thumb:horizontal {
+  border: 0;
+  border-radius: 0;
+  background: var(--cp-cyan);
+  box-shadow: var(--glow-cyan);
+}

@@ -1,0 +1,13 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "afinder-relay",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-01",
+  "observability": { "enabled": true },
+  "durable_objects": {
+    "bindings": [{ "name": "ROOM", "class_name": "Room" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Room"] }],
+  // Connections per IP: pairing and reconnecting are rare, so this only stops floods.
+  "ratelimits": [{ "name": "CONNECT_LIMIT", "namespace_id": "4711", "simple": { "limit": 60, "period": 60 } }]
+}

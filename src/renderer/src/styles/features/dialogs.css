@@ -1,0 +1,673 @@
+/* Dialogs and their forms: batch rename, remote storage, settings, palette, Ask AI, feedback, automations, history. Loaded after xp.css, in the order main.tsx imports them. */
+
+/* ---- batch rename ------------------------------------------------------------------------- */
+
+.xp-window.dialog.batch-rename {
+  width: min(680px, 92vw);
+  max-width: none;
+}
+
+.batch-form {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px 8px;
+}
+
+.batch-form > label,
+.batch-row > label {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  align-items: center;
+  gap: 8px;
+}
+
+.batch-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.batch-row input {
+  width: 70px;
+}
+
+.batch-form input:not([type='checkbox']),
+.batch-form select {
+  height: 21px;
+  padding: 0 4px;
+  border: 1px solid #7f9db9;
+  background: #fff;
+  color: #000;
+}
+
+.batch-checks {
+  display: flex;
+  gap: 16px;
+  padding-left: 138px;
+}
+
+.batch-checks label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.batch-preview {
+  height: 220px;
+  margin: 4px 16px 0;
+  overflow: auto;
+  border: 1px solid #7f9db9;
+  background: var(--list-bg);
+}
+
+.batch-preview table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.batch-preview th {
+  position: sticky;
+  top: 0;
+  padding: 3px 6px;
+  text-align: left;
+  font-weight: normal;
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--face-dark);
+}
+
+.batch-preview td {
+  width: 50%;
+  padding: 2px 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 0;
+}
+
+.batch-preview td:first-child {
+  color: var(--muted);
+}
+
+.batch-preview td svg {
+  vertical-align: -3px;
+  margin-right: 5px;
+}
+
+.batch-preview tr.changed td:last-child {
+  font-weight: bold;
+}
+
+.batch-preview tr.problem td:last-child,
+.batch-problem,
+.batch-summary.error {
+  color: #b00000;
+}
+
+.batch-summary {
+  flex: 1;
+  align-self: center;
+  color: var(--muted);
+}
+
+/* ---- git status ---------------------------------------------------------------------------- */
+
+.git-badge {
+  flex-shrink: 0;
+  margin-left: 6px;
+  padding: 0 3px;
+  border-radius: 2px;
+  font: bold 10px/14px var(--font);
+  color: #fff;
+}
+
+.git-badge.git-modified { background: #c97a10; }
+.git-badge.git-added,
+.git-badge.git-untracked { background: #2e8b3e; }
+.git-badge.git-deleted,
+.git-badge.git-conflict { background: #c9372c; }
+.git-badge.git-renamed { background: #3a72c4; }
+
+.row.git-ignored:not(.selected) .name-text,
+.row.git-ignored:not(.selected) .icon-wrap {
+  opacity: 0.5;
+}
+
+.status-branch {
+  font-variant-numeric: tabular-nums;
+}
+
+/* The theme's own fact (Settings → theme info); numbers tick, so keep their width steady. */
+.status-theme-info {
+  flex-shrink: 0;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- remote storage --------------------------------------------------------------------------- */
+
+.xp-window.dialog.remote-dialog {
+  width: 480px;
+  max-width: 92vw;
+}
+
+.remote-dialog .batch-row.remote-host {
+  grid-template-columns: 1fr 120px;
+}
+
+.remote-dialog .batch-row.remote-host > label:last-child {
+  grid-template-columns: auto 1fr;
+}
+
+.remote-dialog .batch-row input {
+  width: auto;
+  min-width: 0;
+}
+
+.remote-pick {
+  display: flex;
+  gap: 6px;
+  min-width: 0;
+}
+
+.remote-pick input {
+  flex: 1;
+  min-width: 0;
+}
+
+.remote-note {
+  margin: 4px 0 0;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.remote-dialog .batch-summary {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* A live connection gets a small green dot after its name. */
+.task-link.connected span::after {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-left: 6px;
+  border-radius: 50%;
+  background: #34c759;
+  vertical-align: middle;
+}
+
+/* Native modal dialog provides focus trapping and isolates background controls. */
+dialog.settings-dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  padding: 0;
+  width: min(820px, calc(100vw - 24px));
+  min-width: 0;
+  /* Fixed height, so switching categories does not resize the dialog. */
+  height: min(580px, calc(100vh - 24px));
+  color: var(--text);
+}
+dialog.settings-dialog:not([open]) { display: none; }
+/* The content scrolls, not the dialog: the title bar stays visible and themes that set overflow: hidden
+   on dialogs (to clip rounded corners) cannot break scrolling. */
+dialog.settings-dialog[open] { display: flex; flex-direction: column; }
+dialog.settings-dialog::backdrop { background: rgba(0, 0, 0, 0.2); }
+.settings-body { display: flex; flex: 1 1 auto; min-height: 0; }
+.settings-nav { flex: 0 0 168px; display: flex; flex-direction: column; gap: 2px; padding: 8px 6px; overflow-y: auto; border-right: 1px solid var(--face-dark); background: color-mix(in srgb, var(--list-bg) 55%, transparent); }
+.settings-nav-item { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border: 1px solid transparent; border-radius: 3px; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.settings-nav-item:hover { background: color-mix(in srgb, var(--selection) 14%, transparent); }
+.settings-nav-item.active { background: var(--selection); color: var(--selection-text); }
+.settings-nav-item:focus-visible { outline: 1px dotted var(--focus-ring); outline-offset: -3px; }
+.settings-nav-item svg { flex: none; }
+.settings-content { padding: 16px; display: grid; align-content: start; gap: 14px; flex: 1 1 auto; min-width: 0; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+/* Narrow windows: the categories become a wrapping row above the content. */
+@media (max-width: 560px) {
+  .settings-body { flex-direction: column; }
+  .settings-nav { flex: none; flex-direction: row; flex-wrap: wrap; border-right: 0; border-bottom: 1px solid var(--face-dark); }
+}
+.icon-set-list { display: grid; gap: 8px; margin-top: 8px; }
+.icon-set-card { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 4px 8px; padding: 8px 10px; border: 1px solid var(--face-dark); border-radius: 4px; background: var(--list-bg); cursor: pointer; }
+.icon-set-card.active { border-color: var(--selection); box-shadow: inset 0 0 0 1px var(--selection); }
+.icon-set-card .icon-set-text { display: grid; gap: 2px; }
+.icon-set-card .icon-set-sample { grid-column: 2; }
+.icon-set-sample { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0; }
+.settings-content fieldset { margin: 0; padding: 12px; border: 1px solid var(--muted, #888); min-width: 0; }
+.settings-content legend { padding: 0 5px; font-weight: bold; }
+.settings-field { display: grid; grid-template-columns: minmax(100px, 1fr) minmax(0, 1.5fr); align-items: center; gap: 10px; margin: 6px 0; }
+.settings-field select { width: 100%; min-width: 0; height: 22px; padding: 0 4px; border: 1px solid var(--face-dark); background: var(--list-bg); color: var(--text); }
+.settings-field select option { background: var(--menu-bg); color: var(--text); }
+.settings-check { display: flex; align-items: center; gap: 7px; margin: 8px 0; }
+.settings-note { margin: 0; font-size: 12px; }
+.settings-about { margin-top: 10px; display: grid; gap: 2px; user-select: text; }
+.settings-shortcuts { display: grid; gap: 8px; }
+.shortcut-list { max-height: 260px; overflow: auto; border: 1px solid var(--muted, #888); background: var(--list-bg); color: var(--text); }
+.shortcut-row { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(110px, auto); align-items: center; gap: 8px; padding: 3px 6px; }
+.shortcut-row:nth-child(even) { background: color-mix(in srgb, currentColor 5%, transparent); }
+.shortcut-row.changed .shortcut-name { font-weight: bold; }
+.shortcut-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.shortcut-keys { min-width: 110px; display: inline-flex; gap: 4px; justify-content: center; }
+.shortcut-keys kbd { font: inherit; }
+.shortcut-keys.recording { font-style: italic; outline: 2px solid var(--selection, #316ac5); }
+.shortcut-actions { display: flex; gap: 8px; justify-content: flex-end; }
+.link-button { border: 0; padding: 0; background: none; color: inherit; text-decoration: underline; cursor: pointer; font: inherit; font-size: 12px; }
+.shortcut-message { margin: 0; min-height: 1.2em; font-size: 12px; color: #b00020; }
+.settings-shortcuts > .xp-button { justify-self: start; }
+
+/* ---- command palette (⌘K) ----------------------------------------------------------------------- */
+
+.palette-backdrop {
+  align-items: flex-start;
+  padding-top: 12vh;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.palette {
+  width: min(620px, calc(100vw - 32px));
+  max-height: 64vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--menu-border);
+  border-radius: 10px;
+  background: var(--menu-bg);
+  color: var(--text);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+}
+
+.palette-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--menu-border);
+}
+
+.palette-input input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font-size: 15px;
+}
+
+.palette-list {
+  overflow-y: auto;
+  padding: 4px;
+}
+
+.palette-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
+  padding: 3px 10px;
+  border-radius: 6px;
+  cursor: default;
+}
+
+.palette-item.active {
+  background: var(--selection);
+  color: var(--selection-text);
+}
+
+.palette-icon {
+  width: 16px;
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+
+.palette-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.palette-item.active .hit {
+  background: transparent;
+  color: inherit;
+}
+
+.palette-group {
+  color: var(--muted);
+  font-size: 0.9em;
+  white-space: nowrap;
+}
+
+.palette-item.active .palette-group {
+  color: inherit;
+  opacity: 0.8;
+}
+
+.palette-shortcut {
+  min-width: 2.2em;
+  padding: 1px 6px;
+  border: 1px solid var(--menu-border);
+  border-radius: 4px;
+  font: inherit;
+  font-size: 0.85em;
+  text-align: center;
+  opacity: 0.85;
+}
+
+.palette-empty {
+  padding: 16px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.xp-window.dialog.create-archive {
+  width: min(560px, 92vw);
+  max-width: none;
+}
+
+/* ---- Ask AI ----------------------------------------------------------------------------------- */
+
+.xp-window.dialog.ask-ai {
+  width: 460px;
+  max-width: 92vw;
+}
+
+.ask-ai-body {
+  display: grid;
+  gap: 8px;
+  padding: 14px 16px 6px;
+}
+
+.ask-ai-about {
+  margin: 0;
+  font-weight: bold;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ask-ai-body textarea {
+  resize: vertical;
+  min-height: 70px;
+  padding: 6px;
+  border: 1px solid #7f9db9;
+  background: #fff;
+  color: #000;
+  font: inherit;
+}
+
+/* ---- feedback dialog --------------------------------------------------------------------------- */
+
+.xp-window.dialog.feedback-dialog {
+  width: 520px;
+  max-width: 92vw;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.feedback-body {
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px 6px;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.feedback-kind {
+  display: flex;
+  gap: 18px;
+}
+
+.feedback-kind label,
+.feedback-check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.feedback-field {
+  display: grid;
+  gap: 4px;
+}
+
+.feedback-field textarea,
+.feedback-field input {
+  padding: 5px 6px;
+  border: 1px solid #7f9db9;
+  background: #fff;
+  color: #000;
+  font: inherit;
+}
+
+.feedback-field textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+
+.feedback-shot {
+  display: grid;
+  gap: 6px;
+}
+
+.feedback-shot img {
+  max-width: 100%;
+  max-height: 180px;
+  object-fit: contain;
+  justify-self: start;
+  border: 1px solid var(--border, #7f9db9);
+}
+
+.feedback-shot img.off {
+  opacity: 0.3;
+}
+
+.feedback-shot .remote-note,
+.feedback-body > .remote-note {
+  margin: 0;
+}
+
+.feedback-error {
+  margin: 0;
+  color: #c00;
+}
+
+.feedback-sent {
+  margin: 0;
+  padding: 24px 20px;
+}
+
+/* ---- themed checkboxes ----------------------------------------------------------------------- */
+/* XP, Classic and macOS keep the native control; the other themes draw their own from --check-* tokens. */
+
+:root[data-theme]:not([data-theme='xp'], [data-theme='classic'], [data-theme='apple']) input[type='checkbox'] {
+  appearance: none;
+  position: relative;
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  border: 1px solid var(--check-border);
+  border-radius: var(--check-radius, 0);
+  background: var(--check-bg);
+  vertical-align: middle;
+  transition: background 0.12s, border-color 0.12s, box-shadow 0.12s;
+}
+
+:root[data-theme]:not([data-theme='xp'], [data-theme='classic'], [data-theme='apple']) input[type='checkbox']:checked {
+  border-color: var(--check-on-border, var(--check-on));
+  background: var(--check-on);
+  box-shadow: var(--check-glow, none);
+}
+
+:root[data-theme]:not([data-theme='xp'], [data-theme='classic'], [data-theme='apple']) input[type='checkbox']:checked::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 4px;
+  height: 8px;
+  border: solid var(--check-mark);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+:root[data-theme]:not([data-theme='xp'], [data-theme='classic'], [data-theme='apple']) input[type='checkbox']:hover:not(:disabled) {
+  border-color: var(--check-on-border, var(--check-on));
+}
+
+:root[data-theme]:not([data-theme='xp'], [data-theme='classic'], [data-theme='apple']) input[type='checkbox']:focus-visible {
+  outline: 1px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+:root[data-theme]:not([data-theme='xp'], [data-theme='classic'], [data-theme='apple']) input[type='checkbox']:disabled {
+  opacity: 0.45;
+}
+
+/* Dialog title bars move the dialog rather than the application window. */
+.xp-window.dialog > .titlebar,
+.xp-window.quicklook > .titlebar {
+  -webkit-app-region: no-drag;
+  cursor: move;
+  touch-action: none;
+  user-select: none;
+}
+
+/* Edge resizing (resizeDialog): the cursor wins over whatever control sits under the grab zone. */
+.xp-window.dialog[data-resize='e'], .xp-window.dialog[data-resize='e'] *,
+.xp-window.dialog[data-resize='w'], .xp-window.dialog[data-resize='w'] * { cursor: ew-resize !important; }
+.xp-window.dialog[data-resize='s'], .xp-window.dialog[data-resize='s'] * { cursor: ns-resize !important; }
+.xp-window.dialog[data-resize='se'], .xp-window.dialog[data-resize='se'] * { cursor: nwse-resize !important; }
+.xp-window.dialog[data-resize='sw'], .xp-window.dialog[data-resize='sw'] * { cursor: nesw-resize !important; }
+
+/* Automation workbench: compact library beside a readable plan and execution journal. */
+dialog.xp-window.dialog.automations-dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  padding: 0;
+  width: min(980px, calc(100vw - 32px));
+  max-width: 980px;
+  min-width: 0;
+  height: min(760px, calc(100vh - 32px));
+  max-height: calc(100vh - 32px);
+  overflow: hidden;
+  color: var(--text);
+}
+dialog.xp-window.dialog.automations-dialog:not([open]) { display: none; }
+dialog.xp-window.dialog.automations-dialog[open] { display: flex; flex-direction: column; }
+dialog.xp-window.dialog.automations-dialog::backdrop { background: rgba(0, 0, 0, 0.24); }
+.automations-dialog > .titlebar { flex-shrink: 0; }
+.automation-layout { display: grid; grid-template-columns: 224px minmax(0, 1fr); flex: 1; min-height: 0; }
+.automation-list { padding: 14px 10px; border-right: 1px solid var(--face-dark); overflow: auto; background: var(--taskpane-bg); }
+.automation-new { width: 100%; margin-bottom: 14px; }
+.automation-list-item { display: grid; gap: 7px; width: 100%; padding: 12px; margin-bottom: 6px; text-align: left; color: var(--text); background: transparent; border: 1px solid transparent; border-radius: 6px; cursor: pointer; font: inherit; overflow-wrap: anywhere; }
+.automation-list-item > span { font-size: 11px; }
+.automation-list-item:hover { background: var(--face); }
+.automation-list-item.selected { border-color: var(--selection); background: var(--list-bg); }
+.automation-list-item strong { font-size: 13px; }
+.automation-state { font-size: 11px; color: var(--muted); }
+.automation-state.enabled, .automation-run.success > summary > span { color: var(--link-hover); }
+.automation-state.working { color: var(--link-hover); }
+.automation-schedule-note { margin-top: 24px; }
+.automation-detail { padding: 22px 24px; overflow: auto; min-width: 0; background: var(--list-bg); }
+.automation-detail h2 { font-size: 15px; margin: 0 0 8px; font-weight: 600; }
+.automation-note { font-size: 12px; line-height: 1.6; color: var(--muted); margin: 8px 0 12px; }
+.automation-detail label { display: grid; gap: 6px; font-size: 12px; margin-bottom: 12px; }
+.automation-detail input, .automation-detail select, .automation-detail textarea { box-sizing: border-box; width: 100%; min-width: 0; color: var(--text); background: var(--list-bg); border: 1px solid var(--face-dark); border-radius: 4px; padding: 8px; font: inherit; }
+.automation-detail textarea { resize: vertical; line-height: 1.5; }
+.automation-detail :is(input, select, textarea):focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 1px; }
+.automation-detail summary { cursor: pointer; font-size: 12px; font-weight: 600; padding: 8px 0; }
+.automation-template { margin-top: 18px; border-top: 1px solid var(--face-dark); padding-top: 6px; }
+.automation-template[open] > summary, .automation-code[open] > summary { margin-bottom: 12px; }
+.automation-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 14px; }
+.automation-editor, .automation-history { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--face-dark); }
+.automation-editor fieldset { padding: 0; margin: 0; border: 0; min-width: 0; }
+.automation-code textarea, .automation-run pre { font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace; font-size: 11px; tab-size: 2; }
+.automation-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.automation-history-heading { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+.automation-run { border-bottom: 1px solid var(--face-dark); padding: 6px 0; }
+.automation-run > summary { display: flex; justify-content: space-between; gap: 12px; }
+.automation-run time { color: var(--muted); font-weight: 400; font-size: 11px; }
+.automation-run pre { max-height: 260px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; padding: 12px; background: var(--face); line-height: 1.6; border-radius: 4px; }
+.automation-error { color: var(--ap-error, #c22); white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12px; }
+.automation-notice, .automation-questions { background: var(--face); padding: 12px; font-size: 12px; line-height: 1.6; border-left: 3px solid var(--selection); }
+.automation-remove { margin-top: 18px; }
+@media (max-width: 720px) {
+  .automation-layout { grid-template-columns: 172px minmax(0, 1fr); }
+  .automation-detail { padding: 16px; }
+  .automation-fields { grid-template-columns: 1fr; }
+}
+
+.automation-detail .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+.automation-current-run { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 12px; margin-bottom: 14px; background: var(--face); border-left: 3px solid var(--selection); font-size: 12px; }
+.automation-current-run.failed { border-left-color: var(--ap-error, #c22); }
+
+/* Local history uses the same window chrome and controls as Settings. */
+dialog.xp-window.dialog.activity-dialog { width: min(860px, 94vw); max-width: 860px; }
+/* Column layout lets the content fill a dialog that was resized taller. */
+dialog.xp-window.dialog:is(.activity-dialog, .file-assistant-dialog)[open] { display: flex; flex-direction: column; overflow: hidden; }
+:is(.activity-dialog, .file-assistant-dialog) > .titlebar { flex-shrink: 0; }
+.activity-content { padding: 16px; overflow: auto; flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; gap: 12px; }
+.activity-search { display: flex; flex-wrap: wrap; gap: 8px; }
+.activity-search input { flex: 1 1 240px; min-width: 0; }
+.activity-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.activity-events { min-height: 100px; max-height: 38vh; overflow: auto; border: 1px solid var(--border, #aaa); }
+.activity-event { padding: 12px; border-bottom: 1px solid var(--border, #ccc); }
+.activity-event:last-child { border-bottom: 0; }
+.activity-event-heading { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; }
+.activity-event time, .activity-outcome { font-size: 12px; opacity: .75; }
+.activity-path { display: block; overflow-wrap: anywhere; text-align: left; font-size: 12px; margin-top: 4px; }
+.activity-fragment { white-space: pre-wrap; overflow-wrap: anywhere; margin-bottom: 0; }
+.activity-note { display: flex; flex-direction: column; gap: 8px; padding-top: 10px; }
+.activity-error, .activity-outcome.failed { color: #b3261e; overflow-wrap: anywhere; }
+
+/* Live tail in the preview pane. */
+.tail-output {
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  padding: 6px 8px;
+  overflow: auto;
+  background: var(--list-bg);
+  color: var(--text);
+  font: 12px/1.45 Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+  white-space: pre-wrap;
+  word-break: break-all;
+  user-select: text;
+}
+
+.tail-output:focus {
+  outline: none;
+}
+
+.tail-waiting {
+  color: var(--muted);
+}
+
+.preview.tail .preview-title .error {
+  color: #b00000;
+}
+
+/* MCP server section of the settings. */
+.mcp-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 6px; }
+.settings-note.mcp-error { color: #b00020; }
+
+/* Local file assistant: reuse native theme controls and draggable titlebar. */
+dialog.xp-window.dialog.file-assistant-dialog { width: 980px; max-width: calc(100vw - 32px); }
+.assistant-content { padding: 16px; flex: 1 1 auto; min-height: 0; overflow: auto; }
+.assistant-field { display: flex; flex-direction: column; gap: 6px; margin: 12px 0; }
+.assistant-field textarea, .assistant-field input { width: 100%; box-sizing: border-box; }
+.assistant-results { max-height: 38vh; overflow: auto; border: 1px solid var(--border, #aaa); }
+.assistant-row { display: grid; grid-template-columns: 20px minmax(180px, 1fr) minmax(120px, 260px) 42px; align-items: center; gap: 10px; padding: 10px; border-bottom: 1px solid var(--border, #ddd); }
+.assistant-file { min-width: 0; }.assistant-file small, .assistant-result-path { display: block; overflow-wrap: anywhere; opacity: .75; margin-top: 4px; }
+.assistant-review { font-weight: 600; }.assistant-row select { min-width: 0; max-width: 100%; }
+@media(max-width: 620px) { .assistant-row { grid-template-columns: 20px minmax(0, 1fr) 42px; }.assistant-row select { grid-column: 2; grid-row: 2; } }
+.assistant-choice { min-width: 0; }.assistant-choice select { width: 100%; }.assistant-choice small { display: block; overflow-wrap: anywhere; margin-top: 5px; opacity: .75; }
+@media(max-width: 620px) { .assistant-row .assistant-choice { grid-column: 2; grid-row: 2; } }

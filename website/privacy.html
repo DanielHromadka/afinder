@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Privacy Policy · aFinder</title>
+    <meta name="description" content="What aFinder and aFinder Remote do with your data: nothing leaves your devices unless you ask." />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="img/favicon.png" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/geist@5.3.0/index.css" />
+    <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.2/src/regular/style.css" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header class="nav">
+      <div class="wrap nav-row">
+        <a class="brand" href="./" aria-label="aFinder home">
+          <img src="img/icon.png" width="28" height="28" alt="" />
+          <span>aFinder</span>
+        </a>
+        <a class="btn btn-primary btn-small" href="./#download"><i class="ph ph-download-simple" aria-hidden="true"></i><span>Download</span></a>
+      </div>
+    </header>
+    <main id="main" class="wrap prose">
+      <h1>Privacy Policy</h1>
+      <p class="prose-meta">Applies to aFinder for macOS, <span translate="no">Windows</span> and Linux (from this website and the Mac App Store) and aFinder Remote for iPhone and iPad. Last updated 14 October 2026.</p>
+
+      <h2>The short version</h2>
+      <p>aFinder has no accounts, no analytics, no advertising and no tracking. Your files stay on your devices. aFinder only contacts the internet for features you turn on or use, and the phone connection is end-to-end encrypted.</p>
+
+      <h2>Files and settings</h2>
+      <p>aFinder reads and changes files only on your computer and on servers you connect it to yourself (SFTP, S3, SharePoint, OneDrive). Settings, history, favourites and caches are stored locally on your computer. The Mac App Store version sees only the folders and disks you grant it in the system's open panel.</p>
+
+      <h2>Features that use the network</h2>
+      <ul>
+        <li><strong>Updates</strong> (website version): aFinder asks GitHub once a day whether a new version exists. The App Store version is updated by the App Store.</li>
+        <li><strong>Remote connections</strong>: data goes directly between your computer and the server you configured. Passwords and keys stay in your settings on your computer.</li>
+        <li><strong>Phone companion</strong> (off by default): aFinder and aFinder Remote talk through a relay server on Cloudflare. Everything they exchange (file lists, files, the screen picture) is end-to-end encrypted with keys created during pairing; the relay only passes encrypted messages on and stores nothing. Screen viewing goes directly between the devices when possible, otherwise through Cloudflare's TURN service, still encrypted.</li>
+        <li><strong>Local AI models</strong> (off by default): activity history, semantic search and the file assistant run entirely on your computer. Their models are downloaded from Hugging Face only when you click the download button.</li>
+        <li><strong>Claude Code and Codex</strong>: aFinder starts these tools installed on your computer. What they send is governed by Anthropic's and OpenAI's terms, not by aFinder.</li>
+        <li><strong>MCP server</strong> (off by default): listens only on your own computer (127.0.0.1) and needs a token.</li>
+        <li><strong>Stocks, Bitcoin and exchange rates</strong>: when you open these areas aFinder asks Yahoo Finance, CoinGecko or the Czech National Bank for prices. No personal data is sent.</li>
+        <li><strong>Feedback</strong>: only when you press Send, your message, an optional e-mail address, an optional screenshot of the aFinder window and basic details (app version, operating system, language, theme) are filed as an issue in our private bug tracker on GitHub.</li>
+      </ul>
+
+      <h2>aFinder Remote (iPhone and iPad)</h2>
+      <p>The app uses the camera only to scan the pairing QR code; the picture is not stored or sent. Files you open or keep offline are stored in the app on your device and are deleted with it. Pairing keys stay in the device's secure storage. The app collects no data about you.</p>
+
+      <h2>Children</h2>
+      <p>aFinder is a general-purpose tool and does not knowingly collect data from anyone, including children.</p>
+
+      <h2>Changes and contact</h2>
+      <p>If this policy changes, the new version will be published on this page with a new date. Questions: <a href="mailto:danielhromadka1@gmail.com">danielhromadka1@gmail.com</a> or <a href="support.html">Support</a>.</p>
+    </main>
+    <footer class="footer">
+      <div class="wrap footer-row">
+        <a class="brand" href="./"><img src="img/icon.png" width="24" height="24" alt="" /><span>aFinder</span></a>
+        <ul class="footer-links">
+          <li><a href="support.html">Support</a></li>
+          <li><a href="privacy.html">Privacy</a></li>
+          <li><a href="https://github.com/DanielHromadka/afinder-downloads/releases">All releases</a></li>
+        </ul>
+        <p class="footer-note">Not affiliated with Microsoft or Apple. <span translate="no">Windows XP</span> and <span translate="no">Finder</span> are their trademarks.</p>
+      </div>
+    </footer>
+  </body>
+</html>

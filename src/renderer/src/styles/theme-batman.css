@@ -1,0 +1,381 @@
+/* Batman theme: Gotham night. Charcoal and black armour, utility-belt yellow accents, a bat-signal
+   spotlight over the file list. */
+
+:root[data-theme='batman'] {
+  --font: Futura, 'Avenir Next Condensed', 'Helvetica Neue', sans-serif;
+  --font-size: 12px;
+
+  --bm-black: #0a0a0c;
+  --bm-coal: #16171b;
+  --bm-steel: #24262c;
+  --bm-edge: #3a3d45;
+  --bm-yellow: #ffd400;
+  --bm-yellow-dim: rgba(255, 212, 0, 0.18);
+
+  --face: var(--bm-coal);
+  --face-light: var(--bm-steel);
+  --face-dark: var(--bm-edge);
+  --border-dark: var(--bm-black);
+  --text: #d6d8dd;
+  --muted: #7c808a;
+  --link: #e8e9ec;
+  --link-hover: var(--bm-yellow);
+  --window-border: var(--bm-black);
+  --title-gradient: linear-gradient(180deg, var(--bm-steel), var(--bm-black));
+  --taskpane-bg: linear-gradient(180deg, var(--bm-coal), var(--bm-black));
+  --task-header: var(--bm-steel);
+  --task-body: var(--bm-coal);
+  --task-header-text: var(--bm-yellow);
+  --list-bg: var(--bm-black);
+  --header-bg: var(--bm-steel);
+  --header-hover: var(--bm-yellow);
+  --selection: var(--bm-yellow);
+  --selection-text: #000;
+  --hit-bg: transparent;
+  --hit-text: var(--bm-yellow);
+  --menu-bg: var(--bm-coal);
+  --menu-border: var(--bm-edge);
+  --focus-ring: var(--bm-yellow);
+
+  --check-bg: var(--bm-black);
+  --check-border: var(--bm-edge);
+  --check-on: var(--bm-yellow);
+  --check-mark: #000;
+  --check-radius: 2px;
+  --check-glow: 0 0 6px rgba(255, 212, 0, 0.4);
+}
+
+[data-theme='batman'] .xp-window.app {
+  border: 2px solid var(--bm-black);
+  border-top: 0;
+}
+
+[data-theme='batman'] .titlebar {
+  border-radius: 0;
+  border-bottom: 2px solid var(--bm-yellow);
+}
+
+[data-theme='batman'] .titlebar > svg {
+  display: none;
+}
+
+/* Bat emblem: a black bat on a yellow oval. */
+[data-theme='batman'] .titlebar::before {
+  content: '';
+  width: 34px;
+  height: 18px;
+  margin-left: 4px;
+  flex-shrink: 0;
+  border: 1px solid #000;
+  border-radius: 50%;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 50'%3E%3Cpath d='M50 14 L53 6 L55 15 C61 13 69 13 75 17 C71 21 73 27 79 29 C85 27 91 29 95 35 C85 31 77 37 71 45 C67 39 61 41 57 47 C55 43 52 41 50 39 C48 41 45 43 43 47 C39 41 33 39 29 45 C23 37 15 31 5 35 C9 29 15 27 21 29 C27 27 29 21 25 17 C31 13 39 13 45 15 L47 6 Z'/%3E%3C/svg%3E") center / 82% no-repeat,
+    var(--bm-yellow);
+}
+
+[data-theme='batman'] .titlebar-text {
+  color: #f0f0f2;
+  text-shadow: none;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-weight: bold;
+}
+
+[data-theme='batman'] .tb-btn {
+  border: 1px solid var(--bm-edge);
+  border-radius: 2px;
+  background: var(--bm-coal);
+  box-shadow: none;
+}
+
+[data-theme='batman'] .tb-btn:hover {
+  border-color: var(--bm-yellow);
+  filter: none;
+}
+
+[data-theme='batman'] .tb-btn:hover .glyph-min {
+  background: var(--bm-yellow);
+}
+
+[data-theme='batman'] .tb-btn:hover .glyph-max {
+  border-color: var(--bm-yellow);
+}
+
+[data-theme='batman'] .tb-btn:hover .glyph-close {
+  color: var(--bm-yellow);
+}
+
+[data-theme='batman'] .toolbar,
+[data-theme='batman'] .addressbar {
+  background: linear-gradient(180deg, var(--bm-steel), var(--bm-coal));
+  border-bottom: 1px solid var(--bm-black);
+}
+
+[data-theme='batman'] .tool-btn,
+[data-theme='batman'] .go-btn {
+  border-radius: 2px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 11px;
+}
+
+[data-theme='batman'] .tool-btn svg,
+[data-theme='batman'] .go-btn svg,
+[data-theme='batman'] .task-link svg,
+[data-theme='batman'] .menu-icon svg,
+[data-theme='batman'] .cell.name svg,
+[data-theme='batman'] .tree-row svg {
+  filter: grayscale(1) brightness(1.1) contrast(1.2);
+}
+
+[data-theme='batman'] .tool-btn:hover:not(:disabled),
+[data-theme='batman'] .go-btn:hover {
+  border-color: var(--bm-edge);
+  background: var(--bm-black);
+  color: var(--bm-yellow);
+}
+
+[data-theme='batman'] .tool-btn:active:not(:disabled),
+[data-theme='batman'] .tool-btn.pressed {
+  border-color: var(--bm-yellow);
+  background: var(--bm-black);
+  color: var(--bm-yellow);
+  box-shadow: inset 0 -2px 0 var(--bm-yellow);
+}
+
+[data-theme='batman'] .tool-sep {
+  background: var(--bm-black);
+  box-shadow: 1px 0 0 var(--bm-edge);
+}
+
+[data-theme='batman'] .filter-box,
+[data-theme='batman'] .address-input {
+  border: 1px solid var(--bm-edge);
+  border-radius: 2px;
+  background: var(--bm-black);
+}
+
+[data-theme='batman'] .filter-box:focus-within,
+[data-theme='batman'] .address-input:focus-within {
+  border-color: var(--bm-yellow);
+}
+
+[data-theme='batman'] input {
+  caret-color: var(--bm-yellow);
+}
+
+[data-theme='batman'] input::placeholder {
+  color: var(--muted);
+}
+
+[data-theme='batman'] .address-label,
+[data-theme='batman'] .fuzzy-toggle {
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 10px;
+}
+
+[data-theme='batman'] .task-section {
+  border-radius: 0;
+  border: 1px solid var(--bm-edge);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+}
+
+[data-theme='batman'] .task-header {
+  border-radius: 0;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 11px;
+  border-bottom: 2px solid var(--bm-yellow);
+}
+
+[data-theme='batman'] .task-header:hover {
+  color: #fff;
+}
+
+[data-theme='batman'] .chevron {
+  border-radius: 2px;
+  border-color: var(--bm-yellow);
+  background: transparent;
+  color: var(--bm-yellow);
+}
+
+[data-theme='batman'] .task-body {
+  border: 0;
+}
+
+[data-theme='batman'] .foldertree {
+  background: var(--bm-black);
+  border-right: 1px solid var(--bm-edge);
+}
+
+[data-theme='batman'] .pane-header,
+[data-theme='batman'] .col-header {
+  border-color: var(--bm-black);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+[data-theme='batman'] .pane-header {
+  background: var(--bm-steel);
+}
+
+[data-theme='batman'] .col-header.sorted {
+  background: var(--bm-edge);
+  color: var(--bm-yellow);
+}
+
+[data-theme='batman'] .sort-arrow {
+  color: var(--bm-yellow);
+}
+
+/* Bat-signal spotlight in the night sky behind the rows. */
+[data-theme='batman'] .filelist {
+  background:
+    radial-gradient(ellipse 260px 170px at 82% 30%, rgba(255, 212, 0, 0.09), transparent 70%),
+    linear-gradient(180deg, #0f1118, var(--bm-black));
+}
+
+[data-theme='batman'] .row:hover:not(.selected) {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme='batman'] .row.selected .hit {
+  color: #000;
+  background: rgba(0, 0, 0, 0.12);
+  text-decoration-color: #000;
+}
+
+[data-theme='batman'] .row.selected .muted {
+  color: #5a4a00;
+}
+
+[data-theme='batman'] .row.selected svg {
+  filter: grayscale(1) brightness(0.4);
+}
+
+[data-theme='batman'] .tree-row.current .tree-label {
+  background: var(--bm-yellow);
+  color: #000;
+}
+
+[data-theme='batman'] .tree-toggle {
+  border-color: var(--bm-edge);
+  background: var(--bm-steel);
+  color: var(--bm-yellow);
+}
+
+[data-theme='batman'] .rename-input {
+  background: var(--bm-black);
+  color: #fff;
+  border: 1px solid var(--bm-yellow);
+}
+
+[data-theme='batman'] .statusbar {
+  background: var(--bm-black);
+  border-top: 1px solid var(--bm-edge);
+}
+
+[data-theme='batman'] .status-field {
+  border: 0;
+  border-left: 1px solid var(--bm-edge);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 10px;
+}
+
+[data-theme='batman'] .status-field.grow::before {
+  content: 'BATCOMPUTER ▸';
+  margin-right: 8px;
+  color: var(--bm-yellow);
+  font-weight: bold;
+}
+
+[data-theme='batman'] .context-menu {
+  border-top: 2px solid var(--bm-yellow);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.7);
+}
+
+[data-theme='batman'] .menu-item:hover:not(:disabled) svg {
+  filter: grayscale(1) brightness(0.3);
+}
+
+[data-theme='batman'] .menu-sep {
+  background: var(--bm-edge);
+}
+
+[data-theme='batman'] .modal-backdrop {
+  background: rgba(0, 0, 0, 0.55);
+}
+
+[data-theme='batman'] .xp-window.dialog {
+  border: 1px solid var(--bm-edge);
+  border-radius: 0;
+  background: var(--bm-coal);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+}
+
+[data-theme='batman'] .xp-button {
+  border: 1px solid var(--bm-yellow);
+  border-radius: 2px;
+  background: transparent;
+  color: var(--bm-yellow);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: bold;
+}
+
+[data-theme='batman'] .xp-button:hover,
+[data-theme='batman'] .xp-button:focus-visible {
+  background: var(--bm-yellow);
+  color: #000;
+  box-shadow: none;
+  outline: 0;
+}
+
+[data-theme='batman'] .xp-progress {
+  border: 1px solid var(--bm-edge);
+  border-radius: 0;
+  background: var(--bm-black);
+}
+
+[data-theme='batman'] .xp-progress-fill {
+  background: var(--bm-yellow);
+  -webkit-mask: repeating-linear-gradient(90deg, #000 0 10px, transparent 10px 12px);
+}
+
+[data-theme='batman'] .row.drop-target,
+[data-theme='batman'] .tree-row.drop-target .tree-label {
+  background: var(--bm-yellow-dim);
+  outline-color: var(--bm-yellow);
+}
+
+[data-theme='batman'] .filelist-scroll.drop-here {
+  box-shadow: inset 0 0 0 2px var(--bm-yellow);
+}
+
+[data-theme='batman'] ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+[data-theme='batman'] ::-webkit-scrollbar-track,
+[data-theme='batman'] ::-webkit-scrollbar-corner {
+  background: var(--bm-black);
+}
+
+[data-theme='batman'] ::-webkit-scrollbar-thumb,
+[data-theme='batman'] ::-webkit-scrollbar-thumb:horizontal {
+  border: 2px solid var(--bm-black);
+  border-radius: 0;
+  background: var(--bm-edge);
+  box-shadow: none;
+}
+
+[data-theme='batman'] ::-webkit-scrollbar-thumb:hover {
+  background: var(--bm-yellow);
+}

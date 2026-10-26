@@ -1,0 +1,326 @@
+/* The Games and Stocks areas and Doom. Loaded after xp.css, in the order main.tsx imports them. */
+
+/* The Games area: a picker, the scores, and the board scaled to fit what is left. */
+.games-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--list-bg);
+  color: var(--text);
+}
+
+/* Stocks area: search on top, favourites with their changes, the TradingView chart filling the rest. */
+.stocks-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--list-bg);
+  color: var(--text);
+}
+
+.stocks-search {
+  position: relative;
+  flex-wrap: nowrap;
+}
+
+.stocks-matches {
+  position: absolute;
+  z-index: 20;
+  top: 100%;
+  left: 6px;
+  right: 6px;
+  max-height: 260px;
+  overflow-y: auto;
+  border: 1px solid var(--face-dark);
+  background: var(--list-bg);
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.2);
+}
+
+.stocks-match {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 6px;
+  cursor: default;
+  white-space: nowrap;
+}
+
+.stocks-match.on,
+.stocks-match:hover {
+  background: color-mix(in srgb, var(--selection) 14%, transparent);
+}
+
+.stocks-match.empty {
+  color: var(--muted);
+}
+
+.stocks-match-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stocks-match-ex {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.stocks-list {
+  flex-shrink: 0;
+  max-height: 40%;
+  overflow-y: auto;
+  border-bottom: 1px solid var(--face-dark);
+}
+
+.stocks-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.stocks-table th {
+  position: sticky;
+  top: 0;
+  padding: 2px 6px;
+  background: var(--face);
+  font-weight: normal;
+  color: var(--muted);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.stocks-table td {
+  padding: 3px 6px;
+  border-bottom: 1px solid color-mix(in srgb, var(--face-dark) 40%, transparent);
+  white-space: nowrap;
+}
+
+.stocks-table .num {
+  text-align: right;
+}
+
+.stocks-table tbody tr:hover {
+  background: color-mix(in srgb, var(--selection) 8%, transparent);
+}
+
+.stocks-table tbody tr.on {
+  background: color-mix(in srgb, var(--selection) 18%, transparent);
+}
+
+.stocks-list:focus {
+  outline: none;
+}
+
+.stocks-table tbody tr {
+  cursor: grab;
+}
+
+.stocks-table.dragging,
+.stocks-table.dragging tbody tr {
+  cursor: grabbing;
+  user-select: none;
+}
+
+.stocks-table tbody tr.dragged {
+  opacity: 0.45;
+}
+
+.stocks-table tbody tr.drop-before > td {
+  box-shadow: inset 0 2px 0 var(--selection);
+}
+
+.stocks-table tbody tr.drop-after > td {
+  box-shadow: inset 0 -2px 0 var(--selection);
+}
+
+.stocks-name {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stocks-name > span {
+  margin-left: 6px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.stocks-table td.up {
+  color: #2f9e44;
+}
+
+.stocks-table td.down {
+  color: #e03131;
+}
+
+.stocks-table td > .todo-chip-x {
+  visibility: hidden;
+}
+
+.stocks-table tr:hover td > .todo-chip-x {
+  visibility: visible;
+}
+
+.stocks-chart {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.stocks-chart-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  flex-shrink: 0;
+}
+
+.stocks-chart-head > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--muted);
+}
+
+.stocks-frame {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  border: 0;
+  background: var(--list-bg);
+}
+
+.games-tabs {
+  flex-wrap: wrap;
+  white-space: nowrap;
+  padding: 6px;
+  flex-shrink: 0;
+}
+
+.game {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 6px 6px;
+}
+
+.game-scores {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-weight: bold;
+  font-variant-numeric: tabular-nums;
+}
+
+.game-stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow: auto;
+}
+
+.game-board {
+  max-width: 100%;
+  max-height: 100%;
+  border: 1px solid var(--face-dark);
+  border-radius: 6px;
+  image-rendering: pixelated;
+  outline: none;
+}
+
+.game-board:focus-visible {
+  border-color: var(--selection);
+}
+
+.game-overlay {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--list-bg) 88%, transparent);
+  color: var(--text);
+  font-weight: bold;
+  text-align: center;
+  pointer-events: none;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.game-hint {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+/* Doom: its own page in a frame, black around the 4:3 picture; the intro offers the download. */
+.doom-stage {
+  align-items: stretch;
+}
+
+.doom-frame {
+  flex: 1;
+  border: 1px solid var(--face-dark);
+  border-radius: 6px;
+  background: #000;
+}
+
+.doom-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.doom-intro {
+  padding: 6px 12px 12px;
+  gap: 8px;
+}
+
+.doom-intro p {
+  margin: 0;
+}
+
+.mines-grid {
+  display: grid;
+  gap: 1px;
+  margin: 0 auto;
+}
+
+.mines-cell {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid var(--face-dark);
+  border-radius: 3px;
+  background: var(--face-light, var(--face));
+  font: bold 12px/1 var(--font);
+}
+
+.mines-cell:hover:not(.open) {
+  border-color: var(--selection);
+}
+
+.mines-cell.open {
+  border-color: transparent;
+  background: color-mix(in srgb, var(--face-dark) 18%, var(--list-bg));
+}
+
+.mines-cell.boom {
+  background: #ffa8a8;
+}
+
+.mines-face {
+  padding: 0 6px;
+  border: 1px solid var(--face-dark);
+  border-radius: 4px;
+  background: var(--face-light, var(--face));
+  font-size: 14px;
+}

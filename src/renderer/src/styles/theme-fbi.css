@@ -1,0 +1,313 @@
+/* FBI theme: institutional navy and gold, case-file paper, classification banner at the bottom. */
+
+:root[data-theme='fbi'] {
+  --font: 'Helvetica Neue', Arial, sans-serif;
+  --font-size: 12px;
+
+  --fbi-navy: #0b2545;
+  --fbi-navy-dark: #071a33;
+  --fbi-navy-light: #13315c;
+  --fbi-gold: #c5a253;
+  --fbi-gold-light: #e3c97f;
+  --fbi-paper: #f6f4ee;
+  --fbi-line: #d9d4c4;
+
+  --face: #e9e6dc;
+  --face-light: var(--fbi-paper);
+  --face-dark: #a9a390;
+  --border-dark: var(--fbi-navy);
+  --text: #16202e;
+  --muted: #6b7280;
+  --link: var(--fbi-navy-light);
+  --link-hover: #8a6d1f;
+  --window-border: var(--fbi-navy);
+  --title-gradient: linear-gradient(180deg, var(--fbi-navy-light), var(--fbi-navy-dark));
+  --taskpane-bg: linear-gradient(180deg, var(--fbi-navy) 0%, var(--fbi-navy-dark) 100%);
+  --task-header: var(--fbi-navy-dark);
+  --task-body: var(--fbi-paper);
+  --task-header-text: var(--fbi-gold);
+  --list-bg: #fff;
+  --header-bg: linear-gradient(180deg, #f3f1ea, #e2ddcd);
+  --header-hover: var(--fbi-gold);
+  --selection: var(--fbi-navy);
+  --selection-text: #fff;
+  --hit-bg: rgba(197, 162, 83, 0.35);
+  --hit-text: var(--fbi-navy-dark);
+  --menu-bg: var(--fbi-paper);
+  --menu-border: var(--fbi-navy);
+  --focus-ring: var(--fbi-gold);
+
+  --check-bg: #fff;
+  --check-border: var(--fbi-navy);
+  --check-on: var(--fbi-navy);
+  --check-mark: var(--fbi-gold-light);
+  --check-radius: 2px;
+}
+
+[data-theme='fbi'] .xp-window.app {
+  border-width: 2px;
+}
+
+/* Classification banner along the bottom edge of the window. */
+[data-theme='fbi'] .xp-window.app::after {
+  content: 'UNCLASSIFIED // FOR OFFICIAL USE ONLY';
+  flex-shrink: 0;
+  height: 16px;
+  line-height: 16px;
+  text-align: center;
+  background: #007a33;
+  color: #fff;
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+[data-theme='fbi'] .titlebar {
+  border-radius: 0;
+  border-bottom: 2px solid var(--fbi-gold);
+}
+
+[data-theme='fbi'] .titlebar-text {
+  color: var(--fbi-gold-light);
+  text-shadow: none;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 12px;
+}
+
+[data-theme='fbi'] .titlebar-text::before {
+  content: 'FBI ▸ ';
+  color: #fff;
+  letter-spacing: 3px;
+}
+
+[data-theme='fbi'] .tb-btn {
+  border: 1px solid var(--fbi-gold);
+  border-radius: 0;
+  background: var(--fbi-navy-dark);
+  box-shadow: none;
+}
+
+[data-theme='fbi'] .tb-btn:hover {
+  background: var(--fbi-gold);
+  filter: none;
+}
+
+[data-theme='fbi'] .tb-close:hover {
+  background: #a61b1b;
+}
+
+[data-theme='fbi'] .toolbar {
+  background: linear-gradient(180deg, var(--fbi-paper), var(--face));
+  border-bottom: 1px solid var(--fbi-navy);
+}
+
+[data-theme='fbi'] .tool-btn,
+[data-theme='fbi'] .go-btn {
+  border-radius: 0;
+  color: var(--fbi-navy);
+  font-weight: 600;
+}
+
+[data-theme='fbi'] .tool-btn:hover:not(:disabled),
+[data-theme='fbi'] .go-btn:hover {
+  border-color: var(--fbi-navy);
+  background: #fff;
+}
+
+[data-theme='fbi'] .tool-btn:active:not(:disabled),
+[data-theme='fbi'] .tool-btn.pressed {
+  border-color: var(--fbi-gold);
+  background: var(--fbi-navy);
+  color: var(--fbi-gold-light);
+  box-shadow: none;
+}
+
+[data-theme='fbi'] .filter-box,
+[data-theme='fbi'] .address-input {
+  border: 1px solid var(--fbi-navy);
+  border-radius: 0;
+  background: #fff;
+}
+
+[data-theme='fbi'] .filter-box:focus-within,
+[data-theme='fbi'] .address-input:focus-within {
+  box-shadow: 0 0 0 2px var(--fbi-gold);
+}
+
+[data-theme='fbi'] .address-label,
+[data-theme='fbi'] .fuzzy-toggle {
+  color: var(--fbi-navy);
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
+[data-theme='fbi'] .task-section {
+  border-radius: 0;
+  border: 1px solid var(--fbi-gold);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme='fbi'] .task-header {
+  border-radius: 0;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-size: 11px;
+  border-bottom: 1px solid var(--fbi-gold);
+}
+
+[data-theme='fbi'] .task-header:hover {
+  color: var(--fbi-gold-light);
+}
+
+[data-theme='fbi'] .chevron {
+  border-radius: 0;
+  border-color: var(--fbi-gold);
+  background: transparent;
+  color: var(--fbi-gold);
+}
+
+[data-theme='fbi'] .task-body {
+  border: 0;
+}
+
+[data-theme='fbi'] .foldertree {
+  background: var(--fbi-paper);
+}
+
+[data-theme='fbi'] .pane-header {
+  background: var(--fbi-navy);
+  color: var(--fbi-gold-light);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+[data-theme='fbi'] .col-header {
+  border-color: var(--fbi-line);
+  color: var(--fbi-navy);
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
+[data-theme='fbi'] .col-header.sorted {
+  background: linear-gradient(180deg, #fff, #ece6d2);
+  box-shadow: inset 0 -2px 0 var(--fbi-gold);
+}
+
+[data-theme='fbi'] .sort-arrow {
+  color: var(--fbi-navy);
+}
+
+/* Case-file ledger stripes. */
+[data-theme='fbi'] .row:not(.selected) {
+  border-bottom: 1px solid #efece3;
+}
+
+[data-theme='fbi'] .row:hover:not(.selected) {
+  background: #f3efe2;
+}
+
+[data-theme='fbi'] .row.selected {
+  box-shadow: inset 4px 0 0 var(--fbi-gold);
+}
+
+[data-theme='fbi'] .row.selected .hit {
+  color: var(--fbi-gold-light);
+  background: rgba(197, 162, 83, 0.25);
+}
+
+[data-theme='fbi'] .row.selected .muted {
+  color: #b9c4d6;
+}
+
+[data-theme='fbi'] .rename-input {
+  border: 1px solid var(--fbi-navy);
+  box-shadow: 0 0 0 2px var(--fbi-gold);
+}
+
+[data-theme='fbi'] .statusbar {
+  background: var(--fbi-navy);
+  border-top: 2px solid var(--fbi-gold);
+  color: #e6e9ef;
+}
+
+[data-theme='fbi'] .status-field {
+  border: 0;
+  border-left: 1px solid var(--fbi-navy-light);
+}
+
+[data-theme='fbi'] .status-field.grow::before {
+  content: 'CASE ▸ ';
+  color: var(--fbi-gold);
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+[data-theme='fbi'] .context-menu {
+  border-top: 3px solid var(--fbi-gold);
+}
+
+[data-theme='fbi'] .menu-sep {
+  background: var(--fbi-line);
+}
+
+[data-theme='fbi'] .xp-window.dialog {
+  border: 2px solid var(--fbi-navy);
+  border-radius: 0;
+  background: var(--fbi-paper);
+}
+
+[data-theme='fbi'] .xp-button {
+  border: 1px solid var(--fbi-navy);
+  border-radius: 0;
+  background: var(--fbi-navy);
+  color: #fff;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 11px;
+}
+
+[data-theme='fbi'] .xp-button:hover,
+[data-theme='fbi'] .xp-button:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--fbi-gold);
+  outline: 0;
+}
+
+[data-theme='fbi'] .xp-progress {
+  border-radius: 0;
+  border-color: var(--fbi-navy);
+}
+
+[data-theme='fbi'] .xp-progress-fill {
+  background: var(--fbi-navy);
+  -webkit-mask: none;
+}
+
+[data-theme='fbi'] .row.drop-target,
+[data-theme='fbi'] .tree-row.drop-target .tree-label {
+  background: rgba(197, 162, 83, 0.3);
+}
+
+[data-theme='fbi'] ::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+[data-theme='fbi'] ::-webkit-scrollbar-track {
+  background: var(--fbi-paper);
+}
+
+[data-theme='fbi'] ::-webkit-scrollbar-thumb,
+[data-theme='fbi'] ::-webkit-scrollbar-thumb:horizontal {
+  border: 2px solid var(--fbi-paper);
+  border-radius: 0;
+  background: var(--fbi-navy);
+  box-shadow: none;
+}

@@ -1,0 +1,219 @@
+/* Clean look of the macOS theme (Settings → Appearance): one light background, no separator lines, the
+   areas as rounded white cards floating on it, soft rounded controls. Only overrides, scoped by data-clean. */
+
+:root[data-theme='apple'][data-clean] {
+  --ap-window: #f7f8fa;
+  --ap-chrome: #f7f8fa;
+  --ap-sidebar: #ffffff;
+  --ap-content: #ffffff;
+  --ap-stripe: #f8f9fb;
+  --ap-separator: rgba(0, 0, 0, 0.06);
+  --ap-field: rgba(0, 0, 0, 0.04);
+  --clean-card-ring: 0 0 0 1px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.05);
+  --clean-radius: 12px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme='apple'][data-clean] {
+    --ap-window: #161618;
+    --ap-chrome: #161618;
+    --ap-sidebar: #1f1f22;
+    --ap-content: #1f1f22;
+    --ap-stripe: #232326;
+    --ap-separator: rgba(255, 255, 255, 0.06);
+    --ap-field: rgba(255, 255, 255, 0.06);
+    --clean-card-ring: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 1px 3px rgba(0, 0, 0, 0.4);
+  }
+}
+
+/* No lines between the chrome rows: toolbar, address bar, workspace bar, tabs and status bar share the background. */
+[data-theme='apple'][data-clean] .toolbar,
+[data-theme='apple'][data-clean] .addressbar,
+[data-theme='apple'][data-clean] .workspace-bar,
+[data-theme='apple'][data-clean] .statusbar {
+  border: 0;
+  background: var(--ap-window);
+}
+
+[data-theme='apple'][data-clean] .workspace-bar {
+  padding: 0 10px 4px;
+}
+
+[data-theme='apple'][data-clean] .ws-tab.current {
+  border-color: transparent;
+  border-radius: 8px;
+  background: var(--ap-content);
+  box-shadow: var(--clean-card-ring);
+}
+
+[data-theme='apple'][data-clean] .ws-tab {
+  border-radius: 8px;
+}
+
+/* Areas become cards with a little air between them. */
+[data-theme='apple'][data-clean] .workspace-body {
+  padding: 0 8px 4px;
+  background: var(--ap-window);
+}
+
+[data-theme='apple'][data-clean] .area {
+  border-radius: var(--clean-radius);
+  background: var(--ap-content);
+  box-shadow: var(--clean-card-ring);
+}
+
+[data-theme='apple'][data-clean] .area-divider,
+[data-theme='apple'][data-clean] .area-divider.split-row,
+[data-theme='apple'][data-clean] .area-divider.split-column {
+  border: 0;
+  background: transparent;
+}
+
+[data-theme='apple'][data-clean] .area-divider.split-row {
+  width: 8px;
+}
+
+[data-theme='apple'][data-clean] .area-divider.split-column {
+  height: 8px;
+}
+
+[data-theme='apple'][data-clean] .area-divider:hover {
+  background: var(--ap-accent-soft);
+  border-radius: 4px;
+}
+
+[data-theme='apple'][data-clean] .area-header {
+  height: 30px;
+  padding: 0 8px;
+  border: 0;
+  background: transparent;
+}
+
+[data-theme='apple'][data-clean] .area-title {
+  font-weight: 600;
+}
+
+[data-theme='apple'][data-clean] .area-editor,
+[data-theme='apple'][data-clean] .area-btn {
+  border: 0;
+  border-radius: 6px;
+}
+
+[data-theme='apple'][data-clean] .area-editor:hover,
+[data-theme='apple'][data-clean] .area-btn:hover {
+  background: var(--ap-control-hover);
+}
+
+/* Inside the cards: one background, no rules. */
+[data-theme='apple'][data-clean] .tabstrip,
+[data-theme='apple'][data-clean] .taskpane,
+[data-theme='apple'][data-clean] .foldertree,
+[data-theme='apple'][data-clean] .preview-head,
+[data-theme='apple'][data-clean] .col-header {
+  border: 0;
+  background: var(--ap-content);
+}
+
+[data-theme='apple'][data-clean] .col-header:not(.filler)::after {
+  display: none;
+}
+
+/* The Todo area, the file popover and the games: no bars, soft controls. */
+[data-theme='apple'][data-clean] .todo-add,
+[data-theme='apple'][data-clean] .todo-bar {
+  border: 0;
+  background: transparent;
+  padding: 4px 8px;
+}
+
+[data-theme='apple'][data-clean] .todo-item {
+  border: 0;
+  border-radius: 8px;
+  margin: 0 6px;
+}
+
+[data-theme='apple'][data-clean] .todo-add > input,
+[data-theme='apple'][data-clean] .todo-edit,
+[data-theme='apple'][data-clean] .memo-note,
+[data-theme='apple'][data-clean] .address-input,
+[data-theme='apple'][data-clean] .games-panel select {
+  border: 0;
+  border-radius: 8px;
+  background: var(--ap-field);
+  outline: none;
+}
+
+[data-theme='apple'][data-clean] .todo-add > input,
+[data-theme='apple'][data-clean] .todo-btn {
+  height: 26px;
+}
+
+[data-theme='apple'][data-clean] .todo-add > input:focus,
+[data-theme='apple'][data-clean] .memo-note:focus {
+  box-shadow: 0 0 0 3px var(--ap-accent-ring);
+}
+
+[data-theme='apple'][data-clean] .todo-btn,
+[data-theme='apple'][data-clean] .mines-face {
+  border: 0;
+  border-radius: 8px;
+  padding: 0 12px;
+  background: var(--ap-control);
+}
+
+[data-theme='apple'][data-clean] .todo-btn:hover:not(:disabled) {
+  background: var(--ap-control-hover);
+}
+
+[data-theme='apple'][data-clean] .todo-seg {
+  padding: 2px;
+  border-radius: 8px;
+  background: var(--ap-control);
+}
+
+[data-theme='apple'][data-clean] .todo-seg > button,
+[data-theme='apple'][data-clean] .todo-seg > button + button {
+  height: 22px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+}
+
+[data-theme='apple'][data-clean] .todo-seg > button.on {
+  background: var(--ap-content);
+  color: var(--ap-label);
+  box-shadow: var(--clean-card-ring);
+}
+
+[data-theme='apple'][data-clean] .memo-popover {
+  border: 0;
+  border-radius: 12px;
+  box-shadow: var(--ap-shadow);
+  overflow: hidden;
+}
+
+[data-theme='apple'][data-clean] .memo-head {
+  border: 0;
+  background: transparent;
+}
+
+[data-theme='apple'][data-clean] .memo-badge {
+  border: 0;
+  background: var(--ap-control);
+}
+
+[data-theme='apple'][data-clean] .game-board {
+  border: 0;
+  border-radius: 10px;
+  box-shadow: var(--clean-card-ring);
+}
+
+[data-theme='apple'][data-clean] .mines-cell {
+  border: 0;
+  border-radius: 4px;
+  background: var(--ap-control-press);
+}
+
+[data-theme='apple'][data-clean] .mines-cell.open {
+  background: transparent;
+}

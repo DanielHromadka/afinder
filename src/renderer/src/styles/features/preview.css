@@ -1,0 +1,338 @@
+/* The preview pane, Quick Look and the editors shown in them. Loaded after xp.css, in the order main.tsx imports them. */
+
+/* ---- preview pane & Quick Look ---------------------------------------------------------- */
+
+.preview-divider {
+  width: 5px;
+  flex-shrink: 0;
+  cursor: col-resize;
+  background: var(--face);
+  border-left: 1px solid var(--face-dark);
+}
+
+.preview-pane {
+  flex-shrink: 0;
+  min-width: 0;
+  display: flex;
+  background: var(--list-bg);
+}
+
+body.resizing-col {
+  cursor: col-resize;
+  user-select: none;
+}
+
+/* Frames would swallow the mouse moves of a divider drag. */
+body.resizing-col iframe {
+  pointer-events: none;
+}
+
+.preview {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--list-bg);
+  color: var(--text);
+}
+
+.preview-head {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--face-dark);
+}
+
+.preview-title {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.preview-title strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  user-select: text;
+}
+
+.preview-title span {
+  color: var(--muted);
+}
+
+.preview-note {
+  margin: 0;
+  padding: 6px 12px;
+  color: var(--muted);
+  white-space: pre-wrap;
+}
+
+.preview-note.center {
+  margin: auto;
+  padding: 24px;
+  text-align: center;
+}
+
+.preview-note.error {
+  color: #b00000;
+}
+
+.preview-icon {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.preview-image {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  /* A checkerboard shows where transparent images end. */
+  background: repeating-conic-gradient(rgba(127, 127, 127, 0.12) 0% 25%, transparent 0% 50%) 0 0 / 16px 16px;
+}
+
+.preview-image img {
+  min-height: 0;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+.preview-caption {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.preview-frame {
+  flex: 1;
+  width: 100%;
+  border: 0;
+  background: #525659;
+}
+
+.preview-frame.paper {
+  background: #fff;
+}
+
+.preview-media {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  background: #000;
+}
+
+.preview-audio {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 12px;
+}
+
+.preview-audio audio {
+  width: 100%;
+  max-width: 420px;
+}
+
+.preview-text {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.preview-editor {
+  flex: 1;
+  min-height: 0;
+  background: var(--list-bg);
+  color: var(--text);
+}
+
+.preview-sheet {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.sheet-scroll {
+  flex: 1;
+  overflow: auto;
+  background: #fff;
+  color: #000;
+}
+
+.preview-sheet table {
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.preview-sheet th,
+.preview-sheet td {
+  padding: 2px 6px;
+  border: 1px solid #d4d4d4;
+  white-space: nowrap;
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.preview-sheet th {
+  position: sticky;
+  top: 0;
+  background: #efefef;
+  color: #555;
+  font-weight: normal;
+}
+
+.preview-sheet tbody th {
+  position: sticky;
+  left: 0;
+  text-align: right;
+}
+
+.preview-sheet td.num {
+  text-align: right;
+}
+
+.sheet-tabs {
+  display: flex;
+  gap: 2px;
+  padding: 3px 4px 0;
+  overflow-x: auto;
+  background: var(--face);
+  border-top: 1px solid var(--face-dark);
+}
+
+.sheet-tabs button {
+  padding: 2px 10px;
+  border: 1px solid var(--face-dark);
+  border-top: 0;
+  background: var(--face);
+  white-space: nowrap;
+}
+
+.sheet-tabs button.active {
+  background: #fff;
+  font-weight: bold;
+}
+
+.quicklook-backdrop {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.xp-window.quicklook {
+  display: flex;
+  flex-direction: column;
+  width: min(1100px, 90vw);
+  height: min(820px, 88vh);
+  border: 3px solid var(--window-border);
+  border-top: 0;
+  border-radius: 8px 8px 0 0;
+  background: var(--face);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+}
+
+.quicklook-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px;
+  border-bottom: 1px solid var(--face-dark);
+}
+
+.quicklook-bar .xp-button {
+  min-width: 0;
+  padding: 0 10px;
+}
+
+.quicklook-meta {
+  flex: 1;
+  padding: 0 8px;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.quicklook-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+.preview-tools {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 30px;
+  padding: 3px 6px;
+  border-bottom: 1px solid var(--face-dark);
+  background: var(--face);
+}
+
+.preview-tools .xp-button {
+  min-width: 0;
+  padding: 0 12px;
+}
+
+.preview-tools .xp-button.pressed {
+  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.25);
+  background: var(--face-dark);
+}
+
+.preview-status {
+  flex: 1;
+  min-width: 0;
+  padding: 0 6px;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.preview-status.error {
+  color: #b00000;
+}
+
+/* Git change bars in the editor gutter (colours as in VS Code), and the blame note after the cursor line. */
+.monaco-editor .git-bar {
+  width: 3px !important;
+  margin-left: 4px;
+}
+
+.monaco-editor .git-added {
+  background: #2ea043;
+}
+
+.monaco-editor .git-modified {
+  background: #1b81a8;
+}
+
+.monaco-editor .git-deleted::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: -1px;
+  border: 4px solid transparent;
+  border-left-color: #d1242f;
+}
+
+.monaco-editor .git-blame-note {
+  color: var(--muted);
+  font-style: italic;
+  opacity: 0.8;
+}

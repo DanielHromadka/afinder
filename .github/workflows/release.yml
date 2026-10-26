@@ -1,0 +1,224 @@
+# Every push to main builds, signs and notarizes the macOS version, builds Linux (AppImage, deb and rpm for x64
+# and arm64) and publishes them as the latest release of the public DanielHromadka/afinder-downloads repository;
+# the Windows installer and its latest.yml are carried over from the previous release, so Windows downloads and
+# updates keep working. Run by hand (Actions → Release → Run workflow) it builds Windows too. The website links to
+# /releases/latest/download/…, and the app's updater checks the same release, so nobody has to edit links or
+# version numbers by hand.
+#
+# Version: major.minor from package.json plus the run number (0.9.42), so every release is higher than the last
+# without anyone touching it. For a bigger release run the workflow by hand with bump = minor or major: it
+# raises package.json, commits that to main and releases e.g. 0.10.43.
+#
+# Needs the repository secret DOWNLOADS_TOKEN: a fine-grained token with "Contents: read and write"
+# on DanielHromadka/afinder-downloads. macOS signing and notarization need MAC_CSC_LINK (base64 of the Developer ID
+# Application .p12), MAC_CSC_KEY_PASSWORD, APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD and APPLE_TEAM_ID.
+
+name: Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'Raise the version first: minor (0.9 → 0.10) or major (0.9 → 1.0), committed to package.json'
+        type: choice
+        options: [none, minor, major]
+        default: none
+      version:
+        description: 'Exact version to release (empty = major.minor from package.json + run number)'
+        required: false
+      publish:
+        description: 'Publish the release (off = only build the installers as run artifacts)'
+        type: boolean
+        default: true
+
+# Releases never overlap.
+concurrency:
+  group: release
+
+env:
+  NODE_VERSION: 24
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    # The version bump is pushed back to main (GITHUB_TOKEN pushes do not start another run).
+    permissions:
+      contents: write
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      publish: ${{ steps.version.outputs.publish }}
+      notes: ${{ steps.notes.outputs.notes }}
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The release notes list every commit since the last release.
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+      - name: Raise major or minor
+        if: inputs.bump == 'minor' || inputs.bump == 'major'
+        run: |
+          npm version "${{ inputs.bump }}" --no-git-tag-version
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -am "Raise the version to $(node -p "require('./package.json').version")"
+          git push origin HEAD:main
+      - id: version
+        env:
+          REQUESTED: ${{ inputs.version }}
+        run: |
+          echo "version=${REQUESTED:-$(node -p "require('./package.json').version.split('.').slice(0, 2).join('.')").${{ github.run_number }}}" >> "$GITHUB_OUTPUT"
+          echo "publish=${{ github.event_name == 'push' || inputs.publish }}" >> "$GITHUB_OUTPUT"
+      # The GitHub release body and the notes bundled into the app ("What's new"), see scripts/release-notes.mjs.
+      # The JSON goes to the build jobs as a job output: run artifacts count against the account's storage quota,
+      # and once it is hit GitHub refuses every upload until the next billing cycle.
+      - name: Release notes
+        id: notes
+        env:
+          GH_TOKEN: ${{ secrets.DOWNLOADS_TOKEN }}
+        run: |
+          npm run release-notes -- --version "${{ steps.version.outputs.version }}"
+          echo "notes=$(node -p 'JSON.stringify(require("./build/release-notes.json"))')" >> "$GITHUB_OUTPUT"
+      # The build jobs upload their installers straight into a draft release, which neither the website's
+      # /releases/latest links nor the updater see until the release job publishes it. A re-run reuses the draft.
+      - name: Draft the release
+        if: steps.version.outputs.publish == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.DOWNLOADS_TOKEN }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          if gh release view "v$VERSION" --repo DanielHromadka/afinder-downloads > /dev/null 2>&1; then
+            gh release edit "v$VERSION" --repo DanielHromadka/afinder-downloads --notes-file release-notes.md
+          else
+            gh release create "v$VERSION" --draft \
+              --repo DanielHromadka/afinder-downloads \
+              --title "aFinder $VERSION" \
+              --notes-file release-notes.md
+          fi
+      # A push builds macOS and Linux; a manual run builds Windows too. Ubuntu 22.04 keeps glibc old enough
+      # for Debian 12, Ubuntu 22.04 and the RHEL 9 family.
+      - id: matrix
+        run: |
+          mac='{"os":"macos-15","args":"--mac dmg zip --arm64 --x64"}'
+          linux='{"os":"ubuntu-22.04","args":"--linux AppImage deb rpm --x64"}'
+          win='{"os":"windows-latest","args":"--win nsis --x64"}'
+          if [ "${{ github.event_name }}" = push ]; then echo "matrix={\"include\":[$mac,$linux]}"; else echo "matrix={\"include\":[$mac,$linux,$win]}"; fi >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: check
+    strategy:
+      fail-fast: true
+      matrix: ${{ fromJSON(needs.check.outputs.matrix) }}
+    runs-on: ${{ matrix.os }}
+    env:
+      # macOS: signed with the Developer ID certificate and notarized. Windows: no Authenticode certificate (yet),
+      # and CSC_LINK must stay empty there, or electron-builder would try to sign the .exe with the Apple .p12.
+      CSC_IDENTITY_AUTO_DISCOVERY: ${{ startsWith(matrix.os, 'macos') }}
+      CSC_LINK: ${{ startsWith(matrix.os, 'macos') && secrets.MAC_CSC_LINK || '' }}
+      CSC_KEY_PASSWORD: ${{ startsWith(matrix.os, 'macos') && secrets.MAC_CSC_KEY_PASSWORD || '' }}
+      APPLE_ID: ${{ secrets.APPLE_ID }}
+      APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm version ${{ needs.check.outputs.version }} --no-git-tag-version --allow-same-version
+      # build/release-notes.json, packaged as an extra resource.
+      - shell: bash
+        env:
+          NOTES: ${{ needs.check.outputs.notes }}
+        run: printf '%s' "$NOTES" > build/release-notes.json
+      - run: npm ci
+      - run: npm run build
+      - if: runner.os == 'Linux'
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq rpm g++-aarch64-linux-gnu
+      # The remote desktop input helper (native/afinder-input) for every architecture this runner packages.
+      - uses: dtolnay/rust-toolchain@stable
+      - run: npm run build:input
+      - run: npx electron-builder ${{ matrix.args }} --publish never
+      # GitHub has no free arm64 Linux runners for private repositories: node-pty is cross-compiled instead.
+      - if: runner.os == 'Linux'
+        run: npx electron-builder --linux AppImage deb rpm --arm64 --publish never
+        env:
+          CC: aarch64-linux-gnu-gcc
+          CXX: aarch64-linux-gnu-g++
+      - name: Upload to the draft release
+        if: needs.check.outputs.publish == 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.DOWNLOADS_TOKEN }}
+          VERSION: ${{ needs.check.outputs.version }}
+        run: |
+          shopt -s nullglob
+          files=(dist/*.dmg dist/*-mac.zip dist/*.exe dist/*.AppImage dist/*.deb dist/*.rpm dist/*.blockmap dist/latest*.yml)
+          [ ${#files[@]} -gt 0 ] || { echo "::error::No installers in dist"; exit 1; }
+          gh release upload "v$VERSION" "${files[@]}" --clobber --repo DanielHromadka/afinder-downloads
+      # Only a manual run with publish off keeps the installers as run artifacts.
+      - if: needs.check.outputs.publish != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: installers-${{ matrix.os }}
+          if-no-files-found: error
+          retention-days: 1
+          path: |
+            dist/*.dmg
+            dist/*-mac.zip
+            dist/*.exe
+            dist/*.AppImage
+            dist/*.deb
+            dist/*.rpm
+            dist/*.blockmap
+            dist/latest*.yml
+
+  release:
+    needs: [check, build]
+    if: needs.check.outputs.publish == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      # The installer's name has no version and latest.yml names it with its checksum, so the copies keep
+      # the website link and the Windows updater pointing at the last Windows build.
+      - name: Carry over the Windows installer
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ secrets.DOWNLOADS_TOKEN }}
+          VERSION: ${{ needs.check.outputs.version }}
+        run: |
+          mkdir -p windows
+          if gh release download --repo DanielHromadka/afinder-downloads --dir windows \
+            --pattern '*.exe' --pattern '*.exe.blockmap' --pattern 'latest.yml'; then
+            gh release upload "v$VERSION" windows/* --clobber --repo DanielHromadka/afinder-downloads
+          else
+            echo "::warning::No Windows installer in the previous release"
+          fi
+      - name: Publish to afinder-downloads
+        env:
+          GH_TOKEN: ${{ secrets.DOWNLOADS_TOKEN }}
+          VERSION: ${{ needs.check.outputs.version }}
+        run: |
+          gh release view "v$VERSION" --repo DanielHromadka/afinder-downloads --json assets --jq '.assets[].name'
+          gh release edit "v$VERSION" --repo DanielHromadka/afinder-downloads --draft=false --latest
+
+  # A failed build leaves no half-filled draft behind.
+  discard:
+    needs: [check, build, release]
+    if: failure() && needs.check.outputs.publish == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          GH_TOKEN: ${{ secrets.DOWNLOADS_TOKEN }}
+          VERSION: ${{ needs.check.outputs.version }}
+        run: |
+          draft=$(gh release view "v$VERSION" --repo DanielHromadka/afinder-downloads --json isDraft --jq .isDraft || echo false)
+          if [ "$draft" = true ]; then gh release delete "v$VERSION" --yes --repo DanielHromadka/afinder-downloads; fi

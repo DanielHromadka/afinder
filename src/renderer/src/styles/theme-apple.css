@@ -1,0 +1,1091 @@
+/* Modern macOS theme (Sonoma / Sequoia Finder): flat unified title bar and toolbar, gray sidebar,
+   accent-blue selection pills, rounded controls, light and dark following the system appearance.
+   On macOS the window uses the native traffic lights (see applyWindowTheme in the main process). */
+
+:root[data-theme='apple'] {
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', system-ui, sans-serif;
+  --font-size: 13px;
+
+  --ap-accent: #007aff;
+  --ap-accent-soft: rgba(0, 122, 255, 0.14);
+  --ap-accent-ring: rgba(0, 122, 255, 0.35);
+  --ap-label: rgba(0, 0, 0, 0.85);
+  --ap-label-2: rgba(0, 0, 0, 0.5);
+  --ap-label-3: rgba(0, 0, 0, 0.26);
+  --ap-separator: rgba(0, 0, 0, 0.1);
+  --ap-window: #f5f5f7;
+  --ap-chrome: #ececec;
+  --ap-sidebar: #e8e8ea;
+  --ap-content: #ffffff;
+  --ap-stripe: #f4f5f5;
+  --ap-control: rgba(0, 0, 0, 0.05);
+  --ap-control-hover: rgba(0, 0, 0, 0.07);
+  --ap-control-press: rgba(0, 0, 0, 0.12);
+  --ap-field: rgba(0, 0, 0, 0.045);
+  --ap-menu: rgba(246, 246, 246, 0.97);
+  --ap-shadow: 0 10px 34px rgba(0, 0, 0, 0.2), 0 0 0 0.5px rgba(0, 0, 0, 0.18);
+  --ap-red: #ff3b30;
+  --ap-error: #d70015;
+
+  --face: var(--ap-window);
+  --face-light: var(--ap-content);
+  --face-dark: var(--ap-separator);
+  --border-dark: var(--ap-label-3);
+  --text: var(--ap-label);
+  --muted: var(--ap-label-2);
+  --link: var(--ap-label);
+  --link-hover: var(--ap-accent);
+  --window-border: transparent;
+  --title-gradient: var(--ap-chrome);
+  --title-btn: var(--ap-control);
+  --title-btn-close: var(--ap-red);
+  --taskpane-bg: var(--ap-sidebar);
+  --task-header: transparent;
+  --task-body: transparent;
+  --task-header-text: var(--ap-label-2);
+  --list-bg: var(--ap-content);
+  --header-bg: var(--ap-content);
+  --header-hover: var(--ap-accent);
+  --selection: var(--ap-accent);
+  --selection-text: #fff;
+  --hit-bg: rgba(255, 204, 0, 0.45);
+  --hit-text: inherit;
+  --menu-bg: var(--ap-menu);
+  --menu-border: var(--ap-separator);
+  --focus-ring: var(--ap-accent);
+  /* Side list rows as in the folder tree. */
+  --row-height: 26px;
+  --row-radius: 7px;
+  --row-hover: var(--ap-control-hover);
+  --row-current: var(--ap-accent-soft);
+  --row-current-text: var(--ap-accent);
+  --row-current-weight: 600;
+
+  --term-bg: #1e1e1e;
+  --term-fg: #e5e5e5;
+  --term-cursor: #0a84ff;
+  --term-selection: rgba(10, 132, 255, 0.35);
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-theme='apple'] {
+    --ap-accent: #0a84ff;
+    --ap-accent-soft: rgba(10, 132, 255, 0.24);
+    --ap-accent-ring: rgba(10, 132, 255, 0.5);
+    --ap-label: rgba(255, 255, 255, 0.86);
+    --ap-label-2: rgba(255, 255, 255, 0.55);
+    --ap-label-3: rgba(255, 255, 255, 0.25);
+    --ap-separator: rgba(255, 255, 255, 0.1);
+    --ap-window: #1e1e1e;
+    --ap-chrome: #2b2b2d;
+    --ap-sidebar: #252527;
+    --ap-content: #1e1e1e;
+    --ap-stripe: #252527;
+    --ap-control: rgba(255, 255, 255, 0.08);
+    --ap-control-hover: rgba(255, 255, 255, 0.1);
+    --ap-control-press: rgba(255, 255, 255, 0.16);
+    --ap-field: rgba(255, 255, 255, 0.07);
+    --ap-menu: rgba(40, 40, 42, 0.97);
+    --ap-shadow: 0 10px 34px rgba(0, 0, 0, 0.55), 0 0 0 0.5px rgba(255, 255, 255, 0.16);
+    --ap-red: #ff453a;
+    --ap-error: #ff6961;
+
+    --hit-bg: rgba(255, 214, 10, 0.35);
+    --term-bg: #161618;
+    color-scheme: dark;
+  }
+}
+
+/* ---- window & title bar ------------------------------------------------------------------- */
+
+[data-theme='apple'] body {
+  letter-spacing: -0.08px;
+}
+
+[data-theme='apple'] .xp-window.app {
+  border: 0;
+  background: var(--ap-window);
+}
+
+[data-theme='apple'] .titlebar {
+  height: 38px;
+  padding: 0 10px;
+  border-radius: 0;
+  background: var(--ap-chrome);
+  color: var(--ap-label);
+}
+
+[data-theme='apple'] .titlebar-text {
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  text-shadow: none;
+  color: var(--ap-label);
+}
+
+[data-theme='apple'] .titlebar > svg {
+  display: none;
+}
+
+/* macOS: a title bar of its own above the toolbar, holding the native traffic lights (positioned in
+   applyWindowTheme in the main process), so the toolbar can scroll sideways without passing under them. */
+[data-theme='apple'][data-platform='darwin'] .xp-window.app > .titlebar {
+  padding-left: 78px;
+}
+
+[data-theme='apple'][data-platform='darwin'] .xp-window.app > .titlebar > .titlebar-buttons {
+  display: none;
+}
+
+/* In full screen macOS hides the traffic lights and the title bar goes with them. */
+[data-theme='apple'][data-platform='darwin'][data-fullscreen='true'] .xp-window.app > .titlebar {
+  display: none;
+}
+
+/* Windows and Linux: the system's minimize, maximize and close over the right end of the title bar. */
+[data-theme='apple'][data-native-buttons] .xp-window.app > .titlebar {
+  padding-right: calc(100vw - env(titlebar-area-x, 0px) - env(titlebar-area-width, 100vw));
+}
+
+[data-theme='apple'][data-native-buttons] .xp-window.app > .titlebar > .titlebar-buttons {
+  display: none;
+}
+
+/* Elsewhere (and in dialogs) the window buttons become red / yellow / green dots on the left. */
+[data-theme='apple'] .titlebar-buttons {
+  order: -1;
+  gap: 8px;
+  margin-right: 8px;
+  flex-direction: row-reverse;
+}
+
+[data-theme='apple'] .tb-btn {
+  width: 12px;
+  height: 12px;
+  border: 0;
+  border-radius: 50%;
+  background: #febc2e;
+  box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.18);
+}
+
+[data-theme='apple'] .tb-btn:first-child {
+  background: #28c840;
+}
+
+[data-theme='apple'] .tb-btn.tb-close {
+  background: #ff5f57;
+}
+
+[data-theme='apple'] .tb-btn:hover {
+  filter: none;
+}
+
+[data-theme='apple'] .glyph-min,
+[data-theme='apple'] .glyph-max,
+[data-theme='apple'] .glyph-close {
+  visibility: hidden;
+}
+
+[data-theme='apple'] .titlebar-buttons:hover .glyph-close {
+  visibility: visible;
+  color: rgba(0, 0, 0, 0.55);
+  font-size: 8px;
+}
+
+[data-theme='apple'] .titlebar-buttons:hover .glyph-min {
+  visibility: visible;
+  width: 6px;
+  height: 1.5px;
+  margin: 0;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+[data-theme='apple'] .titlebar-buttons:hover .glyph-max {
+  visibility: visible;
+  width: 6px;
+  height: 6px;
+  border: 0;
+  background: rgba(0, 0, 0, 0.55);
+  clip-path: polygon(0 0, 70% 0, 0 70%, 0 0, 100% 30%, 100% 100%, 30% 100%);
+}
+
+/* ---- toolbar & address bar ---------------------------------------------------------------- */
+
+[data-theme='apple'] .toolbar {
+  gap: 4px;
+  padding: 2px 10px 8px;
+  border-bottom: 0;
+  background: var(--ap-chrome);
+}
+
+[data-theme='apple'] .addressbar {
+  padding: 0 10px 8px;
+  border-bottom: 1px solid var(--ap-separator);
+  background: var(--ap-chrome);
+}
+
+[data-theme='apple'] .tool-btn,
+[data-theme='apple'] .go-btn {
+  height: 28px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 6px;
+  color: var(--ap-label);
+}
+
+[data-theme='apple'] .go-btn {
+  height: 24px;
+}
+
+[data-theme='apple'] .tool-btn:hover:not(:disabled),
+[data-theme='apple'] .go-btn:hover {
+  border: 0;
+  background: var(--ap-control-hover);
+}
+
+[data-theme='apple'] .tool-btn:active:not(:disabled) {
+  background: var(--ap-control-press);
+  box-shadow: none;
+}
+
+[data-theme='apple'] .tool-btn.pressed {
+  background: var(--ap-accent-soft);
+  color: var(--ap-accent);
+  box-shadow: none;
+}
+
+[data-theme='apple'] .tool-btn:disabled {
+  opacity: 0.35;
+}
+
+[data-theme='apple'] .tool-sep {
+  height: 18px;
+  margin: 0 6px;
+  background: var(--ap-separator);
+  box-shadow: none;
+}
+
+[data-theme='apple'] .filter-box,
+[data-theme='apple'] .address-input {
+  height: 26px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 7px;
+  background: var(--ap-field);
+  box-shadow: inset 0 0 0 0.5px var(--ap-separator);
+  transition: box-shadow 0.15s;
+}
+
+[data-theme='apple'] .filter-box:focus-within,
+[data-theme='apple'] .address-input:focus-within {
+  background: var(--ap-content);
+  box-shadow: 0 0 0 3px var(--ap-accent-ring), inset 0 0 0 0.5px var(--ap-accent);
+}
+
+[data-theme='apple'] input {
+  caret-color: var(--ap-accent);
+}
+
+[data-theme='apple'] input::placeholder {
+  color: var(--ap-label-3);
+}
+
+[data-theme='apple'] input[type='checkbox'] {
+  accent-color: var(--ap-accent);
+}
+
+[data-theme='apple'] .address-label,
+[data-theme='apple'] .fuzzy-toggle {
+  color: var(--ap-label-2);
+}
+
+[data-theme='apple'] .virtual-crumb {
+  height: 20px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--ap-accent-soft);
+  color: var(--ap-accent);
+  font-weight: 600;
+}
+
+/* ---- sidebar ------------------------------------------------------------------------------ */
+
+[data-theme='apple'] .taskpane {
+  gap: 14px;
+  padding: 10px 8px;
+  background: var(--ap-sidebar);
+  border-right: 1px solid var(--ap-separator);
+}
+
+[data-theme='apple'] .task-section {
+  border-radius: 0;
+  box-shadow: none;
+}
+
+[data-theme='apple'] .task-header {
+  height: 20px;
+  padding: 0 8px;
+  border-radius: 0;
+  background: transparent;
+  color: var(--ap-label-2);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+[data-theme='apple'] .task-header:hover {
+  color: var(--ap-label);
+}
+
+[data-theme='apple'] .chevron {
+  width: auto;
+  height: auto;
+  border: 0;
+  background: transparent;
+  color: var(--ap-label-3);
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+[data-theme='apple'] .task-header:hover .chevron {
+  opacity: 1;
+}
+
+[data-theme='apple'] .task-body {
+  gap: 1px;
+  padding: 2px 0;
+  border: 0;
+  background: transparent;
+}
+
+[data-theme='apple'] .task-link {
+  height: 26px;
+  padding: 0 8px;
+  border-radius: 6px;
+  color: var(--ap-label);
+}
+
+[data-theme='apple'] .task-link:hover:not(:disabled) {
+  background: var(--ap-control-hover);
+  color: var(--ap-label);
+  text-decoration: none;
+}
+
+[data-theme='apple'] .task-link:active:not(:disabled) {
+  background: var(--ap-control-press);
+}
+
+[data-theme='apple'] .task-link:disabled {
+  color: var(--ap-label-3);
+  filter: grayscale(1);
+  opacity: 0.6;
+}
+
+[data-theme='apple'] .task-note,
+[data-theme='apple'] .details {
+  padding: 0 8px;
+}
+
+[data-theme='apple'] .details span {
+  color: var(--ap-label-2);
+}
+
+[data-theme='apple'] .foldertree {
+  background: var(--ap-sidebar);
+  border-right: 1px solid var(--ap-separator);
+}
+
+[data-theme='apple'] .pane-header {
+  height: 26px;
+  padding: 6px 12px;
+  background: transparent;
+  border-bottom: 0;
+  color: var(--ap-label-2);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+[data-theme='apple'] .foldertree {
+  --tree-row-height: 26px;
+  --tree-indent: 12px;
+  --tree-toggle-size: 12px;
+  --tree-line-color: var(--ap-label-2);
+}
+
+[data-theme='apple'] .tree-scroll {
+  padding: 2px 6px;
+}
+
+[data-theme='apple'] .tree-row {
+  height: 26px;
+  padding-right: 8px;
+  border-radius: 7px;
+}
+
+[data-theme='apple'] .tree-row:hover {
+  background: var(--ap-control-hover);
+}
+
+[data-theme='apple'] .tree-row:hover .tree-label {
+  text-decoration: none;
+}
+
+[data-theme='apple'] .tree-row.current {
+  background: var(--ap-accent-soft);
+}
+
+[data-theme='apple'] .tree-row.current .tree-label {
+  background: transparent;
+  color: var(--ap-accent);
+  font-weight: 600;
+}
+
+[data-theme='apple'] .tree-toggle {
+  width: 16px;
+  height: 16px;
+  margin-right: 1px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--ap-label-2);
+}
+
+[data-theme='apple'] .tree-toggle:hover {
+  background: var(--ap-control-hover);
+  color: var(--ap-label);
+}
+
+/* A chevron that turns when the folder opens, instead of the +/− boxes. */
+[data-theme='apple'] .tree-toggle::before {
+  content: none;
+}
+
+[data-theme='apple'] .tree-chevron {
+  display: block;
+  transition: transform 0.15s ease;
+}
+
+[data-theme='apple'] .tree-toggle[aria-expanded='true'] .tree-chevron {
+  transform: rotate(90deg);
+}
+
+/* No dotted rails: indentation alone shows the nesting, as in Finder's sidebar. */
+[data-theme='apple'] .tree-children::before,
+[data-theme='apple'] .tree-children > .tree-node::before,
+[data-theme='apple'] .tree-children > .tree-node::after {
+  display: none;
+}
+
+/* Home and each disk start their own little group. */
+[data-theme='apple'] .tree-scroll > .tree-node + .tree-node {
+  margin-top: 8px;
+}
+
+[data-theme='apple'] .tree-label {
+  padding: 0 0 0 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---- file list ----------------------------------------------------------------------------- */
+
+[data-theme='apple'] .filelist {
+  background: var(--ap-content);
+}
+
+[data-theme='apple'] .list-header {
+  height: 26px;
+}
+
+[data-theme='apple'] .col-header {
+  padding: 0 8px;
+  background: var(--ap-content);
+  border-right: 0;
+  border-bottom: 1px solid var(--ap-separator);
+  color: var(--ap-label-2);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* Thin column separators, inset like Finder's list view. */
+[data-theme='apple'] .col-header:not(.filler)::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 1px;
+  background: var(--ap-separator);
+}
+
+/* --ap-control is translucent: laid over the opaque content colour, or the sticky header shows the
+   scrolled rows through it. */
+[data-theme='apple'] .col-header:not(.filler):hover {
+  border-bottom: 1px solid var(--ap-separator);
+  background: linear-gradient(var(--ap-control), var(--ap-control)), var(--ap-content);
+}
+
+[data-theme='apple'] .col-header.sorted {
+  background: var(--ap-content);
+  color: var(--ap-label);
+  font-weight: 600;
+}
+
+[data-theme='apple'] .sort-arrow {
+  color: var(--ap-accent);
+  font-size: 8px;
+}
+
+/* Rows are virtualized (DOM order is not list order), so there are no zebra stripes – just a hover. */
+[data-theme='apple'] .row {
+  border-radius: 5px;
+}
+
+[data-theme='apple'] .row:hover:not(.selected):not(.drop-target) {
+  background: var(--ap-stripe);
+}
+
+[data-theme='apple'] .row.selected {
+  background: var(--ap-accent);
+  color: #fff;
+}
+
+[data-theme='apple'] .row.focused:not(.selected) {
+  outline: 0;
+  box-shadow: inset 0 0 0 1.5px var(--ap-accent-ring);
+}
+
+[data-theme='apple'] .row.selected .muted {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+[data-theme='apple'] .hit {
+  text-decoration: none;
+  border-radius: 3px;
+  font-weight: 600;
+}
+
+[data-theme='apple'] .row.selected .hit {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.25);
+}
+
+[data-theme='apple'] .rename-input {
+  height: 20px;
+  padding: 0 4px;
+  border: 0;
+  border-radius: 4px;
+  background: var(--ap-content);
+  color: var(--ap-label);
+  box-shadow: 0 0 0 3px var(--ap-accent-ring), inset 0 0 0 1px var(--ap-accent);
+}
+
+[data-theme='apple'] .shortcut-arrow {
+  border: 0;
+  border-radius: 2px;
+  box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme='apple'] .empty-note {
+  color: var(--ap-label-3);
+  font-size: 15px;
+}
+
+[data-theme='apple'] .group-row {
+  color: var(--ap-label);
+  padding: 6px 14px 0;
+}
+
+[data-theme='apple'] .group-row:hover .group-label {
+  color: var(--ap-label);
+  text-decoration: none;
+}
+
+[data-theme='apple'] .group-label {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+[data-theme='apple'] .group-chevron {
+  color: var(--ap-label-2);
+}
+
+[data-theme='apple'] .group-line {
+  background: var(--ap-separator);
+  opacity: 1;
+}
+
+[data-theme='apple'] .git-badge {
+  border-radius: 4px;
+  padding: 0 4px;
+  font-weight: 600;
+}
+
+/* Finder-blue folders instead of the XP manila ones. */
+[data-theme='apple'] svg path[fill='#d9a52a'] {
+  fill: #4fa3e8;
+  stroke: #3a8bd3;
+}
+
+[data-theme='apple'] svg path[fill='url(#fg)'] {
+  fill: #7ec4f6;
+  stroke: #4fa3e8;
+}
+
+/* ---- drag & drop, cut ------------------------------------------------------------------- */
+
+[data-theme='apple'] .row.drop-target,
+[data-theme='apple'] .tree-row.drop-target {
+  background: var(--ap-accent-soft);
+  outline: 2px solid var(--ap-accent);
+  outline-offset: -2px;
+}
+
+[data-theme='apple'] .tree-row.drop-target .tree-label {
+  background: transparent;
+  outline: 0;
+}
+
+[data-theme='apple'] .filelist-scroll.drop-here {
+  box-shadow: inset 0 0 0 3px var(--ap-accent-ring);
+}
+
+/* ---- tabs & panes ----------------------------------------------------------------------------- */
+
+[data-theme='apple'] .tabstrip {
+  align-items: center;
+  gap: 4px;
+  height: 32px;
+  padding: 4px 8px;
+  background: var(--ap-chrome);
+  border-bottom: 1px solid var(--ap-separator);
+}
+
+[data-theme='apple'] .tabstrip.active {
+  box-shadow: inset 0 -2px 0 var(--ap-accent);
+}
+
+[data-theme='apple'] .tab {
+  flex: 1 1 0;
+  max-width: 240px;
+  height: 24px;
+  justify-content: center;
+  padding: 0 6px 0 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ap-label-2);
+}
+
+[data-theme='apple'] .tab:hover {
+  background: var(--ap-control-hover);
+}
+
+[data-theme='apple'] .tab.current {
+  height: 24px;
+  margin: 0;
+  background: var(--ap-content);
+  color: var(--ap-label);
+  font-weight: 500;
+  box-shadow: 0 0.5px 2px rgba(0, 0, 0, 0.12), 0 0 0 0.5px var(--ap-separator);
+}
+
+[data-theme='apple'] .tab-title {
+  text-align: center;
+}
+
+[data-theme='apple'] .tab-close {
+  border-radius: 4px;
+  opacity: 0;
+}
+
+[data-theme='apple'] .tab:hover .tab-close {
+  opacity: 0.6;
+}
+
+[data-theme='apple'] .tab-close:hover {
+  opacity: 1;
+  background: var(--ap-control-press);
+}
+
+[data-theme='apple'] .tab-new {
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 6px;
+  color: var(--ap-label-2);
+}
+
+[data-theme='apple'] .tab-new:hover {
+  background: var(--ap-control-hover);
+}
+
+[data-theme='apple'] .tab.drop-before::before,
+[data-theme='apple'] .tab.drop-after::after {
+  width: 2px;
+  border-radius: 1px;
+  background: var(--ap-accent);
+}
+
+[data-theme='apple'] .pane-divider,
+[data-theme='apple'] .preview-divider {
+  width: 1px;
+  border: 0;
+  background: var(--ap-separator);
+  position: relative;
+}
+
+/* A wider invisible grip around the hairline divider. */
+[data-theme='apple'] .pane-divider::after,
+[data-theme='apple'] .preview-divider::after {
+  content: '';
+  position: absolute;
+  inset: 0 -3px;
+  z-index: 2;
+}
+
+[data-theme='apple'] .pane-divider:hover,
+[data-theme='apple'] .preview-divider:hover {
+  background: var(--ap-accent);
+}
+
+/* ---- status bar ------------------------------------------------------------------------------ */
+
+[data-theme='apple'] .statusbar {
+  height: 24px;
+  padding: 0 6px;
+  border-top: 1px solid var(--ap-separator);
+  background: var(--ap-chrome);
+}
+
+[data-theme='apple'] .status-field {
+  border: 0;
+  color: var(--ap-label-2);
+  font-size: 11px;
+}
+
+[data-theme='apple'] .status-field.grow {
+  justify-content: center;
+}
+
+[data-theme='apple'] .status-clock:hover,
+[data-theme='apple'] .status-clock.open {
+  border-radius: 5px;
+  background: var(--ap-control-hover);
+}
+
+[data-theme='apple'] .clock-time {
+  font-weight: 600;
+}
+
+/* ---- menus & calendar ------------------------------------------------------------------------ */
+
+[data-theme='apple'] .context-menu {
+  min-width: 230px;
+  padding: 5px;
+  border: 0;
+  border-radius: 9px;
+  background: var(--ap-menu);
+  box-shadow: var(--ap-shadow);
+  backdrop-filter: blur(24px) saturate(1.6);
+}
+
+[data-theme='apple'] .menu-item {
+  height: 24px;
+  padding: 0 10px 0 4px;
+  border-radius: 5px;
+  color: var(--ap-label);
+}
+
+[data-theme='apple'] .menu-item.bold {
+  font-weight: 600;
+}
+
+[data-theme='apple'] .menu-item:hover:not(:disabled) {
+  background: var(--ap-accent);
+  color: #fff;
+}
+
+[data-theme='apple'] .menu-item:disabled {
+  color: var(--ap-label-3);
+}
+
+[data-theme='apple'] .menu-shortcut {
+  color: var(--ap-label-2);
+  opacity: 1;
+}
+
+[data-theme='apple'] .menu-item:hover:not(:disabled) .menu-shortcut {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+[data-theme='apple'] .menu-sep {
+  height: 1px;
+  margin: 5px 10px;
+  background: var(--ap-separator);
+}
+
+[data-theme='apple'] .calendar-nav,
+[data-theme='apple'] .calendar-today {
+  border-radius: 5px;
+}
+
+[data-theme='apple'] .calendar-today {
+  border: 0;
+  background: var(--ap-control);
+}
+
+[data-theme='apple'] .calendar-grid td.today {
+  border-radius: 50%;
+  background: var(--ap-accent);
+}
+
+[data-theme='apple'] .calendar-grid .calendar-week,
+[data-theme='apple'] .calendar-now,
+[data-theme='apple'] .calendar-foot {
+  border-color: var(--ap-separator);
+}
+
+/* ---- dialogs, buttons, progress ------------------------------------------------------------- */
+
+[data-theme='apple'] .modal-backdrop {
+  background: rgba(0, 0, 0, 0.18);
+}
+
+[data-theme='apple'] .xp-window.dialog,
+[data-theme='apple'] .xp-window.quicklook {
+  border: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--ap-window);
+  box-shadow: var(--ap-shadow);
+}
+
+/* auto still clips to the rounded corners but lets tall dialogs (settings) scroll. */
+[data-theme='apple'] .xp-window.dialog {
+  overflow: auto;
+}
+
+[data-theme='apple'] .xp-window.dialog .titlebar,
+[data-theme='apple'] .xp-window.quicklook .titlebar {
+  height: 32px;
+  background: transparent;
+}
+
+[data-theme='apple'] .dialog-body {
+  padding: 8px 20px 10px;
+}
+
+[data-theme='apple'] .dialog-buttons {
+  gap: 8px;
+  padding: 10px 20px 18px;
+  justify-content: flex-end;
+}
+
+[data-theme='apple'] .xp-button {
+  min-width: 72px;
+  height: 24px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--ap-content);
+  color: var(--ap-label);
+  box-shadow: 0 0.5px 1.5px rgba(0, 0, 0, 0.18), 0 0 0 0.5px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme='apple'] .xp-button:hover {
+  box-shadow: 0 0.5px 1.5px rgba(0, 0, 0, 0.18), 0 0 0 0.5px rgba(0, 0, 0, 0.12);
+  filter: brightness(0.97);
+}
+
+[data-theme='apple'] .xp-button:active {
+  filter: brightness(0.92);
+}
+
+/* The focused button is the default one – drawn as Apple's filled accent button. */
+[data-theme='apple'] .xp-button:focus-visible,
+[data-theme='apple'] .dialog-buttons .xp-button:focus {
+  outline: 0;
+  background: var(--ap-accent);
+  color: #fff;
+  box-shadow: 0 0 0 3px var(--ap-accent-ring);
+}
+
+[data-theme='apple'] .xp-progress {
+  height: 6px;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: var(--ap-control-press);
+}
+
+[data-theme='apple'] .xp-progress-fill {
+  border-radius: 3px;
+  background: var(--ap-accent);
+  -webkit-mask: none;
+}
+
+[data-theme='apple'] .conflict-list {
+  color: var(--ap-label-2);
+}
+
+[data-theme='apple'] .batch-form input:not([type='checkbox']),
+[data-theme='apple'] .batch-form select {
+  height: 24px;
+  padding: 0 7px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--ap-content);
+  color: var(--ap-label);
+  box-shadow: inset 0 0 0 0.5px var(--ap-label-3);
+}
+
+[data-theme='apple'] .batch-form input:not([type='checkbox']):focus,
+[data-theme='apple'] .batch-form select:focus {
+  outline: 0;
+  box-shadow: 0 0 0 3px var(--ap-accent-ring), inset 0 0 0 1px var(--ap-accent);
+}
+
+[data-theme='apple'] .batch-preview {
+  border: 0;
+  border-radius: 8px;
+  box-shadow: inset 0 0 0 0.5px var(--ap-label-3);
+}
+
+[data-theme='apple'] .batch-preview th {
+  background: var(--ap-content);
+  border-bottom: 1px solid var(--ap-separator);
+  color: var(--ap-label-2);
+  font-weight: 500;
+}
+
+[data-theme='apple'] .batch-preview tr.problem td:last-child,
+[data-theme='apple'] .batch-problem,
+[data-theme='apple'] .batch-summary.error,
+[data-theme='apple'] .preview-note.error,
+[data-theme='apple'] .preview-status.error {
+  color: var(--ap-error);
+}
+
+/* ---- preview & Quick Look -------------------------------------------------------------------- */
+
+[data-theme='apple'] .preview-head {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--ap-separator);
+}
+
+[data-theme='apple'] .preview-title strong {
+  font-weight: 600;
+}
+
+[data-theme='apple'] .preview-image img {
+  border-radius: 4px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
+}
+
+[data-theme='apple'] .preview-tools,
+[data-theme='apple'] .quicklook-bar {
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--ap-separator);
+  background: var(--ap-chrome);
+}
+
+[data-theme='apple'] .preview-tools .xp-button.pressed {
+  background: var(--ap-accent-soft);
+  color: var(--ap-accent);
+  box-shadow: none;
+}
+
+[data-theme='apple'] .quicklook-backdrop {
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(2px);
+}
+
+[data-theme='apple'] .sheet-tabs {
+  gap: 4px;
+  padding: 4px 6px;
+  background: var(--ap-chrome);
+  border-top: 1px solid var(--ap-separator);
+}
+
+[data-theme='apple'] .sheet-tabs button {
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--ap-label-2);
+}
+
+[data-theme='apple'] .sheet-tabs button.active {
+  background: var(--ap-content);
+  color: var(--ap-label);
+  font-weight: 600;
+  box-shadow: 0 0.5px 2px rgba(0, 0, 0, 0.15);
+}
+
+/* ---- integrated console ------------------------------------------------------------------- */
+
+[data-theme='apple'] .console {
+  border-top: 1px solid var(--ap-separator);
+  background: var(--ap-chrome);
+}
+
+[data-theme='apple'] .console-bar {
+  gap: 4px;
+  height: 30px;
+  padding: 3px 6px;
+  border-bottom: 0;
+}
+
+[data-theme='apple'] .console-tab {
+  height: 24px;
+  padding: 0 6px 0 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ap-label-2);
+}
+
+[data-theme='apple'] .console-tab:hover {
+  background: var(--ap-control-hover);
+}
+
+[data-theme='apple'] .console-tab.current {
+  background: var(--term-bg);
+  color: var(--term-fg);
+}
+
+[data-theme='apple'] .console-hide {
+  width: 24px;
+  height: 22px;
+  border: 0;
+  border-radius: 5px;
+}
+
+[data-theme='apple'] .console-hide:hover {
+  background: var(--ap-control-hover);
+}
+
+/* ---- scrollbars: thin overlay style ---------------------------------------------------------- */
+
+[data-theme='apple'] ::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+
+[data-theme='apple'] ::-webkit-scrollbar-track,
+[data-theme='apple'] ::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+[data-theme='apple'] ::-webkit-scrollbar-thumb,
+[data-theme='apple'] ::-webkit-scrollbar-thumb:horizontal {
+  border: 3px solid transparent;
+  border-radius: 6px;
+  background: var(--ap-label-3) padding-box;
+  box-shadow: none;
+}
+
+[data-theme='apple'] ::-webkit-scrollbar-thumb:hover {
+  background: var(--ap-label-2) padding-box;
+}

@@ -1,0 +1,140 @@
+/* The guided tour and its first-start offer. Loaded after xp.css, in the order main.tsx imports them. */
+
+/* ---- guided tour ----------------------------------------------------------------------------- */
+
+.tour-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+}
+
+/* Dimming with a hole per highlighted element (an SVG mask), so the space between two stays dark. */
+.tour-dim {
+  position: absolute;
+  inset: 0;
+  fill: rgb(0 0 0 / 0.5);
+}
+
+.tour-spotlight {
+  position: absolute;
+  box-sizing: border-box;
+  border: 2px solid var(--selection);
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+.tour-balloon,
+.tour-offer {
+  position: absolute;
+  box-sizing: border-box;
+  width: 340px;
+  max-width: calc(100vw - 16px);
+  padding: 12px 14px 10px;
+  border: 1px solid var(--face-dark);
+  border-radius: 8px;
+  background: var(--list-bg);
+  color: var(--text);
+  box-shadow: 0 10px 30px rgb(0 0 0 / 0.35);
+  transition: left 0.25s ease, top 0.25s ease;
+}
+
+.tour-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.tour-title {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.tour-count {
+  color: var(--muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.tour-balloon.wide {
+  width: 440px;
+}
+
+.tour-text {
+  margin: 6px 0 10px;
+  line-height: 1.45;
+}
+
+.tour-text p {
+  margin: 0;
+}
+
+.tour-text ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+}
+
+.tour-text li + li {
+  margin-top: 2px;
+}
+
+.tour-dots {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.tour-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--face-dark);
+}
+
+.tour-dots span.seen {
+  background: color-mix(in srgb, var(--selection) 45%, transparent);
+}
+
+.tour-dots span.on {
+  background: var(--selection);
+}
+
+.tour-buttons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tour-spacer {
+  flex: 1;
+}
+
+.tour-skip {
+  color: var(--muted);
+}
+
+.tour-next {
+  font-weight: 700;
+}
+
+/* The first-start offer: a small note in the corner that blocks nothing. */
+.tour-offer {
+  position: fixed;
+  z-index: 2500;
+  right: 16px;
+  bottom: 40px;
+}
+
+.tour-offer p {
+  margin: 6px 0 10px;
+  line-height: 1.4;
+}
+
+.tour-offer-close {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  border: 0;
+  background: none;
+  color: var(--muted);
+}

@@ -1,0 +1,419 @@
+/* Matrix theme: green phosphor on black, monospace, faint digital rain behind the window,
+   glowing code-green selection and a blinking terminal cursor in the status bar. */
+
+:root[data-theme='matrix'] {
+  --font: 'SF Mono', Menlo, Monaco, 'Cascadia Mono', Consolas, monospace;
+  --font-size: 12px;
+
+  --mx-bg: #000400;
+  --mx-panel: #020d04;
+  --mx-green: #00ff41;
+  --mx-mid: #00b32d;
+  --mx-dark: #0a3d16;
+  --mx-faint: rgba(0, 255, 65, 0.1);
+  --mx-white: #d7ffe0;
+
+  --face: var(--mx-bg);
+  --face-light: var(--mx-panel);
+  --face-dark: var(--mx-dark);
+  --border-dark: var(--mx-mid);
+  --text: #9dffb5;
+  --muted: #2f8a45;
+  --link: var(--mx-green);
+  --link-hover: var(--mx-white);
+  --window-border: var(--mx-dark);
+  --title-gradient: var(--mx-bg);
+  --taskpane-bg: var(--mx-panel);
+  --task-header: transparent;
+  --task-body: transparent;
+  --task-header-text: var(--mx-green);
+  --list-bg: transparent;
+  --header-bg: var(--mx-panel);
+  --header-hover: var(--mx-white);
+  --selection: rgba(0, 255, 65, 0.2);
+  --selection-text: var(--mx-white);
+  --hit-bg: transparent;
+  --hit-text: var(--mx-white);
+  --menu-bg: #010a03;
+  --menu-border: var(--mx-mid);
+  --focus-ring: var(--mx-green);
+
+  --mx-glow: 0 0 8px rgba(0, 255, 65, 0.55);
+  --mx-text-glow: 0 0 5px rgba(0, 255, 65, 0.8);
+
+  --check-bg: #000;
+  --check-border: var(--mx-dark);
+  --check-on: var(--mx-faint);
+  --check-on-border: var(--mx-green);
+  --check-mark: var(--mx-green);
+  --check-radius: 0;
+  --check-glow: var(--mx-glow);
+}
+
+/* Digital rain (MatrixRain canvas) behind the content: an isolated stacking context keeps the
+   canvas at z-index -1, above the window face and below every pane. */
+[data-theme='matrix'] .xp-window.app {
+  position: relative;
+  isolation: isolate;
+  border: 1px solid var(--mx-dark);
+  background: var(--mx-bg);
+}
+
+.matrix-rain {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  opacity: 0.24;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme='matrix'] .status-field.grow::after {
+    animation: none;
+  }
+}
+
+/* Faint scanlines over the whole window. */
+[data-theme='matrix'] body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1000;
+  background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.14) 0 1px, transparent 1px 3px);
+}
+
+[data-theme='matrix'] .titlebar {
+  border-radius: 0;
+  border-bottom: 1px solid var(--mx-dark);
+}
+
+[data-theme='matrix'] .titlebar > svg {
+  filter: grayscale(1) brightness(1.4) sepia(1) hue-rotate(70deg) saturate(6) drop-shadow(0 0 2px var(--mx-green));
+}
+
+[data-theme='matrix'] .titlebar-text {
+  color: var(--mx-green);
+  font-weight: 400;
+  text-shadow: var(--mx-text-glow);
+  letter-spacing: 2px;
+}
+
+[data-theme='matrix'] .titlebar-text::before {
+  content: '> ';
+  color: var(--mx-white);
+}
+
+[data-theme='matrix'] .tb-btn {
+  border: 1px solid var(--mx-dark);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+[data-theme='matrix'] .tb-btn:hover {
+  border-color: var(--mx-green);
+  box-shadow: var(--mx-glow);
+  filter: none;
+}
+
+[data-theme='matrix'] .glyph-min {
+  background: var(--mx-green);
+}
+
+[data-theme='matrix'] .glyph-max {
+  border-color: var(--mx-green);
+}
+
+[data-theme='matrix'] .glyph-close {
+  color: var(--mx-green);
+}
+
+[data-theme='matrix'] .toolbar,
+[data-theme='matrix'] .addressbar {
+  background: rgba(0, 4, 0, 0.85);
+  border-bottom: 1px solid var(--mx-dark);
+}
+
+[data-theme='matrix'] .tool-btn,
+[data-theme='matrix'] .go-btn {
+  border: 1px solid transparent;
+  border-radius: 0;
+  font-size: 11px;
+  color: var(--text);
+}
+
+[data-theme='matrix'] .tool-btn svg,
+[data-theme='matrix'] .go-btn svg,
+[data-theme='matrix'] .task-link svg,
+[data-theme='matrix'] .menu-icon svg,
+[data-theme='matrix'] .cell.name svg,
+[data-theme='matrix'] .tree-row svg {
+  filter: grayscale(1) brightness(1.3) sepia(1) hue-rotate(70deg) saturate(5);
+}
+
+[data-theme='matrix'] .tool-btn:hover:not(:disabled),
+[data-theme='matrix'] .go-btn:hover {
+  border-color: var(--mx-mid);
+  background: var(--mx-faint);
+  color: var(--mx-green);
+  text-shadow: var(--mx-text-glow);
+}
+
+[data-theme='matrix'] .tool-btn:active:not(:disabled),
+[data-theme='matrix'] .tool-btn.pressed {
+  border-color: var(--mx-green);
+  background: rgba(0, 255, 65, 0.18);
+  color: var(--mx-white);
+  box-shadow: var(--mx-glow);
+}
+
+[data-theme='matrix'] .tool-sep {
+  background: var(--mx-dark);
+  box-shadow: none;
+}
+
+[data-theme='matrix'] .filter-box,
+[data-theme='matrix'] .address-input {
+  border: 1px solid var(--mx-dark);
+  border-radius: 0;
+  background: #000;
+}
+
+[data-theme='matrix'] .filter-box:focus-within,
+[data-theme='matrix'] .address-input:focus-within {
+  border-color: var(--mx-green);
+  box-shadow: var(--mx-glow);
+}
+
+[data-theme='matrix'] input {
+  caret-color: var(--mx-green);
+}
+
+[data-theme='matrix'] input::placeholder {
+  color: var(--muted);
+}
+
+[data-theme='matrix'] .address-label,
+[data-theme='matrix'] .fuzzy-toggle {
+  color: var(--mx-mid);
+  font-size: 11px;
+}
+
+[data-theme='matrix'] .taskpane,
+[data-theme='matrix'] .foldertree {
+  background: rgba(2, 13, 4, 0.85);
+  border-right: 1px solid var(--mx-dark);
+}
+
+[data-theme='matrix'] .task-section {
+  border: 1px solid var(--mx-dark);
+  border-radius: 0;
+  box-shadow: none;
+  background: rgba(0, 4, 0, 0.7);
+}
+
+[data-theme='matrix'] .task-header {
+  border-radius: 0;
+  border-bottom: 1px solid var(--mx-dark);
+  font-weight: 400;
+  text-shadow: var(--mx-text-glow);
+}
+
+[data-theme='matrix'] .task-header::before {
+  content: '// ';
+  color: var(--muted);
+  text-shadow: none;
+}
+
+[data-theme='matrix'] .chevron {
+  border-color: var(--mx-mid);
+  border-radius: 0;
+  background: transparent;
+  color: var(--mx-green);
+}
+
+[data-theme='matrix'] .task-body {
+  border: 0;
+}
+
+[data-theme='matrix'] .task-link:hover:not(:disabled) {
+  text-shadow: var(--mx-text-glow);
+}
+
+[data-theme='matrix'] .pane-header,
+[data-theme='matrix'] .col-header {
+  border-color: var(--mx-dark);
+  color: var(--mx-mid);
+}
+
+[data-theme='matrix'] .col-header.sorted {
+  background: rgba(0, 255, 65, 0.08);
+  color: var(--mx-green);
+}
+
+[data-theme='matrix'] .sort-arrow {
+  color: var(--mx-green);
+}
+
+[data-theme='matrix'] .row:hover:not(.selected) {
+  background: rgba(0, 255, 65, 0.06);
+}
+
+[data-theme='matrix'] .row.selected {
+  box-shadow: inset 2px 0 0 var(--mx-green);
+  text-shadow: var(--mx-text-glow);
+}
+
+[data-theme='matrix'] .row.selected .muted {
+  color: #6fd88a;
+}
+
+[data-theme='matrix'] .row.focused:not(.selected) {
+  outline: 1px dashed var(--mx-mid);
+}
+
+[data-theme='matrix'] .hit,
+[data-theme='matrix'] .row.selected .hit {
+  color: var(--mx-white);
+  background: transparent;
+  text-decoration-color: var(--mx-white);
+  text-shadow: 0 0 6px var(--mx-green);
+}
+
+[data-theme='matrix'] .tree-row.current .tree-label {
+  background: var(--selection);
+  box-shadow: inset 2px 0 0 var(--mx-green);
+}
+
+[data-theme='matrix'] .tree-toggle {
+  border-color: var(--mx-mid);
+  background: transparent;
+  color: var(--mx-green);
+}
+
+[data-theme='matrix'] .rename-input {
+  background: #000;
+  color: var(--mx-white);
+  border: 1px solid var(--mx-green);
+  box-shadow: var(--mx-glow);
+}
+
+[data-theme='matrix'] .statusbar {
+  border-top: 1px solid var(--mx-dark);
+  background: var(--mx-bg);
+}
+
+[data-theme='matrix'] .status-field {
+  border: 0;
+  border-left: 1px solid var(--mx-dark);
+  color: var(--mx-mid);
+  font-size: 11px;
+}
+
+[data-theme='matrix'] .status-field.grow {
+  color: var(--mx-green);
+}
+
+/* A block cursor after the selection summary, like a waiting terminal. */
+[data-theme='matrix'] .status-field.grow::after {
+  content: '█';
+  margin-left: 4px;
+  color: var(--mx-green);
+  text-shadow: var(--mx-text-glow);
+  animation: mx-blink 1s steps(2) infinite;
+}
+
+@keyframes mx-blink {
+  50% { opacity: 0; }
+}
+
+[data-theme='matrix'] .context-menu {
+  border-radius: 0;
+  box-shadow: var(--mx-glow);
+}
+
+[data-theme='matrix'] .menu-item:hover:not(:disabled) {
+  background: var(--mx-green);
+  color: #000;
+}
+
+[data-theme='matrix'] .menu-item:hover:not(:disabled) svg {
+  filter: grayscale(1) brightness(0);
+}
+
+[data-theme='matrix'] .menu-sep {
+  background: var(--mx-dark);
+}
+
+[data-theme='matrix'] .modal-backdrop {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+[data-theme='matrix'] .xp-window.dialog {
+  border: 1px solid var(--mx-mid);
+  border-radius: 0;
+  background: var(--mx-panel);
+  box-shadow: 0 0 24px rgba(0, 255, 65, 0.25);
+}
+
+[data-theme='matrix'] .xp-button {
+  border: 1px solid var(--mx-mid);
+  border-radius: 0;
+  background: transparent;
+  color: var(--mx-green);
+}
+
+[data-theme='matrix'] .xp-button:hover,
+[data-theme='matrix'] .xp-button:focus-visible {
+  background: var(--mx-green);
+  color: #000;
+  box-shadow: var(--mx-glow);
+  outline: 0;
+}
+
+[data-theme='matrix'] .xp-progress {
+  border: 1px solid var(--mx-mid);
+  border-radius: 0;
+  background: #000;
+}
+
+[data-theme='matrix'] .xp-progress-fill {
+  background: var(--mx-green);
+  box-shadow: var(--mx-glow);
+  -webkit-mask: repeating-linear-gradient(90deg, #000 0 6px, transparent 6px 8px);
+}
+
+[data-theme='matrix'] .row.drop-target,
+[data-theme='matrix'] .tree-row.drop-target .tree-label {
+  background: rgba(0, 255, 65, 0.22);
+  outline-color: var(--mx-green);
+}
+
+[data-theme='matrix'] .filelist-scroll.drop-here {
+  box-shadow: inset 0 0 0 1px var(--mx-green), inset 0 0 16px rgba(0, 255, 65, 0.3);
+}
+
+[data-theme='matrix'] ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+[data-theme='matrix'] ::-webkit-scrollbar-track,
+[data-theme='matrix'] ::-webkit-scrollbar-corner {
+  background: var(--mx-bg);
+}
+
+[data-theme='matrix'] ::-webkit-scrollbar-thumb,
+[data-theme='matrix'] ::-webkit-scrollbar-thumb:horizontal {
+  border: 0;
+  border-radius: 0;
+  background: var(--mx-dark);
+  box-shadow: none;
+}
+
+[data-theme='matrix'] ::-webkit-scrollbar-thumb:hover {
+  background: var(--mx-mid);
+}

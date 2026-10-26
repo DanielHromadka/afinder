@@ -1,0 +1,134 @@
+/* The full-screen slideshow. Loaded after xp.css, in the order main.tsx imports them. */
+
+/* Slideshow: full screen, black, images cross-fading; the controls fade out while the mouse rests. */
+.modal-backdrop.slideshow {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: block;
+  background: #000;
+  color: #fff;
+  overflow: hidden;
+}
+
+.slideshow.idle {
+  cursor: none;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  user-select: none;
+}
+
+.slide.current {
+  animation: slide-in 0.6s ease both;
+}
+
+.slide-failed {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #aaa;
+}
+
+@keyframes slide-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.slideshow-bar {
+  position: absolute;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  max-width: calc(100% - 32px);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  background: rgba(20, 20, 20, 0.72);
+  backdrop-filter: blur(10px);
+  font-size: 13px;
+  transition: opacity 0.3s ease;
+}
+
+.slideshow.idle .slideshow-bar {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.slideshow-btn {
+  min-width: 32px;
+  height: 28px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.slideshow-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.slideshow-btn:disabled {
+  opacity: 0.35;
+}
+
+.slideshow-name {
+  min-width: 0;
+  max-width: 40vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.slideshow-count {
+  color: #bbb;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.slideshow-field {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.slideshow-field select {
+  color: #000;
+}
+
+/* Time left until the next slide. */
+.slideshow-progress {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.6);
+  transform-origin: left;
+  animation: slide-progress linear both;
+  transition: opacity 0.3s ease;
+}
+
+.slideshow.idle .slideshow-progress {
+  opacity: 0.35;
+}
+
+@keyframes slide-progress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slide.current { animation-duration: 0.01s; }
+}

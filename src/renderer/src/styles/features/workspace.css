@@ -1,0 +1,327 @@
+/* Workspaces and the Blender-style area layout. Loaded after xp.css, in the order main.tsx imports them. */
+
+/* ---- workspaces & areas (Blender-style layout) ------------------------------------------------ */
+
+.workspace-bar {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 24px;
+  padding: 2px 6px 0;
+  flex-shrink: 0;
+  background: var(--face);
+  border-bottom: 1px solid var(--face-dark);
+}
+
+.ws-tabs {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.ws-tab {
+  position: relative;
+  height: 20px;
+  padding: 2px 10px 0;
+  border: 1px solid transparent;
+  border-bottom: 0;
+  border-radius: 4px 4px 0 0;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.ws-tab:hover {
+  color: var(--text);
+  background: color-mix(in srgb, var(--face-light) 60%, transparent);
+}
+
+.ws-tab.current {
+  color: var(--text);
+  font-weight: bold;
+  background: var(--face-light);
+  border-color: var(--face-dark);
+}
+
+.ws-tab:focus-visible {
+  outline: 1px dotted var(--focus-ring);
+  outline-offset: -3px;
+}
+
+.ws-tab.dragging {
+  opacity: 0.5;
+}
+
+.ws-tab.drop-before::before,
+.ws-drop-end {
+  content: '';
+  position: absolute;
+  left: -2px;
+  top: 2px;
+  bottom: 0;
+  width: 2px;
+  background: var(--selection);
+}
+
+.ws-drop-end {
+  position: relative;
+  left: 0;
+  height: 16px;
+}
+
+.ws-rename {
+  width: 120px;
+  height: 16px;
+  padding: 0 3px;
+  font-weight: normal;
+}
+
+.ws-add,
+.ws-areas {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 20px;
+  margin-bottom: 1px;
+  padding: 0 6px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--muted);
+}
+
+.ws-add:hover,
+.ws-areas:hover {
+  border-color: var(--face-dark);
+  color: var(--text);
+}
+
+.workspace-body {
+  position: relative;
+}
+
+.workspace-body > .area,
+.area-cell > .area {
+  flex: 1;
+}
+
+.area-split {
+  flex: 1;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+}
+
+.area-split.split-column {
+  flex-direction: column;
+}
+
+.area-cell {
+  display: flex;
+  min-width: 60px;
+  min-height: 48px;
+}
+
+.area {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.area.dragging {
+  opacity: 0.55;
+}
+
+.area-body {
+  flex: 1;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+}
+
+.area-host {
+  flex: 1;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* Editors not in the workspace stay mounted here. */
+.area-parking {
+  display: none;
+}
+
+/* Side editors fill their area instead of keeping the old fixed side pane width. */
+.area-host > .taskpane,
+.area-host > .foldertree,
+.area-host > .preview-pane,
+.area-host > .git-panel,
+.area-host > .todo-panel,
+.area-host > .games-panel,
+.area-host > .stocks-panel {
+  flex: 1;
+  width: auto;
+  min-width: 0;
+  border-right: 0;
+}
+
+/* The area header already names the folder tree. */
+.area-host > .foldertree > .pane-header {
+  display: none;
+}
+
+.area-divider {
+  flex-shrink: 0;
+  background: var(--face);
+  z-index: 1;
+}
+
+.area-divider.split-row {
+  width: 5px;
+  cursor: col-resize;
+  border-left: 1px solid var(--face-dark);
+  border-right: 1px solid var(--face-dark);
+}
+
+.area-divider.split-column {
+  height: 5px;
+  cursor: row-resize;
+  border-top: 1px solid var(--face-dark);
+  border-bottom: 1px solid var(--face-dark);
+}
+
+.area-divider:hover,
+.area-divider:focus-visible {
+  background: var(--face-dark);
+  outline: none;
+}
+
+/* Every theme's divider highlight waits 2 s on hover, so a cursor just passing over it does not flash;
+   the resize cursor still shows at once, and grabbing the divider lights it up immediately. */
+.area-divider,
+.pane-divider,
+.preview-divider {
+  transition: background-color 0.12s;
+}
+
+.area-divider:hover,
+.pane-divider:hover,
+.preview-divider:hover {
+  transition-delay: 2s;
+}
+
+.area-divider:active,
+.pane-divider:active,
+.preview-divider:active,
+.area-divider:focus-visible {
+  transition-delay: 0s;
+}
+
+body.resizing-row {
+  cursor: row-resize;
+  user-select: none;
+}
+
+body.resizing-row iframe,
+body.dragging-area iframe {
+  pointer-events: none;
+}
+
+body.dragging-area,
+body.dragging-area * {
+  cursor: grabbing !important;
+}
+
+.area-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 22px;
+  padding: 0 3px;
+  flex-shrink: 0;
+  background: var(--face);
+  border-bottom: 1px solid var(--face-dark);
+  cursor: grab;
+}
+
+.area-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: bold;
+}
+
+.area-editor,
+.area-btn {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  height: 18px;
+  padding: 0 3px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--muted);
+  cursor: default;
+}
+
+.area-editor:hover,
+.area-btn:hover {
+  border-color: var(--face-dark);
+  color: var(--text);
+}
+
+/* The handle of the Files and Console areas: their tab strip or bar acts as the header. */
+.area-grip {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  margin-right: 2px;
+  cursor: grab;
+}
+
+.area-grip-dots {
+  padding: 0 1px;
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: -1px;
+}
+
+.tabstrip > .area-grip {
+  padding-bottom: 3px;
+}
+
+.dock-overlay {
+  position: fixed;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--selection) 28%, transparent);
+  border: 2px solid var(--selection);
+  transition: all 80ms ease-out;
+}
+
+.dock-overlay span {
+  padding: 3px 8px;
+  border-radius: 3px;
+  background: var(--selection);
+  color: var(--selection-text);
+  font-weight: bold;
+}
+
+.panes.split-column {
+  flex-direction: column;
+}
+
+.pane-divider.split-column {
+  width: auto;
+  height: 5px;
+  cursor: row-resize;
+  border: 0;
+  border-top: 1px solid var(--face-dark);
+  border-bottom: 1px solid var(--face-dark);
+}

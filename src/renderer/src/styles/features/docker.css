@@ -1,0 +1,292 @@
+/* The Docker area. Loaded after xp.css, in the order main.tsx imports them. */
+
+/* ---- Docker area ------------------------------------------------------------------------------- */
+/* Built from the Task Manager's pieces (lists, meters, cards, confirm bar); only the layout is its own. */
+
+.tool.docker.fill {
+  gap: 8px;
+}
+
+.docker-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+}
+
+.docker-engine {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* State dots: green running, amber paused or restarting, grey stopped, red dead. */
+.docker-dot {
+  flex: none;
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--muted);
+}
+
+.docker-dot.running {
+  background: #2f9e44;
+}
+
+.docker-dot.paused,
+.docker-dot.restarting,
+.docker-dot.removing {
+  background: #e8a90c;
+}
+
+.docker-dot.dead {
+  background: #d03030;
+}
+
+.docker-empty {
+  display: grid;
+  gap: 8px;
+  max-width: 560px;
+  padding: 12px 0;
+}
+
+.docker-empty p {
+  margin: 0;
+}
+
+.docker-hint,
+.docker-output,
+.docker-pull {
+  padding: 6px 8px;
+  border: 1px solid var(--face-dark);
+  border-radius: var(--row-radius);
+  background: var(--face);
+}
+
+.docker-output {
+  display: grid;
+  gap: 6px;
+  justify-items: start;
+}
+
+.docker-output .tool-block {
+  width: 100%;
+  max-height: 160px;
+  overflow: auto;
+  margin: 0;
+  background: var(--list-bg);
+}
+
+.docker-pull .sys-meter {
+  flex: 0 0 140px;
+}
+
+.docker-actions {
+  min-height: 24px;
+}
+
+/* The list and the chosen container's detail share the height; each scrolls on its own. */
+.tool.docker > .docker-split {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  gap: 8px;
+  min-height: 160px;
+}
+
+.docker-split > .docker-list,
+.tool.docker > .docker-list {
+  flex: 1 1 0;
+  min-height: 120px;
+  overflow: auto;
+  border: 1px solid var(--face-dark);
+  border-radius: var(--row-radius);
+  background: var(--list-bg);
+}
+
+.docker-split.with-detail > .docker-list {
+  flex: 1 1 0;
+}
+
+.docker-split.with-detail > .docker-detail {
+  flex: 1.4 1 0;
+}
+
+.tool.docker > .docker-df {
+  flex: 0 0 auto;
+}
+
+.docker-pad {
+  padding: 8px;
+}
+
+.docker-list .mono {
+  font-family: 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+  font-size: 0.92em;
+}
+
+/* A compose project: its name and actions above its containers. */
+.docker-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  min-width: 640px;
+  padding: 6px 8px 4px;
+  border-top: 1px solid color-mix(in srgb, var(--face-dark) 50%, transparent);
+}
+
+[role='rowgroup']:first-of-type > .docker-group {
+  border-top: 0;
+}
+
+.docker-group-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.docker-group-actions .todo-btn {
+  height: 20px;
+  padding: 0 6px;
+}
+
+.docker-name {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.docker-ports {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+}
+
+.docker-ports a {
+  color: var(--link);
+  text-decoration: none;
+}
+
+.docker-ports a:hover {
+  text-decoration: underline;
+}
+
+.row.selected .docker-ports a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.docker-badge {
+  margin-left: 6px;
+  padding: 0 5px;
+  border: 1px solid var(--face-dark);
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 0.85em;
+}
+
+.docker-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 220px;
+  padding: 8px;
+  border: 1px solid var(--face-dark);
+  border-radius: var(--row-radius);
+  background: var(--face);
+}
+
+.docker-detail-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+
+.docker-detail-status {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.docker-detail > .docker-stats,
+.docker-detail > .docker-inspect {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow: auto;
+}
+
+.docker-detail > .docker-logs {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  gap: 6px;
+  min-height: 0;
+}
+
+.docker-logs > * {
+  flex-shrink: 0;
+}
+
+.docker-log {
+  flex: 1 1 0;
+  min-height: 80px;
+  overflow: auto;
+  padding: 4px 6px;
+  border: 1px solid var(--face-dark);
+  border-radius: var(--row-radius);
+  background: var(--term-bg);
+  color: var(--term-fg);
+  font: 12px/1.45 'SF Mono', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+  white-space: pre;
+  user-select: text;
+}
+
+.docker-log.wrap {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.docker-log .err {
+  color: #ff7b72;
+}
+
+.docker-log .tool-muted,
+.docker-log-end {
+  color: color-mix(in srgb, var(--term-fg) 55%, transparent);
+  font-style: italic;
+}
+
+.docker-kv {
+  display: grid;
+  gap: 2px;
+}
+
+.docker-kv-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.docker-kv-row > code {
+  flex: none;
+  max-width: 45%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.docker-subtitle {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.docker-labels > summary {
+  cursor: default;
+}

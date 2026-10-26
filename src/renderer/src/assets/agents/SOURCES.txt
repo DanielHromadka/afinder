@@ -1,0 +1,5 @@
+Downloaded 2026-10-09 from LobeHub Icons (MIT license).
+Claude: https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/claude-color.svg
+Codex: https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/codex-color.svg
+Upstream: https://github.com/lobehub/lobe-icons
+Brand marks belong to their respective owners.

@@ -1,0 +1,421 @@
+/* DOS theme: Norton Commander in VGA text mode. Blue panels with double-line frames, a cyan
+   selection bar, yellow highlights, black-on-cyan bars and a monospaced IBM PC font. */
+
+:root[data-theme='dos'] {
+  --font: 'Perfect DOS VGA 437', 'Px437 IBM VGA 8x16', 'Lucida Console', Consolas, 'Courier New', monospace;
+  --font-size: 12px;
+
+  --dos-black: #000;
+  --dos-blue: #0000aa;
+  --dos-cyan: #00aaaa;
+  --dos-grey: #aaaaaa;
+  --dos-bright-cyan: #55ffff;
+  --dos-yellow: #ffff55;
+  --dos-white: #fff;
+
+  --face: var(--dos-blue);
+  --face-light: var(--dos-blue);
+  --face-dark: var(--dos-bright-cyan);
+  --border-dark: var(--dos-bright-cyan);
+  --text: var(--dos-bright-cyan);
+  --muted: var(--dos-grey);
+  --link: var(--dos-yellow);
+  --link-hover: var(--dos-white);
+  --window-border: var(--dos-grey);
+  --title-gradient: var(--dos-cyan);
+  --taskpane-bg: var(--dos-blue);
+  --task-header: var(--dos-cyan);
+  --task-body: var(--dos-blue);
+  --task-header-text: var(--dos-black);
+  --list-bg: var(--dos-blue);
+  --header-bg: var(--dos-blue);
+  --header-hover: var(--dos-yellow);
+  --selection: var(--dos-cyan);
+  --selection-text: var(--dos-black);
+  --hit-bg: transparent;
+  --hit-text: var(--dos-yellow);
+  --menu-bg: var(--dos-cyan);
+  --menu-border: var(--dos-black);
+  --focus-ring: var(--dos-yellow);
+
+  --dos-frame: 3px double var(--dos-bright-cyan);
+  --dos-shadow: 8px 8px 0 rgba(0, 0, 0, 0.75);
+
+  --check-bg: var(--dos-black);
+  --check-border: var(--dos-bright-cyan);
+  --check-on: var(--dos-black);
+  --check-on-border: var(--dos-yellow);
+  --check-mark: var(--dos-yellow);
+  --check-radius: 0;
+  --check-glow: none;
+}
+
+[data-theme='dos'] .xp-window.app {
+  border: 0;
+  background: var(--dos-blue);
+}
+
+/* ---- title, toolbar, address bar: the black-on-cyan bars of the menu line --------------------- */
+
+[data-theme='dos'] .titlebar {
+  border-radius: 0;
+  color: var(--dos-black);
+}
+
+[data-theme='dos'] .titlebar > svg {
+  filter: grayscale(1) brightness(0);
+}
+
+[data-theme='dos'] .titlebar-text {
+  color: var(--dos-black);
+  font-weight: 400;
+  text-shadow: none;
+  text-align: center;
+}
+
+[data-theme='dos'] .tb-btn {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+[data-theme='dos'] .tb-btn:hover {
+  background: var(--dos-black);
+  filter: none;
+}
+
+[data-theme='dos'] .glyph-min {
+  background: var(--dos-black);
+}
+
+[data-theme='dos'] .glyph-max {
+  border-color: var(--dos-black);
+}
+
+[data-theme='dos'] .glyph-close {
+  color: var(--dos-black);
+}
+
+[data-theme='dos'] .tb-btn:hover .glyph-min {
+  background: var(--dos-bright-cyan);
+}
+
+[data-theme='dos'] .tb-btn:hover .glyph-max {
+  border-color: var(--dos-bright-cyan);
+}
+
+[data-theme='dos'] .tb-btn:hover .glyph-close {
+  color: var(--dos-bright-cyan);
+}
+
+[data-theme='dos'] .toolbar,
+[data-theme='dos'] .addressbar {
+  background: var(--dos-blue);
+  border-bottom: 1px solid var(--dos-bright-cyan);
+}
+
+[data-theme='dos'] .tool-btn,
+[data-theme='dos'] .go-btn {
+  border: 1px solid transparent;
+  border-radius: 0;
+  color: var(--dos-bright-cyan);
+}
+
+[data-theme='dos'] .tool-btn:hover:not(:disabled),
+[data-theme='dos'] .go-btn:hover {
+  border-color: transparent;
+  background: var(--dos-cyan);
+  color: var(--dos-black);
+}
+
+[data-theme='dos'] .tool-btn:active:not(:disabled),
+[data-theme='dos'] .tool-btn.pressed {
+  border-color: transparent;
+  background: var(--dos-black);
+  color: var(--dos-yellow);
+  box-shadow: none;
+}
+
+[data-theme='dos'] .tool-sep {
+  background: var(--dos-bright-cyan);
+  box-shadow: none;
+}
+
+[data-theme='dos'] .filter-box,
+[data-theme='dos'] .address-input {
+  border: 1px solid var(--dos-bright-cyan);
+  border-radius: 0;
+  background: var(--dos-black);
+  color: var(--dos-grey);
+}
+
+[data-theme='dos'] .filter-box:focus-within,
+[data-theme='dos'] .address-input:focus-within {
+  border-color: var(--dos-yellow);
+  box-shadow: none;
+}
+
+[data-theme='dos'] input {
+  caret-color: var(--dos-grey);
+}
+
+[data-theme='dos'] input::placeholder {
+  color: #5555ff;
+}
+
+[data-theme='dos'] .address-label,
+[data-theme='dos'] .fuzzy-toggle {
+  color: var(--dos-grey);
+}
+
+/* ---- panels: double-line frames ---------------------------------------------------------------- */
+
+[data-theme='dos'] .taskpane,
+[data-theme='dos'] .foldertree {
+  background: var(--dos-blue);
+  border-right: var(--dos-frame);
+}
+
+[data-theme='dos'] .task-section {
+  border: var(--dos-frame);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+[data-theme='dos'] .task-header {
+  border-radius: 0;
+  font-weight: 400;
+}
+
+[data-theme='dos'] .chevron {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--dos-black);
+}
+
+[data-theme='dos'] .task-body {
+  border: 0;
+}
+
+[data-theme='dos'] .task-link:hover:not(:disabled) {
+  background: var(--dos-cyan);
+  color: var(--dos-black);
+  text-decoration: none;
+}
+
+[data-theme='dos'] .filelist {
+  border: var(--dos-frame);
+}
+
+[data-theme='dos'] .pane-header,
+[data-theme='dos'] .col-header {
+  border-color: var(--dos-bright-cyan);
+  color: var(--dos-yellow);
+}
+
+[data-theme='dos'] .col-header.sorted {
+  background: transparent;
+  color: var(--dos-white);
+}
+
+[data-theme='dos'] .sort-arrow {
+  color: var(--dos-white);
+}
+
+[data-theme='dos'] .row:hover:not(.selected) {
+  background: rgba(85, 255, 255, 0.1);
+}
+
+[data-theme='dos'] .row.selected .muted {
+  color: var(--dos-blue);
+}
+
+[data-theme='dos'] .row.focused:not(.selected) {
+  outline: 1px solid var(--dos-cyan);
+}
+
+[data-theme='dos'] .row.selected .hit {
+  color: var(--dos-blue);
+  background: transparent;
+}
+
+[data-theme='dos'] .tree-row.current .tree-label {
+  background: var(--dos-cyan);
+  color: var(--dos-black);
+}
+
+[data-theme='dos'] .tree-toggle {
+  border-color: var(--dos-bright-cyan);
+  border-radius: 0;
+  background: transparent;
+  color: var(--dos-bright-cyan);
+}
+
+[data-theme='dos'] .rename-input {
+  background: var(--dos-black);
+  color: var(--dos-white);
+  border: 1px solid var(--dos-yellow);
+}
+
+/* ---- status bar: the key bar along the bottom of the screen ------------------------------------ */
+
+[data-theme='dos'] .statusbar {
+  border-top: 0;
+  background: var(--dos-black);
+}
+
+[data-theme='dos'] .status-field {
+  border: 0;
+  background: var(--dos-cyan);
+  color: var(--dos-black);
+}
+
+[data-theme='dos'] .status-field + .status-field {
+  margin-left: 1ch;
+}
+
+/* The C:\> prompt with a blinking underscore cursor after the selection summary. */
+[data-theme='dos'] .status-field.grow::before {
+  content: 'C:\\>';
+  margin-right: 1ch;
+}
+
+[data-theme='dos'] .status-field.grow::after {
+  content: '_';
+  margin-left: 2px;
+  animation: dos-blink 1s steps(2) infinite;
+}
+
+@keyframes dos-blink {
+  50% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-theme='dos'] .status-field.grow::after {
+    animation: none;
+  }
+}
+
+/* ---- menus, dialogs, buttons ---------------------------------------------------------------------- */
+
+[data-theme='dos'] .context-menu {
+  border: 2px solid var(--dos-black);
+  border-radius: 0;
+  color: var(--dos-black);
+  box-shadow: var(--dos-shadow);
+}
+
+[data-theme='dos'] .menu-item:hover:not(:disabled) {
+  background: var(--dos-black);
+  color: var(--dos-bright-cyan);
+}
+
+[data-theme='dos'] .menu-sep {
+  background: var(--dos-black);
+}
+
+[data-theme='dos'] .modal-backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+/* Dialogs are the grey boxes of the DOS setup programs. */
+[data-theme='dos'] .xp-window.dialog {
+  --text: var(--dos-black);
+  --muted: #555;
+  border: 3px double var(--dos-black);
+  border-radius: 0;
+  background: var(--dos-grey);
+  color: var(--dos-black);
+  box-shadow: var(--dos-shadow);
+}
+
+/* Fields inside the grey box are the blue input lines of a setup program, not black-on-blue. */
+[data-theme='dos'] .xp-window.dialog :is(select, textarea, .shortcut-list, input:not([type='checkbox']):not([type='radio']):not([type='range'])) {
+  --text: var(--dos-white);
+  border: 1px solid var(--dos-black);
+  border-radius: 0;
+  background: var(--dos-blue);
+  color: var(--dos-white);
+}
+
+[data-theme='dos'] .xp-window.dialog select option {
+  background: var(--dos-cyan);
+  color: var(--dos-black);
+}
+
+[data-theme='dos'] .xp-window.dialog :is(select, textarea, input):focus {
+  border-color: var(--dos-yellow);
+  outline: 0;
+}
+
+[data-theme='dos'] .xp-window.dialog .shortcut-message {
+  color: #aa0000;
+}
+
+[data-theme='dos'] .xp-button {
+  border: 0;
+  border-radius: 0;
+  background: var(--dos-cyan);
+  color: var(--dos-black);
+  box-shadow: 4px 4px 0 var(--dos-black);
+}
+
+[data-theme='dos'] .xp-button:hover,
+[data-theme='dos'] .xp-button:focus-visible {
+  background: var(--dos-bright-cyan);
+  outline: 0;
+}
+
+[data-theme='dos'] .xp-button:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 var(--dos-black);
+}
+
+[data-theme='dos'] .xp-progress {
+  border: 1px solid var(--dos-bright-cyan);
+  border-radius: 0;
+  background: var(--dos-blue);
+}
+
+/* ▓ blocks, like a text-mode progress bar. */
+[data-theme='dos'] .xp-progress-fill {
+  background: var(--dos-yellow);
+  -webkit-mask: repeating-linear-gradient(90deg, #000 0 7px, transparent 7px 8px);
+}
+
+[data-theme='dos'] .row.drop-target,
+[data-theme='dos'] .tree-row.drop-target .tree-label {
+  background: var(--dos-yellow);
+  color: var(--dos-black);
+  outline-color: var(--dos-white);
+}
+
+[data-theme='dos'] .filelist-scroll.drop-here {
+  box-shadow: inset 0 0 0 2px var(--dos-yellow);
+}
+
+/* ---- scrollbars: ░ track, ▓ thumb ----------------------------------------------------------------- */
+
+[data-theme='dos'] ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+[data-theme='dos'] ::-webkit-scrollbar-track,
+[data-theme='dos'] ::-webkit-scrollbar-corner {
+  background: repeating-conic-gradient(var(--dos-blue) 0 25%, var(--dos-cyan) 0 50%) 0 0 / 2px 2px;
+}
+
+[data-theme='dos'] ::-webkit-scrollbar-thumb,
+[data-theme='dos'] ::-webkit-scrollbar-thumb:horizontal {
+  border: 0;
+  border-radius: 0;
+  background: var(--dos-cyan);
+  box-shadow: none;
+}
+
+[data-theme='dos'] ::-webkit-scrollbar-thumb:hover {
+  background: var(--dos-bright-cyan);
+}

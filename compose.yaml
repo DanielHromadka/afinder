@@ -1,0 +1,22 @@
+services:
+  afinder:
+    image: afinder:0.9.0
+    build:
+      context: .
+    ports:
+      - "127.0.0.1:${AFINDER_PORT:-6080}:6080"
+    environment:
+      AFINDER_SCREEN: "${AFINDER_SCREEN:-1440x900x24}"
+    volumes:
+      - afinder-profile:/home/afinder
+      - type: bind
+        source: "${AFINDER_WORKSPACE:-./workspace}"
+        target: /workspace
+        bind:
+          create_host_path: false
+    shm_size: 1gb
+    init: false # tini is already the image entrypoint
+    restart: unless-stopped
+    stop_grace_period: 30s
+volumes:
+  afinder-profile:

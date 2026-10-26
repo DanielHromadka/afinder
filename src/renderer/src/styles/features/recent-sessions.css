@@ -1,0 +1,68 @@
+/* Recent files in the task pane and the list of earlier agent sessions. Loaded after xp.css, in the order main.tsx imports them. */
+
+/* Recent files in the task pane: name and a muted age on the right. */
+.task-link.recent-link {
+  width: 100%;
+}
+
+.task-link.recent-link > span {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.task-link.recent-link > small {
+  flex: none;
+  color: var(--muted);
+  font-size: 0.85em;
+}
+
+.screenshot-dialog {
+  width: min(460px, 92vw);
+}
+
+.screenshot-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 16px 4px;
+}
+
+.screenshot-body img {
+  align-self: center;
+  max-width: 100%;
+  max-height: 220px;
+  object-fit: contain;
+  border: 1px solid var(--face-dark);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.screenshot-body p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.screenshot-body .muted {
+  color: var(--muted);
+  font-size: 0.9em;
+}
+
+/* Earlier agent sessions (resume in the console). */
+dialog.xp-window.dialog.agent-sessions-dialog { width: min(760px, 94vw); max-width: 94vw; }
+dialog.xp-window.dialog.agent-sessions-dialog[open] { display: flex; flex-direction: column; overflow: hidden; }
+.agent-sessions-dialog > .titlebar { flex-shrink: 0; }
+.agent-sessions-content { padding: 12px 16px 0; flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; gap: 8px; }
+.agent-sessions-filter { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.agent-sessions-filter input:not([type]) { flex: 1 1 220px; min-width: 0; }
+.agent-sessions-content .settings-note { margin: 0; }
+.agent-sessions-list { height: min(380px, 50vh); min-height: 120px; flex: 1 1 auto; overflow: auto; border: 1px solid var(--face-dark); background: var(--list-bg); color: var(--text); }
+.as-item { display: flex; align-items: center; gap: var(--row-gap); min-height: var(--row-height); padding: var(--row-pad); cursor: default; border-bottom: 1px solid color-mix(in srgb, currentColor 8%, transparent); }
+.as-item:hover { background: var(--row-hover); }
+.as-item.current { background: var(--row-current); color: var(--row-current-text); font-weight: var(--row-current-weight); }
+.as-item.unavailable { opacity: 0.55; }
+.as-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.as-place, .as-time { flex: none; color: var(--muted); font-size: 0.9em; white-space: nowrap; }
+.as-item.current :is(.as-place, .as-time) { color: inherit; opacity: 0.85; }
+.as-place { max-width: 30%; overflow: hidden; text-overflow: ellipsis; }

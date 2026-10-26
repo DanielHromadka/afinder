@@ -1,0 +1,196 @@
+/* The image editor in Quick Look. Loaded after xp.css, in the order main.tsx imports them. */
+
+/* Image editor in Quick Look. */
+.image-editor {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.image-editor-tools {
+  flex-wrap: wrap;
+  row-gap: 4px;
+}
+
+.image-editor .xp-button.xp-button {
+  min-width: 0;
+}
+
+.image-editor-tools .xp-button {
+  padding: 0 8px;
+}
+
+.image-editor-group .xp-button {
+  min-width: 28px !important;
+  font-size: 14px;
+}
+
+.image-editor-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.image-editor-tools .tool-sep {
+  width: 1px;
+  align-self: stretch;
+  margin: 2px 4px;
+  background: var(--face-dark);
+}
+
+.image-swatch {
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.image-swatch.active {
+  outline: 2px solid var(--selection, #316ac5);
+  outline-offset: 1px;
+}
+
+.image-editor input[type='color'] {
+  width: 24px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.image-editor-field {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 4px;
+  white-space: nowrap;
+}
+
+.image-editor-field input[type='range'] {
+  width: 70px;
+}
+
+.image-editor-body {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 220px;
+}
+
+.image-editor-stage {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  overflow: hidden;
+  background: repeating-conic-gradient(rgba(127, 127, 127, 0.12) 0% 25%, transparent 0% 50%) 0 0 / 16px 16px;
+}
+
+.image-editor-stage canvas {
+  max-width: 100%;
+  max-height: 100%;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.image-editor-stage.tool-text canvas {
+  cursor: text;
+}
+
+.image-editor-text {
+  position: absolute;
+  min-width: 140px;
+  padding: 2px 4px;
+  font: 600 16px system-ui, sans-serif;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px dashed #666;
+}
+
+.image-editor-side {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  overflow-y: auto;
+  border-left: 1px solid var(--face-dark);
+}
+
+.image-editor-side fieldset {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+}
+
+.image-editor-side label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.image-editor-slider {
+  display: grid !important;
+  grid-template-columns: 1fr auto;
+}
+
+.image-editor-slider input {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  width: 100%;
+}
+
+.image-editor-slider output {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.image-editor-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.image-editor-row input[type='number'] {
+  width: 70px;
+}
+
+.image-editor-side .preview-status {
+  flex: none;
+  white-space: normal;
+}
+
+@media (max-width: 760px) {
+  .image-editor-body {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+  .image-editor-side {
+    max-height: 40%;
+    border-left: 0;
+    border-top: 1px solid var(--face-dark);
+  }
+}
+
+.image-editor-side .xp-button {
+  min-width: 0;
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+.image-editor-side .image-editor-row .xp-button {
+  flex: 1;
+  padding: 0;
+}
+
+.image-editor-side fieldset {
+  min-width: 0;
+  overflow: hidden;
+}

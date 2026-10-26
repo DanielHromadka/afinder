@@ -1,0 +1,421 @@
+/* The integrated console and its session list. Loaded after xp.css, in the order main.tsx imports them. */
+
+/* ---- integrated console ------------------------------------------------------------------- */
+
+:root {
+  --term-bg: #0c0c0c;
+  --term-fg: #cccccc;
+  --term-cursor: #ffffff;
+  --term-selection: rgba(255, 255, 255, 0.3);
+}
+
+:root[data-theme='cyberpunk'] { --term-bg: #07070d; --term-fg: #d1f7ff; --term-cursor: #fcee0a; --term-selection: rgba(255, 42, 109, 0.35); }
+:root[data-theme='jarvis'] { --term-bg: #020b16; --term-fg: #c9f3ff; --term-cursor: #39d5ff; --term-selection: rgba(57, 213, 255, 0.3); }
+:root[data-theme='bitcoin'] { --term-bg: #0d0d0f; --term-fg: #e6e6ea; --term-cursor: #f7931a; --term-selection: rgba(247, 147, 26, 0.3); }
+:root[data-theme='batman'] { --term-bg: #0a0a0c; --term-fg: #d6d8dd; --term-cursor: #ffd400; --term-selection: rgba(255, 212, 0, 0.25); }
+:root[data-theme='barbie'] { --term-bg: #2b0a1d; --term-fg: #ffd6ea; --term-cursor: #ff8fc8; --term-selection: rgba(255, 143, 200, 0.35); }
+:root[data-theme='fbi'] { --term-bg: #071a33; --term-fg: #e6e9ef; --term-cursor: #c5a253; --term-selection: rgba(197, 162, 83, 0.3); }
+:root[data-theme='matrix'] { --term-bg: #000400; --term-fg: #9dffb5; --term-cursor: #00ff41; --term-selection: rgba(0, 255, 65, 0.3); }
+:root[data-theme='dos'] { --term-bg: #000000; --term-fg: #aaaaaa; --term-cursor: #aaaaaa; --term-selection: rgba(0, 170, 170, 0.5); }
+:root[data-theme='classic'] { --term-bg: #000000; --term-fg: #c0c0c0; --term-cursor: #c0c0c0; }
+
+.console {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--face);
+}
+
+.console.hidden {
+  display: none;
+}
+
+.console-bar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 26px;
+  padding: 2px 4px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-bottom: 1px solid var(--face-dark);
+}
+
+.console-tab {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  max-width: 260px;
+  height: 21px;
+  padding: 0 4px 0 7px;
+  border: 1px solid var(--face-dark);
+  border-radius: 3px;
+  background: var(--face);
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.console-tab.current {
+  background: var(--term-bg);
+  color: var(--term-fg);
+  border-color: var(--term-bg);
+}
+
+.console-tab.exited .console-tab-title {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+.console-tab-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.console-badge {
+  font-family: 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.console-badge.claude {
+  color: #d97757;
+}
+
+.console-badge.codex {
+  color: #10a37f;
+}
+
+.console-badge.opencode {
+  color: #6c7bd9;
+}
+
+.console-badge.shell {
+  color: #3fae3f;
+}
+
+.console-hide {
+  width: 22px;
+  height: 18px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--muted);
+}
+
+.console-hide:hover {
+  border-color: var(--face-dark);
+  color: var(--text);
+}
+
+.console-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  background: var(--term-bg);
+}
+
+.console-screen {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.console-hide.on {
+  color: var(--text);
+}
+
+/* Session list on the left of the console: terminal colours, so it fits every theme. */
+.console-side {
+  display: flex;
+  flex-direction: column;
+  /* In a narrow console area the terminal keeps most of the width. */
+  width: min(250px, 40%);
+  flex-shrink: 0;
+  min-height: 0;
+  border-right: 1px solid color-mix(in srgb, var(--term-fg) 18%, var(--term-bg));
+  background: color-mix(in srgb, var(--term-fg) 5%, var(--term-bg));
+  color: var(--term-fg);
+  font-size: 11px;
+}
+
+.console-side-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 8px 4px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.75;
+}
+
+.console-side-summary {
+  display: flex;
+  gap: 8px;
+  font-weight: normal;
+}
+
+.cs-count {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.console-side-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 4px 4px;
+}
+
+.cs-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 3px;
+  padding: 5px 6px;
+  border: 1px solid transparent;
+  border-left: 3px solid transparent;
+  border-radius: 4px;
+  cursor: default;
+}
+
+.cs-item:hover {
+  background: color-mix(in srgb, var(--term-fg) 8%, transparent);
+}
+
+.cs-item.current {
+  background: color-mix(in srgb, var(--term-fg) 14%, transparent);
+  border-color: color-mix(in srgb, var(--term-fg) 22%, transparent);
+}
+
+.cs-item.attention {
+  border-left-color: #f0a020;
+}
+
+.cs-line,
+.cs-status,
+.cs-context {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.cs-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: bold;
+}
+
+.cs-item .tab-close {
+  color: inherit;
+  visibility: hidden;
+}
+
+.cs-item:hover .tab-close {
+  visibility: visible;
+}
+
+.cs-status-label {
+  white-space: nowrap;
+}
+
+.cs-model {
+  margin-left: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0.6;
+}
+
+.cs-activity,
+.cs-place {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0.7;
+}
+
+.cs-place {
+  opacity: 0.5;
+}
+
+.cs-context {
+  opacity: 0.8;
+  white-space: nowrap;
+}
+
+.cs-meter {
+  position: relative;
+  flex: 1;
+  max-width: 70px;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--term-fg) 18%, transparent);
+}
+
+.cs-meter > span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: #3fae3f;
+}
+
+.cs-context.high .cs-meter > span {
+  background: #e0a020;
+}
+
+.cs-context.full .cs-meter > span {
+  background: #e05040;
+}
+
+.cs-empty {
+  padding: 8px 4px;
+  opacity: 0.6;
+}
+
+.console-history {
+  display: flex;
+  flex-direction: column;
+  /* Next to the sessions list the terminal still keeps at least a third of the console. */
+  width: min(260px, 28%);
+  flex-shrink: 0;
+  min-height: 0;
+  border-left: 1px solid color-mix(in srgb, var(--term-fg) 18%, var(--term-bg));
+  background: color-mix(in srgb, var(--term-fg) 5%, var(--term-bg));
+  color: var(--term-fg);
+  font-size: 11px;
+}
+
+.ch-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 3px;
+  padding: 5px 6px;
+  border: 1px solid transparent;
+  border-left: 3px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.ch-item:hover {
+  background: color-mix(in srgb, var(--term-fg) 8%, transparent);
+}
+
+.ch-item.current {
+  background: color-mix(in srgb, var(--term-fg) 14%, transparent);
+  border-color: color-mix(in srgb, var(--term-fg) 22%, transparent);
+}
+
+.ch-item.running {
+  border-left-color: #3fae3f;
+}
+
+.ch-item.lost {
+  border-left-color: #e0a020;
+}
+
+.ch-prompt {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.ch-meta {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  opacity: 0.6;
+  white-space: nowrap;
+}
+
+.ch-duration {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+
+.status-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #888;
+}
+
+.status-dot.working,
+.status-dot.running {
+  background: #3fae3f;
+  animation: status-pulse 1.2s ease-in-out infinite;
+}
+
+.status-dot.waiting {
+  background: #f0a020;
+}
+
+.status-dot.idle {
+  background: #4a90e2;
+}
+
+.status-dot.ready {
+  background: #7a9a7a;
+}
+
+.status-dot.ended,
+.status-dot.exited {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px currentColor;
+  opacity: 0.5;
+}
+
+.status-dot.attention {
+  box-shadow: 0 0 0 2px rgba(240, 160, 32, 0.5);
+}
+
+@keyframes status-pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .status-dot.working,
+  .status-dot.running {
+    animation: none;
+  }
+}
+
+.xterm-host {
+  position: absolute;
+  inset: 0;
+  padding: 4px 0 0 6px;
+}
+
+.xterm-host.hidden {
+  display: none;
+}
+
+.console-empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--term-fg);
+  opacity: 0.6;
+}
+
+/* xterm.js reads its own size from this element; the app-wide user-select: none must not apply. */
+.console .xterm {
+  height: 100%;
+  user-select: text;
+}

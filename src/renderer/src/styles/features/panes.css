@@ -1,0 +1,304 @@
+/* Panes side by side, the tab strip with its agent badges, and grouped (virtual) folders. Loaded after xp.css, in the order main.tsx imports them. */
+
+/* ---- panes & tabs -------------------------------------------------------------------------- */
+
+/* Placeholders the focused tab renders the toolbar, address bar, side pane and status bar into. */
+.slot {
+  display: contents;
+}
+
+.panes {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+}
+
+.pane {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.pane-body {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
+.tab-view {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+}
+
+/* Hidden tabs keep their layout (not display: none): the virtualized list then already has its height and
+   rows when the tab is shown, instead of rendering empty for a frame – a visible blink on every switch. */
+.tab-view.hidden {
+  position: absolute;
+  inset: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.pane-divider {
+  width: 5px;
+  flex-shrink: 0;
+  cursor: col-resize;
+  background: var(--face);
+  border-left: 1px solid var(--face-dark);
+  border-right: 1px solid var(--face-dark);
+}
+
+.pane-divider:hover {
+  background: var(--face-dark);
+}
+
+.tabstrip {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 25px;
+  padding: 3px 4px 0;
+  flex-shrink: 0;
+  overflow: hidden;
+  background: var(--face);
+  border-bottom: 1px solid var(--face-dark);
+}
+
+/* With several panes the active one is marked by its tab strip. */
+.tabstrip.active {
+  box-shadow: inset 0 3px 0 var(--selection);
+}
+
+.tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 60px;
+  max-width: 190px;
+  flex: 0 1 auto;
+  height: 21px;
+  padding: 0 4px 0 8px;
+  border: 1px solid var(--face-dark);
+  border-bottom: 0;
+  border-radius: 4px 4px 0 0;
+  background: var(--face);
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.tab:hover {
+  color: var(--text);
+}
+
+.tab.current {
+  height: 22px;
+  margin-bottom: -1px;
+  background: var(--list-bg);
+  color: var(--text);
+  font-weight: bold;
+  box-shadow: inset 0 2px 0 var(--header-hover);
+}
+
+.tab.drop-before::before,
+.tab.drop-after::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  width: 3px;
+  background: var(--selection);
+}
+
+.tab.drop-before::before {
+  left: -3px;
+}
+
+.tab.drop-after::after {
+  right: -3px;
+}
+
+.tab-title {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Agents running in the tab's folder; hovering lists them (tab-agents-popover). */
+.tab-agents {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 15px;
+  padding: 0 3px;
+  border-radius: 7px;
+  font-weight: normal;
+  cursor: pointer;
+}
+
+.tab-agents:hover {
+  background: var(--face-dark);
+}
+
+.tab-agents .console-badge {
+  font-size: 10px;
+}
+
+.tab-agents-count {
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.tab-agents-popover {
+  position: fixed;
+  z-index: 100;
+  width: 280px;
+  max-height: min(400px, calc(100vh - 8px));
+  overflow-y: auto;
+  border: 1px solid var(--menu-border);
+  border-radius: 4px;
+  background: var(--menu-bg);
+  color: var(--text);
+  box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
+}
+
+.tab-agents-head {
+  padding: 5px 6px;
+  border-bottom: 1px solid var(--face-dark);
+  background: var(--face);
+  font-weight: bold;
+}
+
+.tab-agents-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  padding: 5px 6px;
+  border: 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--face-dark) 50%, transparent);
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.tab-agents-item:hover {
+  background: var(--selection);
+  color: var(--selection-text);
+}
+
+.tab-agents-hint {
+  padding: 4px 6px;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.tab-close {
+  width: 15px;
+  height: 15px;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  font-size: 9px;
+  line-height: 15px;
+  opacity: 0.55;
+}
+
+.tab-close:hover {
+  opacity: 1;
+  background: var(--face-dark);
+}
+
+.tab-new {
+  align-self: center;
+  width: 20px;
+  height: 18px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: transparent;
+  font-size: 14px;
+  line-height: 14px;
+  color: var(--muted);
+}
+
+.tab-new:hover {
+  border-color: var(--face-dark);
+  color: var(--text);
+}
+
+/* ---- groups (virtual folders) --------------------------------------------------------------- */
+
+.group-row {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px 0;
+  color: var(--link);
+  white-space: nowrap;
+}
+
+.group-row:hover .group-label {
+  color: var(--link-hover);
+  text-decoration: underline;
+}
+
+.group-chevron {
+  width: 10px;
+  font-size: 10px;
+}
+
+.group-label {
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.group-meta {
+  color: var(--muted);
+}
+
+.group-line {
+  flex: 1;
+  height: 1px;
+  margin-left: 6px;
+  background: linear-gradient(90deg, var(--link), transparent);
+  opacity: 0.6;
+}
+
+.virtual-crumb {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 16px;
+  margin-left: 4px;
+  padding: 0 6px;
+  border: 1px solid var(--face-dark);
+  border-radius: 8px;
+  background: var(--face-light);
+  color: var(--link);
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.virtual-close {
+  font-size: 9px;
+  color: var(--muted);
+}
+
+.virtual-crumb:hover .virtual-close {
+  color: var(--text);
+}

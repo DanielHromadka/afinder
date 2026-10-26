@@ -1,0 +1,21 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <application>
+    <provider
+      android:name="expo.modules.afinderopen.AfinderFileProvider"
+      android:authorities="${applicationId}.AfinderFileProvider"
+      android:exported="false"
+      android:grantUriPermissions="true">
+      <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/afinder_open_paths" />
+    </provider>
+  </application>
+  <queries>
+    <intent>
+      <action android:name="android.intent.action.VIEW" />
+      <data android:mimeType="*/*" />
+    </intent>
+    <intent>
+      <action android:name="android.intent.action.EDIT" />
+      <data android:mimeType="*/*" />
+    </intent>
+  </queries>
+</manifest>

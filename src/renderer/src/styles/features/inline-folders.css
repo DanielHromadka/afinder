@@ -1,0 +1,38 @@
+/* Folders opened in place in the details view. Loaded after xp.css, in the order main.tsx imports them. */
+
+/* Folders opened in place in the details view: a chevron (or its empty slot) before the icon. */
+.row-expander {
+  flex-shrink: 0;
+  display: inline-flex;
+  width: 16px;
+  justify-content: center;
+}
+
+.row-toggle {
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--muted);
+  display: grid;
+  place-items: center;
+}
+
+.row-toggle:hover {
+  color: var(--text);
+  background: color-mix(in srgb, var(--face-dark) 35%, transparent);
+}
+
+.row-toggle > svg {
+  transition: transform 0.15s ease;
+}
+
+.row-toggle[aria-expanded='true'] > svg {
+  transform: rotate(90deg);
+}
+
+.row.selected .row-toggle {
+  color: inherit;
+}

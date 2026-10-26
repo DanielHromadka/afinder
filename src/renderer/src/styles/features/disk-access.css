@@ -1,0 +1,6 @@
+/* The Mac App Store disk access offer. Loaded after xp.css, in the order main.tsx imports them. */
+
+/* ---- Disk access (Mac App Store build) ------------------------------------------------------- */
+.disk-access-list { list-style: none; margin: 4px 0; padding: 0; display: grid; gap: 4px; }
+.disk-access-list li { display: flex; align-items: center; gap: 10px; }
+.disk-access-list code { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

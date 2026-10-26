@@ -1,0 +1,22 @@
+/* The phone companion settings and the screen sharing banner. Loaded after xp.css, in the order main.tsx imports them. */
+
+/* Phone companion (Settings → Phone) */
+.companion-pair { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; margin-bottom: 10px; }
+.companion-qr { width: 200px; height: 200px; image-rendering: pixelated; background: #fff; border-radius: 8px; padding: 6px; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12); }
+.companion-link { width: 100%; box-sizing: border-box; font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; }
+.companion-sas { margin: 0; font: 600 28px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: 2px; }
+.companion-devices { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.companion-devices li { display: flex; flex-wrap: wrap; align-items: center; column-gap: 12px; row-gap: 2px; }
+.companion-devices .settings-check { margin: 0; white-space: nowrap; }
+.companion-name { display: flex; flex-direction: column; flex: 1 1 180px; min-width: 0; }
+.companion-name strong, .companion-name small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.companion-name small { opacity: 0.7; }
+.companion-dot { width: 8px; height: 8px; border-radius: 50%; background: #9aa0a6; flex: none; }
+.companion-dot.on { background: #2fb344; }
+.settings-field input { width: 100%; min-width: 0; height: 22px; padding: 0 4px; border: 1px solid var(--face-dark); background: var(--list-bg); color: var(--text); box-sizing: border-box; }
+/* A phone watches the screen: hard to miss in every theme, ends with one click. */
+.screen-share-banner { display: flex; align-items: center; gap: 10px; padding: 5px 12px; background: #c62828; color: #fff; font-weight: 600; flex: none; }
+.screen-share-banner span:nth-child(2) { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.screen-share-dot { width: 9px; height: 9px; border-radius: 50%; background: #fff; flex: none; animation: screen-share-pulse 1.4s ease-in-out infinite; }
+@keyframes screen-share-pulse { 50% { opacity: 0.3; } }
+@media (prefers-reduced-motion: reduce) { .screen-share-dot { animation: none; } }

@@ -1,0 +1,5 @@
+{
+  "platforms": ["apple", "android"],
+  "apple": { "modules": ["AfinderOpenModule"] },
+  "android": { "modules": ["expo.modules.afinderopen.AfinderOpenModule"] }
+}

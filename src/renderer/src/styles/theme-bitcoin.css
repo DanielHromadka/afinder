@@ -1,0 +1,437 @@
+/* Bitcoin theme: exchange terminal. Near-black panels, bitcoin orange, monospace numbers, a ₿ coin
+   in the title bar and a block-height style status bar. */
+
+:root[data-theme='bitcoin'] {
+  --font: 'SF Mono', Menlo, 'JetBrains Mono', monospace;
+  --font-size: 12px;
+
+  --btc-bg: #0d0d0f;
+  --btc-panel: #16161a;
+  --btc-panel-2: #1e1e24;
+  --btc-line: #2a2a32;
+  --btc-orange: #f7931a;
+  --btc-orange-light: #ffb54d;
+  --btc-green: #16c784;
+  --btc-red: #ea3943;
+
+  --face: var(--btc-bg);
+  --face-light: var(--btc-panel);
+  --face-dark: var(--btc-line);
+  --border-dark: var(--btc-line);
+  --text: #e6e6ea;
+  --muted: #7a7a86;
+  --link: #e6e6ea;
+  --link-hover: var(--btc-orange);
+  --window-border: var(--btc-line);
+  --title-gradient: var(--btc-panel);
+  --taskpane-bg: var(--btc-bg);
+  --task-header: var(--btc-panel-2);
+  --task-body: var(--btc-panel);
+  --task-header-text: var(--btc-orange);
+  --list-bg: var(--btc-bg);
+  --header-bg: var(--btc-panel);
+  --header-hover: var(--btc-orange);
+  --selection: rgba(247, 147, 26, 0.22);
+  --selection-text: #fff;
+  --hit-bg: transparent;
+  --hit-text: var(--btc-orange);
+  --menu-bg: var(--btc-panel);
+  --menu-border: var(--btc-line);
+  --focus-ring: var(--btc-orange);
+
+  --check-bg: var(--btc-panel);
+  --check-border: #44444f;
+  --check-on: var(--btc-orange);
+  --check-mark: #000;
+  --check-radius: 4px;
+}
+
+[data-theme='bitcoin'] .xp-window.app {
+  border: 1px solid var(--btc-line);
+  border-top: 0;
+}
+
+[data-theme='bitcoin'] .titlebar {
+  border-radius: 0;
+  border-bottom: 1px solid var(--btc-line);
+}
+
+[data-theme='bitcoin'] .titlebar > svg {
+  display: none;
+}
+
+/* The coin. */
+[data-theme='bitcoin'] .titlebar::before {
+  content: '₿';
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--btc-orange);
+  color: #fff;
+  font-weight: bold;
+  font-size: 13px;
+  transform: rotate(14deg);
+  box-shadow: 0 0 10px rgba(247, 147, 26, 0.5);
+}
+
+[data-theme='bitcoin'] .titlebar-text {
+  text-shadow: none;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+[data-theme='bitcoin'] .titlebar-text::after {
+  content: '  ▲ HODL';
+  color: var(--btc-green);
+  font-size: 11px;
+}
+
+/* With the live price shown, a fixed green "▲ HODL" would contradict a falling week. */
+[data-theme='bitcoin'] .titlebar.has-extra .titlebar-text::after {
+  content: none;
+}
+
+.btc-ticker {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-left: 14px;
+  padding: 1px 8px;
+  border: 1px solid var(--btc-line);
+  border-radius: 4px;
+  background: var(--btc-bg);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.btc-price {
+  color: var(--btc-orange);
+  font-weight: 700;
+}
+
+.btc-change {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.btc-ticker.up {
+  border-color: color-mix(in srgb, var(--btc-green) 45%, var(--btc-line));
+}
+
+.btc-ticker.up .btc-change {
+  color: var(--btc-green);
+}
+
+.btc-ticker.down {
+  border-color: color-mix(in srgb, var(--btc-red) 45%, var(--btc-line));
+}
+
+.btc-ticker.down .btc-change {
+  color: var(--btc-red);
+}
+
+[data-theme='bitcoin'] .tb-btn {
+  border: 1px solid var(--btc-line);
+  border-radius: 4px;
+  background: var(--btc-bg);
+  box-shadow: none;
+}
+
+[data-theme='bitcoin'] .tb-btn:hover {
+  border-color: var(--btc-orange);
+  filter: none;
+}
+
+[data-theme='bitcoin'] .tb-close:hover {
+  border-color: var(--btc-red);
+  background: var(--btc-red);
+}
+
+[data-theme='bitcoin'] .toolbar,
+[data-theme='bitcoin'] .addressbar {
+  background: var(--btc-panel);
+  border-bottom: 1px solid var(--btc-line);
+}
+
+[data-theme='bitcoin'] .tool-btn,
+[data-theme='bitcoin'] .go-btn {
+  border-radius: 6px;
+}
+
+[data-theme='bitcoin'] .tool-btn svg,
+[data-theme='bitcoin'] .go-btn svg,
+[data-theme='bitcoin'] .task-link svg,
+[data-theme='bitcoin'] .menu-icon svg,
+[data-theme='bitcoin'] .cell.name svg,
+[data-theme='bitcoin'] .tree-row svg {
+  filter: grayscale(1) sepia(1) saturate(5) hue-rotate(-12deg) brightness(1.05);
+}
+
+[data-theme='bitcoin'] .tool-btn:hover:not(:disabled),
+[data-theme='bitcoin'] .go-btn:hover {
+  border-color: var(--btc-line);
+  background: var(--btc-panel-2);
+  color: var(--btc-orange-light);
+}
+
+[data-theme='bitcoin'] .tool-btn:active:not(:disabled),
+[data-theme='bitcoin'] .tool-btn.pressed {
+  border-color: var(--btc-orange);
+  background: rgba(247, 147, 26, 0.12);
+  color: var(--btc-orange);
+  box-shadow: none;
+}
+
+[data-theme='bitcoin'] .tool-sep {
+  background: var(--btc-line);
+  box-shadow: none;
+}
+
+[data-theme='bitcoin'] .filter-box,
+[data-theme='bitcoin'] .address-input {
+  border: 1px solid var(--btc-line);
+  border-radius: 6px;
+  background: var(--btc-bg);
+}
+
+[data-theme='bitcoin'] .filter-box:focus-within,
+[data-theme='bitcoin'] .address-input:focus-within {
+  border-color: var(--btc-orange);
+  box-shadow: 0 0 0 2px rgba(247, 147, 26, 0.2);
+}
+
+[data-theme='bitcoin'] input {
+  caret-color: var(--btc-orange);
+}
+
+[data-theme='bitcoin'] input::placeholder {
+  color: var(--muted);
+}
+
+[data-theme='bitcoin'] .address-label,
+[data-theme='bitcoin'] .fuzzy-toggle {
+  color: var(--muted);
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
+[data-theme='bitcoin'] .taskpane {
+  border-right: 1px solid var(--btc-line);
+}
+
+[data-theme='bitcoin'] .task-section {
+  border: 1px solid var(--btc-line);
+  border-radius: 8px;
+  box-shadow: none;
+}
+
+[data-theme='bitcoin'] .task-header {
+  border-radius: 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 10px;
+  border-bottom: 1px solid var(--btc-line);
+}
+
+[data-theme='bitcoin'] .task-header:hover {
+  color: var(--btc-orange-light);
+}
+
+[data-theme='bitcoin'] .chevron {
+  border-color: var(--btc-line);
+  background: var(--btc-bg);
+  color: var(--btc-orange);
+}
+
+[data-theme='bitcoin'] .task-body {
+  border: 0;
+}
+
+[data-theme='bitcoin'] .foldertree {
+  background: var(--btc-bg);
+  border-right: 1px solid var(--btc-line);
+}
+
+[data-theme='bitcoin'] .pane-header,
+[data-theme='bitcoin'] .col-header {
+  border-color: var(--btc-line);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 10px;
+}
+
+[data-theme='bitcoin'] .pane-header {
+  background: var(--btc-panel);
+}
+
+[data-theme='bitcoin'] .col-header.sorted {
+  background: var(--btc-panel-2);
+  color: var(--btc-orange);
+}
+
+[data-theme='bitcoin'] .sort-arrow {
+  color: var(--btc-orange);
+}
+
+/* Order book rows. */
+[data-theme='bitcoin'] .row:not(.selected) {
+  border-bottom: 1px solid #141418;
+}
+
+[data-theme='bitcoin'] .row:hover:not(.selected) {
+  background: var(--btc-panel);
+}
+
+[data-theme='bitcoin'] .row.selected {
+  box-shadow: inset 2px 0 0 var(--btc-orange);
+}
+
+[data-theme='bitcoin'] .row.selected .muted {
+  color: #b0a08a;
+}
+
+/* Sizes read like amounts: green, monospace numerals. */
+[data-theme='bitcoin'] .cell.right {
+  color: var(--btc-green);
+  font-variant-numeric: tabular-nums;
+}
+
+[data-theme='bitcoin'] .cell.right.muted,
+[data-theme='bitcoin'] .cell.right .muted {
+  color: var(--muted);
+}
+
+[data-theme='bitcoin'] .tree-row.current .tree-label {
+  background: var(--selection);
+  box-shadow: inset 2px 0 0 var(--btc-orange);
+}
+
+[data-theme='bitcoin'] .tree-toggle {
+  border-color: var(--btc-line);
+  background: var(--btc-panel);
+  color: var(--btc-orange);
+}
+
+[data-theme='bitcoin'] .rename-input {
+  background: var(--btc-bg);
+  color: #fff;
+  border: 1px solid var(--btc-orange);
+}
+
+[data-theme='bitcoin'] .statusbar {
+  background: var(--btc-panel);
+  border-top: 1px solid var(--btc-line);
+}
+
+[data-theme='bitcoin'] .status-field {
+  border: 0;
+  border-left: 1px solid var(--btc-line);
+  color: var(--muted);
+  font-size: 11px;
+}
+
+[data-theme='bitcoin'] .status-field.grow::before {
+  content: '● BLOCK';
+  margin-right: 8px;
+  color: var(--btc-green);
+  animation: btc-tick 2s steps(2) infinite;
+}
+
+@keyframes btc-tick {
+  50% { color: var(--btc-orange); }
+}
+
+[data-theme='bitcoin'] .context-menu {
+  border-radius: 8px;
+  padding: 4px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+[data-theme='bitcoin'] .menu-item {
+  border-radius: 4px;
+}
+
+[data-theme='bitcoin'] .menu-item:hover:not(:disabled) {
+  background: var(--btc-orange);
+  color: #000;
+}
+
+[data-theme='bitcoin'] .menu-sep {
+  background: var(--btc-line);
+}
+
+[data-theme='bitcoin'] .modal-backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+[data-theme='bitcoin'] .xp-window.dialog {
+  border: 1px solid var(--btc-line);
+  border-radius: 10px;
+  overflow: auto; /* clips the rounded corners, still scrolls */
+  background: var(--btc-panel);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.7);
+}
+
+[data-theme='bitcoin'] .xp-button {
+  border: 0;
+  border-radius: 6px;
+  background: var(--btc-orange);
+  color: #000;
+  font-weight: bold;
+}
+
+[data-theme='bitcoin'] .xp-button:hover,
+[data-theme='bitcoin'] .xp-button:focus-visible {
+  background: var(--btc-orange-light);
+  box-shadow: none;
+  outline: 0;
+}
+
+[data-theme='bitcoin'] .xp-progress {
+  border: 1px solid var(--btc-line);
+  border-radius: 6px;
+  background: var(--btc-bg);
+}
+
+[data-theme='bitcoin'] .xp-progress-fill {
+  border-radius: 3px;
+  background: var(--btc-orange);
+  -webkit-mask: repeating-linear-gradient(90deg, #000 0 6px, transparent 6px 8px);
+}
+
+[data-theme='bitcoin'] .row.drop-target,
+[data-theme='bitcoin'] .tree-row.drop-target .tree-label {
+  background: rgba(247, 147, 26, 0.15);
+  outline-color: var(--btc-orange);
+}
+
+[data-theme='bitcoin'] .filelist-scroll.drop-here {
+  box-shadow: inset 0 0 0 2px var(--btc-orange);
+}
+
+[data-theme='bitcoin'] ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+[data-theme='bitcoin'] ::-webkit-scrollbar-track,
+[data-theme='bitcoin'] ::-webkit-scrollbar-corner {
+  background: var(--btc-bg);
+}
+
+[data-theme='bitcoin'] ::-webkit-scrollbar-thumb,
+[data-theme='bitcoin'] ::-webkit-scrollbar-thumb:horizontal {
+  border: 0;
+  border-radius: 4px;
+  background: var(--btc-line);
+  box-shadow: none;
+}
+
+[data-theme='bitcoin'] ::-webkit-scrollbar-thumb:hover {
+  background: var(--btc-orange);
+}
