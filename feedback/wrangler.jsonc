@@ -5,7 +5,7 @@
   "compatibility_date": "2026-09-01",
   "observability": { "enabled": true },
   // The private repository the issues go to. GITHUB_TOKEN is a secret: `npx wrangler secret put GITHUB_TOKEN`.
-  "vars": { "GITHUB_REPO": "DanielHromadka/afinder-feedback" },
+  "vars": { "GITHUB_REPO": "DanielHromadka/afinder" },
   // Reports per IP: people send one now and then, so this only stops floods (periods are 10 or 60 s).
   "ratelimits": [{ "name": "SEND_LIMIT", "namespace_id": "4712", "simple": { "limit": 3, "period": 60 } }]
 }

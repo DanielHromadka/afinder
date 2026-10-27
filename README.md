@@ -8,8 +8,8 @@
 
 A fast, keyboard-driven file manager for macOS, Windows and Linux: tabs and split panes, a preview with the VS Code editor, git, archives, SFTP, S3 and SharePoint, Claude Code and Codex beside your files. In a modern macOS look, Windows XP, or nine others.
 
-[![Latest release](https://img.shields.io/github/v/release/DanielHromadka/afinder-downloads?label=latest&color=2563eb)](https://github.com/DanielHromadka/afinder-downloads/releases/latest)
-[![Downloads](https://img.shields.io/github/downloads/DanielHromadka/afinder-downloads/total?color=2563eb)](https://github.com/DanielHromadka/afinder-downloads/releases)
+[![Latest release](https://img.shields.io/github/v/release/DanielHromadka/afinder?label=latest&color=2563eb)](https://github.com/DanielHromadka/afinder/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/DanielHromadka/afinder/total?color=2563eb)](https://github.com/DanielHromadka/afinder/releases)
 [![CI](https://github.com/DanielHromadka/afinder/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/DanielHromadka/afinder/actions/workflows/ci.yml)
 [![License: GPL v3](https://img.shields.io/badge/license-GPL--3.0-blue)](LICENSE)
 <br>
@@ -18,7 +18,7 @@ A fast, keyboard-driven file manager for macOS, Windows and Linux: tabs and spli
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![React](https://img.shields.io/badge/React-087EA4?logo=react&logoColor=white)](https://react.dev/)
 
-[**Download**](#download) · [Website](https://afinder.pages.dev/) · [Release notes](https://github.com/DanielHromadka/afinder-downloads/releases/latest) · [Report a bug](https://github.com/DanielHromadka/afinder/issues/new) · [Čeština](README.cs.md)
+[**Download**](#download) · [Website](https://afinder.pages.dev/) · [Release notes](https://github.com/DanielHromadka/afinder/releases/latest) · [Report a bug](https://github.com/DanielHromadka/afinder/issues/new) · [Čeština](README.cs.md)
 
 <img src="website/img/hero.webp" alt="aFinder with two panes, the file preview and the git area" width="900">
 
@@ -30,11 +30,11 @@ Free for macOS, Windows and Linux. These links always point to the latest releas
 
 | Platform | Download |
 |---|---|
-| **macOS** · Apple silicon | [aFinder-arm64.dmg](https://github.com/DanielHromadka/afinder-downloads/releases/latest/download/aFinder-arm64.dmg) |
-| **macOS** · Intel | [aFinder-x64.dmg](https://github.com/DanielHromadka/afinder-downloads/releases/latest/download/aFinder-x64.dmg) |
-| **Windows** · x64 | [aFinder-Setup-x64.exe](https://github.com/DanielHromadka/afinder-downloads/releases/latest/download/aFinder-Setup-x64.exe) |
-| **Linux** · x64 | [AppImage](https://github.com/DanielHromadka/afinder-downloads/releases/latest/download/aFinder-x86_64.AppImage) · [.deb and .rpm](https://github.com/DanielHromadka/afinder-downloads/releases/latest) |
-| **Linux** · arm64 | [AppImage](https://github.com/DanielHromadka/afinder-downloads/releases/latest/download/aFinder-arm64.AppImage) · [.deb and .rpm](https://github.com/DanielHromadka/afinder-downloads/releases/latest) |
+| **macOS** · Apple silicon | [aFinder-arm64.dmg](https://github.com/DanielHromadka/afinder/releases/latest/download/aFinder-arm64.dmg) |
+| **macOS** · Intel | [aFinder-x64.dmg](https://github.com/DanielHromadka/afinder/releases/latest/download/aFinder-x64.dmg) |
+| **Windows** · x64 | [aFinder-Setup-x64.exe](https://github.com/DanielHromadka/afinder/releases/latest/download/aFinder-Setup-x64.exe) |
+| **Linux** · x64 | [AppImage](https://github.com/DanielHromadka/afinder/releases/latest/download/aFinder-x86_64.AppImage) · [.deb and .rpm](https://github.com/DanielHromadka/afinder/releases/latest) |
+| **Linux** · arm64 | [AppImage](https://github.com/DanielHromadka/afinder/releases/latest/download/aFinder-arm64.AppImage) · [.deb and .rpm](https://github.com/DanielHromadka/afinder/releases/latest) |
 
 aFinder updates itself: it asks first, then downloads, installs and restarts. The macOS build is signed and notarized. The Windows installer is not signed yet, so SmartScreen may warn on the first start (*More info → Run anyway*). On Linux, make the AppImage executable (`chmod +x aFinder-*.AppImage`).
 

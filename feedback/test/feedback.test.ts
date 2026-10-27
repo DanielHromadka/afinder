@@ -11,8 +11,7 @@ function fakeGitHub(status = 201): { calls: { method: string; url: string; body:
   vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => {
     const url = String(input)
     calls.push({ method: init?.method ?? 'GET', url, body: JSON.parse(String(init?.body)), auth: new Headers(init?.headers).get('Authorization') })
-    const reply = url.includes('/contents/') ? { content: { html_url: 'https://github.com/owner/feedback/blob/main/shot.jpg' } } : { number: 7 }
-    return new Response(JSON.stringify(reply), { status })
+    return new Response(JSON.stringify({ number: 7 }), { status })
   })
   return { calls }
 }
@@ -20,21 +19,18 @@ function fakeGitHub(status = 201): { calls: { method: string; url: string; body:
 afterEach(() => vi.restoreAllMocks())
 
 describe('feedback worker', () => {
-  it('files an issue with the screenshot committed next to it', async () => {
+  // The issue is public: an old version's e-mail and screenshot never reach it.
+  it('files an issue without the e-mail and the screenshot of an old version', async () => {
     const { calls } = fakeGitHub()
-    const res = await send({ kind: 'bug', message: 'Crash on rename\nsteps…', screenshot: '/9j/4AAQ' })
+    const res = await send({ kind: 'bug', message: 'Crash on rename\nsteps…', email: 'a@b.cz', screenshot: '/9j/4AAQ' })
     expect(res.status).toBe(201)
     expect(await res.json()).toEqual({ ok: true, issue: 7 })
-    expect(calls.map((c) => [c.method, c.url.replace(/\d{4}-\d\d\/.*\.jpg$/, '…')])).toEqual([
-      ['PUT', 'https://api.github.com/repos/owner/feedback/contents/screenshots/…'],
-      ['POST', 'https://api.github.com/repos/owner/feedback/issues']
-    ])
-    expect(calls[0].body.content).toBe('/9j/4AAQ')
-    expect(calls[1]).toMatchObject({ auth: 'Bearer token', body: { title: 'Crash on rename', labels: ['bug'] } })
-    expect(calls[1].body.body).toContain('![Screenshot](https://github.com/owner/feedback/blob/main/shot.jpg?raw=true)')
+    expect(calls.map((c) => [c.method, c.url])).toEqual([['POST', 'https://api.github.com/repos/owner/feedback/issues']])
+    expect(calls[0]).toMatchObject({ auth: 'Bearer token', body: { title: 'Crash on rename', labels: ['bug'] } })
+    expect(calls[0].body.body).not.toMatch(/b\.cz|Screenshot/)
   })
 
-  it('files a suggestion without a screenshot as one call', async () => {
+  it('files a suggestion as one call', async () => {
     const { calls } = fakeGitHub()
     expect((await send({ kind: 'idea', message: 'Dark XP theme' })).status).toBe(201)
     expect(calls).toHaveLength(1)

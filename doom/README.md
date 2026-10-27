@@ -17,5 +17,5 @@ The wasm talks to aFinder only through standard WASI calls and five exports (`dg
 doom/build.sh          # needs Docker; writes doom/out/ and prints sizes and SHA-256
 ```
 
-Upload everything in `doom/out/` to the `doom-<n>` release of `DanielHromadka/afinder-downloads`, then put the printed
+Upload everything in `doom/out/` to the `doom-<n>` release of `DanielHromadka/afinder`, then put the printed
 sizes and hashes and the release tag into `src/shared/doom.ts`.

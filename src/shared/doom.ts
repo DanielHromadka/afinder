@@ -2,7 +2,7 @@
 // Doom's key codes. The engine (GPLv2) and Freedoom (BSD) are never bundled – see doom/README.md.
 
 export const DOOM_RELEASE = 'doom-1'
-export const DOOM_BASE = `https://github.com/DanielHromadka/afinder-downloads/releases/download/${DOOM_RELEASE}`
+export const DOOM_BASE = `https://github.com/DanielHromadka/afinder/releases/download/${DOOM_RELEASE}`
 export const DOOM_SOURCE_URL = `${DOOM_BASE}/doom-source.tar.gz`
 export const DOOM_WAD = 'freedoom1.wad'
 

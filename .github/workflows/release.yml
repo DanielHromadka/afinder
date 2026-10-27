@@ -1,5 +1,5 @@
 # Every push to main builds, signs and notarizes the macOS version, builds Linux (AppImage, deb and rpm for x64
-# and arm64) and publishes them as the latest release of the public DanielHromadka/afinder-downloads repository;
+# and arm64) and publishes them as the latest release of this repository;
 # the Windows installer and its latest.yml are carried over from the previous release, so Windows downloads and
 # updates keep working. Run by hand (Actions → Release → Run workflow) it builds Windows too. The website links to
 # /releases/latest/download/…, and the app's updater checks the same release, so nobody has to edit links or
@@ -9,9 +9,9 @@
 # without anyone touching it. For a bigger release run the workflow by hand with bump = minor or major: it
 # raises package.json, commits that to main and releases e.g. 0.10.43.
 #
-# Needs the repository secret DOWNLOADS_TOKEN: a fine-grained token with "Contents: read and write"
-# on DanielHromadka/afinder-downloads. macOS signing and notarization need MAC_CSC_LINK (base64 of the Developer ID
-# Application .p12), MAC_CSC_KEY_PASSWORD, APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD and APPLE_TEAM_ID.
+# Releases go to this repository with the workflow's own token. macOS signing and notarization need MAC_CSC_LINK
+# (base64 of the Developer ID Application .p12), MAC_CSC_KEY_PASSWORD, APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD and
+# APPLE_TEAM_ID.
 
 name: Release
 
@@ -36,6 +36,10 @@ on:
 # Releases never overlap.
 concurrency:
   group: release
+
+# Every job writes to this repository's releases.
+permissions:
+  contents: write
 
 env:
   NODE_VERSION: 24
@@ -84,7 +88,7 @@ jobs:
       - name: Release notes
         id: notes
         env:
-          GH_TOKEN: ${{ secrets.DOWNLOADS_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           npm run release-notes -- --version "${{ steps.version.outputs.version }}"
           echo "notes=$(node -p 'JSON.stringify(require("./build/release-notes.json"))')" >> "$GITHUB_OUTPUT"
@@ -93,14 +97,14 @@ jobs:
       - name: Draft the release
         if: steps.version.outputs.publish == 'true'
         env:
-          GH_TOKEN: ${{ secrets.DOWNLOADS_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
           VERSION: ${{ steps.version.outputs.version }}
         run: |
-          if gh release view "v$VERSION" --repo DanielHromadka/afinder-downloads > /dev/null 2>&1; then
-            gh release edit "v$VERSION" --repo DanielHromadka/afinder-downloads --notes-file release-notes.md
+          if gh release view "v$VERSION" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            gh release edit "v$VERSION" --repo "$GITHUB_REPOSITORY" --notes-file release-notes.md
           else
             gh release create "v$VERSION" --draft \
-              --repo DanielHromadka/afinder-downloads \
+              --repo "$GITHUB_REPOSITORY" \
               --title "aFinder $VERSION" \
               --notes-file release-notes.md
           fi
@@ -158,13 +162,13 @@ jobs:
         if: needs.check.outputs.publish == 'true'
         shell: bash
         env:
-          GH_TOKEN: ${{ secrets.DOWNLOADS_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
           VERSION: ${{ needs.check.outputs.version }}
         run: |
           shopt -s nullglob
           files=(dist/*.dmg dist/*-mac.zip dist/*.exe dist/*.AppImage dist/*.deb dist/*.rpm dist/*.blockmap dist/latest*.yml)
           [ ${#files[@]} -gt 0 ] || { echo "::error::No installers in dist"; exit 1; }
-          gh release upload "v$VERSION" "${files[@]}" --clobber --repo DanielHromadka/afinder-downloads
+          gh release upload "v$VERSION" "${files[@]}" --clobber --repo "$GITHUB_REPOSITORY"
       # Only a manual run with publish off keeps the installers as run artifacts.
       - if: needs.check.outputs.publish != 'true'
         uses: actions/upload-artifact@v4
@@ -192,23 +196,23 @@ jobs:
       - name: Carry over the Windows installer
         if: github.event_name == 'push'
         env:
-          GH_TOKEN: ${{ secrets.DOWNLOADS_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
           VERSION: ${{ needs.check.outputs.version }}
         run: |
           mkdir -p windows
-          if gh release download --repo DanielHromadka/afinder-downloads --dir windows \
+          if gh release download --repo "$GITHUB_REPOSITORY" --dir windows \
             --pattern '*.exe' --pattern '*.exe.blockmap' --pattern 'latest.yml'; then
-            gh release upload "v$VERSION" windows/* --clobber --repo DanielHromadka/afinder-downloads
+            gh release upload "v$VERSION" windows/* --clobber --repo "$GITHUB_REPOSITORY"
           else
             echo "::warning::No Windows installer in the previous release"
           fi
-      - name: Publish to afinder-downloads
+      - name: Publish the release
         env:
-          GH_TOKEN: ${{ secrets.DOWNLOADS_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
           VERSION: ${{ needs.check.outputs.version }}
         run: |
-          gh release view "v$VERSION" --repo DanielHromadka/afinder-downloads --json assets --jq '.assets[].name'
-          gh release edit "v$VERSION" --repo DanielHromadka/afinder-downloads --draft=false --latest
+          gh release view "v$VERSION" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name'
+          gh release edit "v$VERSION" --repo "$GITHUB_REPOSITORY" --draft=false --latest
 
   # A failed build leaves no half-filled draft behind.
   discard:
@@ -217,8 +221,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - env:
-          GH_TOKEN: ${{ secrets.DOWNLOADS_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
           VERSION: ${{ needs.check.outputs.version }}
         run: |
-          draft=$(gh release view "v$VERSION" --repo DanielHromadka/afinder-downloads --json isDraft --jq .isDraft || echo false)
-          if [ "$draft" = true ]; then gh release delete "v$VERSION" --yes --repo DanielHromadka/afinder-downloads; fi
+          draft=$(gh release view "v$VERSION" --repo "$GITHUB_REPOSITORY" --json isDraft --jq .isDraft || echo false)
+          if [ "$draft" = true ]; then gh release delete "v$VERSION" --yes --repo "$GITHUB_REPOSITORY"; fi

@@ -10,7 +10,7 @@ python3 -m http.server 8765 -d website    # http://localhost:8765/
 
 ## Downloads
 
-`site.js` asks the GitHub API for the latest release of `DanielHromadka/afinder-downloads` and matches its assets
+`site.js` asks the GitHub API for the latest release of `DanielHromadka/afinder` and matches its assets
 by pattern (macOS arm64 / x64 `.dmg`, Windows x64 / arm64 installer, Linux AppImage / `.deb` / `.rpm`). Versioned names
 (`aFinder-0.1.0-arm64.dmg`) and the stable ones electron-builder now produces (`aFinder-arm64.dmg`) both match.
 

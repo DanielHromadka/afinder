@@ -249,8 +249,6 @@ export interface AfinderApi {
     onChanged(callback: (status: DoomStatus) => void): () => void
   }
   feedback: {
-    /** A shot of this window as a base64 JPEG, taken before the feedback dialog covers it. */
-    capture(): Promise<string>
     /** Sends the report to the feedback service; rejects with a readable message. */
     send(draft: FeedbackDraft): Promise<void>
   }

@@ -118,7 +118,6 @@ export interface IpcContract {
   [IPC.doomDownload]: AfinderApi['doom']['download']
   [IPC.doomCancel]: AfinderApi['doom']['cancel']
   [IPC.doomRemove]: AfinderApi['doom']['remove']
-  [IPC.feedbackCapture]: AfinderApi['feedback']['capture']
   [IPC.feedbackSend]: AfinderApi['feedback']['send']
   [IPC.systemInfo]: AfinderApi['systemInfo']
   [IPC.btcPrice]: AfinderApi['btcPrice']

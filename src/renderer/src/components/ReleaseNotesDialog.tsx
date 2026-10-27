@@ -4,7 +4,7 @@ import type { ReleaseNote } from '@shared/releaseNotes'
 import { dateFormat } from '@renderer/lib/format'
 import { Dialog } from './Dialog'
 
-const RELEASES_URL = 'https://github.com/DanielHromadka/afinder-downloads/releases'
+const RELEASES_URL = 'https://github.com/DanielHromadka/afinder/releases'
 
 /** "What's new": the notes bundled with this build, newest first, this version marked. */
 export function ReleaseNotesDialog({ onClose }: { onClose(): void }): React.JSX.Element {

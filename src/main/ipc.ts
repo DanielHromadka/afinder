@@ -228,7 +228,6 @@ export function registerIpc(deps: {
     if (typeof port !== 'number' || !Number.isInteger(port) || port < 1 || port > 65535) throw new Error('Invalid port.')
     await shell.openExternal(`http://localhost:${port}`)
   })
-  handle(IPC.feedbackCapture, (e) => feedback.capture(e.sender))
   handle(IPC.feedbackSend, (_e, draft: FeedbackDraft) => feedback.send(draft))
   handle(IPC.systemInfo, (_e, p: string) => system.info(String(p)))
   handle(IPC.btcPrice, () => system.btcPrice())
