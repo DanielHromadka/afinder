@@ -1,6 +1,6 @@
 // Checks for a newer release at startup and then once a day, and installs it when the user agrees.
 //
-// Releases live in the public DanielHromadka/afinder-downloads repository (the manual release workflow).
+// Releases live in this public repository, DanielHromadka/afinder (the release workflow).
 // electron-updater reads latest.yml / latest-mac.yml there on every platform: Windows runs the NSIS
 // installer silently, the AppImage replaces itself, and macOS installs the signed .zip through
 // Squirrel.Mac. Nothing downloads before the user says "Install".
@@ -11,7 +11,7 @@ import { bodyLines } from '@shared/releaseNotes'
 import { loadState } from './settings'
 import { isMas } from '../mas'
 
-const REPO = 'DanielHromadka/afinder-downloads'
+const REPO = 'DanielHromadka/afinder'
 const FIRST_CHECK_MS = 15_000
 const CHECK_EVERY_MS = 24 * 60 * 60 * 1000
 

@@ -35,9 +35,6 @@ export interface CompanionDevice {
 export interface FeedbackDraft {
   kind: 'bug' | 'idea'
   message: string
-  email: string
-  /** Base64 JPEG from `feedback.capture()`, or null to send none. */
-  screenshot: string | null
   includeInfo: boolean
 }
 

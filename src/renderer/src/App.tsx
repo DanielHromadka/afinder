@@ -117,17 +117,11 @@ export function App(): React.JSX.Element {
   const [diskOfferClosed, setDiskOfferClosed] = useState(false)
   // Folders opened before the grant failed in the sandbox: start over with the access in place.
   const grantedDisk = (): void => window.location.reload()
-  /** The feedback dialog with the window shot taken just before it opened (null: none could be taken). */
-  const [feedback, setFeedback] = useState<{ screenshot: string | null } | null>(null)
+  const [feedbackOpen, setFeedbackOpen] = useState(false)
   const [releaseNotesOpen, setReleaseNotesOpen] = useState(false)
   // Once after an update: what changed in the version that just started.
   useEffect(() => void api.releaseNotes.pending().then((p) => p && setReleaseNotesOpen(true), () => undefined), [])
-  const openFeedback = useCallback((): void => {
-    void window.api.feedback.capture().then(
-      (screenshot) => setFeedback({ screenshot }),
-      () => setFeedback({ screenshot: null })
-    )
-  }, [])
+  const openFeedback = useCallback((): void => setFeedbackOpen(true), [])
   const [remotes, setRemotes] = useState<RemoteMount[]>([])
   /** Commands shown by the open palette (a snapshot taken when it opened), or null. */
   const [palette, setPalette] = useState<PaletteCommand[] | null>(null)
@@ -770,7 +764,7 @@ export function App(): React.JSX.Element {
           <TourOffer onStart={startTour} onDismiss={() => updateSettings({ tourOffered: true })} />
         )}
         {releaseNotesOpen && <ReleaseNotesDialog onClose={() => setReleaseNotesOpen(false)} />}
-        {feedback && <FeedbackDialog screenshot={feedback.screenshot} onClose={() => setFeedback(null)} />}
+        {feedbackOpen && <FeedbackDialog onClose={() => setFeedbackOpen(false)} />}
         {error && <ErrorDialog message={error} onClose={() => setError(null)} />}
       </div>
     </IconSetContext.Provider>

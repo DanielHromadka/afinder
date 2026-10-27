@@ -16,7 +16,7 @@ import { bodyLines, MAX_NOTES, noteLines, releaseBody, releaseCommit } from '../
 const { values: args } = parseArgs({
   options: {
     version: { type: 'string' },
-    repo: { type: 'string', default: 'DanielHromadka/afinder-downloads' },
+    repo: { type: 'string', default: 'DanielHromadka/afinder' },
     md: { type: 'string', default: 'release-notes.md' },
     json: { type: 'string', default: 'build/release-notes.json' }
   }

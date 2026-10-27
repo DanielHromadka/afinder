@@ -129,7 +129,6 @@ export const IPC = {
   diskGrants: 'diskAccess:list',
   diskGrant: 'diskAccess:grant',
   diskRevoke: 'diskAccess:revoke',
-  feedbackCapture: 'feedback:capture',
   toolsHash: 'tools:hash',
   toolsDuplicates: 'tools:duplicates',
   toolsDiskTree: 'tools:diskTree',

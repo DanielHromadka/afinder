@@ -1,12 +1,11 @@
-// aFinder feedback: takes a bug report or suggestion from the app and files it as an issue in a private
-// GitHub repository, with the window screenshot committed next to it. The GitHub token lives only
-// here (a Worker secret), never in the app.
+// aFinder feedback: takes a bug report or suggestion from the app and files it as a public issue in the
+// aFinder repository. The GitHub token lives only here (a Worker secret), never in the app.
 
 import { checkReport, issueBody, issueLabel, issueTitle, MAX_BODY } from '../../src/shared/feedback'
 
 export interface Env {
   GITHUB_TOKEN: string
-  /** owner/name of the (private) repository. */
+  /** owner/name of the repository that gets the issues. */
   GITHUB_REPO: string
   /** Only for tests and local runs; GitHub's API otherwise. */
   GITHUB_API?: string
@@ -55,17 +54,8 @@ export default {
     if (typeof report === 'string') return json(400, { error: report })
     if (!env.GITHUB_TOKEN) return json(503, { error: 'not-configured' })
 
-    const now = new Date()
-    const id = `${now.toISOString().slice(0, 19).replace(/[:T]/g, '-')}-${crypto.randomUUID().slice(0, 8)}`
     try {
-      let image: string | undefined
-      if (report.screenshot) {
-        // A file in the private repository: only people with access to it can see the image.
-        const saved = await github(env, 'PUT', `/contents/screenshots/${now.toISOString().slice(0, 7)}/${id}.jpg`, { message: `Screenshot ${id}`, content: report.screenshot })
-        const html = (saved.content as { html_url?: string } | undefined)?.html_url
-        if (html) image = `${html}?raw=true`
-      }
-      const issue = await github(env, 'POST', '/issues', { title: issueTitle(report), body: issueBody(report, image), labels: [issueLabel(report.kind)] })
+      const issue = await github(env, 'POST', '/issues', { title: issueTitle(report), body: issueBody(report), labels: [issueLabel(report.kind)] })
       return json(201, { ok: true, issue: issue.number })
     } catch (err) {
       console.error(err)

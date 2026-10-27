@@ -45,7 +45,7 @@ async function detectArch(os) {
 
 // ---- builds ----------------------------------------------------------------------------------------
 
-const REPO = 'DanielHromadka/afinder-downloads'
+const REPO = 'DanielHromadka/afinder'
 const RELEASES = `https://github.com/${REPO}/releases`
 const OS_NAME = { mac: 'macOS', win: 'Windows', linux: 'Linux' }
 const OS_ICON = { mac: 'ph-apple-logo', win: 'ph-windows-logo', linux: 'ph-linux-logo' }

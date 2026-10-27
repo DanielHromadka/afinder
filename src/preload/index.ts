@@ -200,7 +200,6 @@ const api: AfinderApi = {
     onChanged: (cb) => subscribe<DoomStatus>(IPC.doomChanged, cb)
   },
   feedback: {
-    capture: () => call(IPC.feedbackCapture),
     send: (draft) => call(IPC.feedbackSend, draft)
   },
   systemInfo: (p) => call(IPC.systemInfo, p),

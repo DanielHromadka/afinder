@@ -114,9 +114,9 @@ rpm:
     - libsecret
     - mesa-libgbm
     - alsa-lib
-# Releases go to the public downloads repository; electron-updater reads latest.yml from there.
+# Releases go to this repository; electron-updater reads latest.yml from there.
 publish:
   provider: github
   owner: DanielHromadka
-  repo: afinder-downloads
+  repo: afinder
   releaseType: release
