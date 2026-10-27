@@ -301,12 +301,38 @@ kbd + kbd {
   background: var(--surface-2);
 }
 
+/* Pushed right like the section links; on the home page the links already take the free space. */
+.nav-github {
+  display: inline-flex;
+  margin: 0 -12px 0 auto;
+  padding: 8px;
+  border-radius: var(--r-btn);
+  color: var(--muted);
+  font-size: 22px;
+  text-decoration: none;
+}
+
+.nav nav + .nav-github {
+  margin-left: 0;
+}
+
+.nav-github:hover {
+  color: var(--text);
+  background: var(--surface-2);
+}
+
 @media (max-width: 860px) {
   .nav nav {
     display: none;
   }
   .nav .btn {
     margin-left: auto;
+  }
+  .nav nav + .nav-github {
+    margin-left: auto;
+  }
+  .nav .nav-github + .btn {
+    margin-left: 0;
   }
 }
 
