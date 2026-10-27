@@ -9,10 +9,10 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@cloudflare/vitest-plugin": "^1.4.0",
+    "@cloudflare/vitest-plugin": "^1.4.8",
     "@cloudflare/workers-types": "^5.20261012.1",
     "typescript": "^7.0.2",
-    "vitest": "4.1",
+    "vitest": "5.0",
     "wrangler": "^4.149.0"
   }
 }
