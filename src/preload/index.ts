@@ -139,9 +139,19 @@ const api: AfinderApi = {
     set: (on) => call(IPC.defaultAppSet, on)
   },
   diskAccess: { list: () => call(IPC.diskGrants), grant: (suggested) => call(IPC.diskGrant, suggested), revoke: (p) => call(IPC.diskRevoke, p) },
+  transcribe: {
+    status: () => call(IPC.transcribeStatus),
+    download: (model) => call(IPC.transcribeDownload, model),
+    onProgress: (cb) => subscribe<number>(IPC.transcribeProgress, cb),
+    begin: (p, model, language) => call(IPC.transcribeBegin, p, model, language),
+    chunk: (id, samples, offset) => call(IPC.transcribeChunk, id, samples, offset),
+    finish: (id, format) => call(IPC.transcribeFinish, id, format),
+    abort: (id) => call(IPC.transcribeAbort, id)
+  },
   tools: {
     hash: (id, p) => call(IPC.toolsHash, id, p),
     duplicates: (id, dir) => call(IPC.toolsDuplicates, id, dir),
+    images: (id, dir) => call(IPC.toolsImages, id, dir),
     diskTree: (id, dir) => call(IPC.toolsDiskTree, id, dir),
     cancel: (id) => ipcRenderer.send(IPC.toolsCancel, id),
     onProgress: (cb) => {
@@ -228,7 +238,13 @@ const api: AfinderApi = {
     sheet: (p, index) => call(IPC.previewSheet, p, index ?? 0),
     thumbnail: (p, size) => call(IPC.previewThumbnail, p, size),
     save: (p, text, modified, bom, force) => call(IPC.previewSave, p, text, modified, bom, force === true),
-    saveImage: (p, data, opts) => call(IPC.previewSaveImage, p, data, opts.modified, opts.force === true, opts.copy === true)
+    saveImage: (p, data, opts) => call(IPC.previewSaveImage, p, data, opts.modified, opts.force === true, opts.copy === true),
+    writeVideo: {
+      begin: (p, convertTo, merged) => call(IPC.previewVideoBegin, p, convertTo ?? null, merged === true),
+      write: (id, position, data) => call(IPC.previewVideoWrite, id, position, data),
+      finish: (id) => call(IPC.previewVideoFinish, id),
+      abort: (id) => call(IPC.previewVideoAbort, id)
+    }
   },
   companion: {
     status: () => call(IPC.companionStatus),

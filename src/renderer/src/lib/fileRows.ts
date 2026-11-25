@@ -30,10 +30,12 @@ export interface RowsInput {
   expanded: Set<string>
   subLists: Map<string, FileEntry[]>
   now: number
+  /** Dates taken for the "Date taken" grouping (null: none, undefined: not read yet). */
+  takenOf?: (e: FileEntry) => string | null | undefined
 }
 
 export function buildRows(input: RowsInput): { rows: Row[]; groups: ListGroup[] | null } {
-  const { entries, filter, fuzzy, showHidden, sort, sizes, groupBy, virtual, collapsed, path, searchMode, tree, expanded, subLists, now } = input
+  const { entries, filter, fuzzy, showHidden, sort, sizes, groupBy, virtual, collapsed, path, searchMode, tree, expanded, subLists, now, takenOf } = input
   const collator = new Intl.Collator(locale(), { numeric: true, sensitivity: 'base' })
   const sizeOf = (e: FileEntry): number => e.size ?? sizes.get(e.path)?.size ?? -1
   const grouped = groupBy !== 'none'
@@ -41,7 +43,7 @@ export function buildRows(input: RowsInput): { rows: Row[]; groups: ListGroup[] 
   for (const entry of entries) {
     const hits = match(entry.name, filter, fuzzy)
     if (!hits) continue
-    const group = grouped ? groupOf(entry, groupBy, now, sizeOf) : null
+    const group = grouped ? groupOf(entry, groupBy, now, sizeOf, takenOf) : null
     if (virtual && group?.key !== virtual.key) continue
     out.push({ entry, hits, group })
   }

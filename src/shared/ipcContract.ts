@@ -78,6 +78,13 @@ export interface IpcContract {
   [IPC.diskRevoke]: AfinderApi['diskAccess']['revoke']
   [IPC.toolsHash]: AfinderApi['tools']['hash']
   [IPC.toolsDuplicates]: AfinderApi['tools']['duplicates']
+  [IPC.toolsImages]: AfinderApi['tools']['images']
+  [IPC.transcribeStatus]: AfinderApi['transcribe']['status']
+  [IPC.transcribeDownload]: AfinderApi['transcribe']['download']
+  [IPC.transcribeBegin]: AfinderApi['transcribe']['begin']
+  [IPC.transcribeChunk]: AfinderApi['transcribe']['chunk']
+  [IPC.transcribeFinish]: AfinderApi['transcribe']['finish']
+  [IPC.transcribeAbort]: AfinderApi['transcribe']['abort']
   [IPC.toolsDiskTree]: AfinderApi['tools']['diskTree']
   [IPC.toolsRates]: AfinderApi['tools']['rates']
   [IPC.toolsDecodeImage]: AfinderApi['tools']['decodeImage']
@@ -140,6 +147,10 @@ export interface IpcContract {
   // Sent flattened: the preload fills in the defaults.
   [IPC.previewSave]: (path: string, text: string, modified: number, bom: boolean, force: boolean) => ReturnType<AfinderApi['preview']['save']>
   [IPC.previewSaveImage]: (path: string, data: Uint8Array, modified: number | undefined, force: boolean, copy: boolean) => ReturnType<AfinderApi['preview']['saveImage']>
+  [IPC.previewVideoBegin]: (path: string, convertTo: string | null, merged: boolean) => ReturnType<AfinderApi['preview']['writeVideo']['begin']>
+  [IPC.previewVideoWrite]: AfinderApi['preview']['writeVideo']['write']
+  [IPC.previewVideoFinish]: AfinderApi['preview']['writeVideo']['finish']
+  [IPC.previewVideoAbort]: AfinderApi['preview']['writeVideo']['abort']
   [IPC.companionStatus]: AfinderApi['companion']['status']
   [IPC.companionPair]: AfinderApi['companion']['pair']
   [IPC.companionCancelPair]: AfinderApi['companion']['cancelPair']

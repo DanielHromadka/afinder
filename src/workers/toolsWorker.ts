@@ -1,13 +1,14 @@
 // Runs in an Electron utilityProcess: the Tools area's long jobs, off the main process.
 //
-// Parent → worker: { type: 'hash', id, path } | { type: 'dupes', id, dir } | { type: 'tree', id, dir }
+// Parent → worker: { type: 'hash', id, path } | { type: 'dupes', id, dir } | { type: 'tree', id, dir } | { type: 'images', id, dir }
 //                  | { type: 'cancel', id }
 // Worker → parent: { id, progress: ToolsProgress } | { id, result } | { id, error }
 
 import { createHash } from 'node:crypto'
 import { createReadStream, promises as fs } from 'node:fs'
 import path from 'node:path'
-import type { DiskNode, DuplicateGroup, FileHashes, ToolsProgress } from '@shared/types'
+import { MAX_SIMILAR_IMAGES } from '@shared/phash'
+import type { DiskNode, DuplicateGroup, FileHashes, ImageFile, ToolsProgress } from '@shared/types'
 
 const parentPort = process.parentPort
 const cancelled = new Set<string>()
@@ -79,6 +80,28 @@ async function digest(file: string, algo: string, limit?: number): Promise<strin
   const h = createHash(algo)
   for await (const chunk of createReadStream(file, { highWaterMark: 1024 * 1024, ...(limit ? { end: limit - 1 } : {}) })) h.update(chunk as Buffer)
   return h.digest('hex')
+}
+
+/** Photo formats the renderer (or the OS) can draw, for the similar photos search. */
+const IMAGE_FILE = /\.(jpe?g|png|webp|gif|bmp|avif|heic|heif|tiff?)$/i
+
+/** Every photo below dir, for hashing in the renderer (which has the decoders). */
+async function images(id: string, dir: string): Promise<ImageFile[]> {
+  const report = progressor(id)
+  const found: { path: string; size: number }[] = []
+  await walkFiles(id, dir, (file, size) => {
+    if (size === 0 || !IMAGE_FILE.test(file)) return
+    if (found.length >= MAX_SIMILAR_IMAGES) throw new Error(`Too many images (over ${MAX_SIMILAR_IMAGES})`)
+    found.push({ path: file, size })
+    report({ done: found.length, total: 0, phase: 'scan' })
+  })
+  const out: ImageFile[] = []
+  for (const f of found) {
+    check(id)
+    const st = await fs.stat(f.path).catch(() => null)
+    if (st) out.push({ ...f, modified: st.mtimeMs })
+  }
+  return out.sort((a, b) => a.path.localeCompare(b.path))
 }
 
 /** Same size, then the same first 64 KiB, then the same SHA-256: only real candidates are read fully. */
@@ -172,7 +195,7 @@ async function diskTree(id: string, dir: string): Promise<DiskNode> {
 parentPort.on('message', (e) => {
   const msg = e.data as { type: string; id: string; path?: string; dir?: string }
   if (msg.type === 'cancel') return void cancelled.add(msg.id)
-  const job = msg.type === 'hash' ? hashFile(msg.id, msg.path!) : msg.type === 'dupes' ? duplicates(msg.id, msg.dir!) : msg.type === 'tree' ? diskTree(msg.id, msg.dir!) : null
+  const job = msg.type === 'hash' ? hashFile(msg.id, msg.path!) : msg.type === 'dupes' ? duplicates(msg.id, msg.dir!) : msg.type === 'tree' ? diskTree(msg.id, msg.dir!) : msg.type === 'images' ? images(msg.id, msg.dir!) : null
   if (!job) return
   job.then(
     (result) => parentPort.postMessage({ id: msg.id, result }),

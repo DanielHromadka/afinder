@@ -46,6 +46,7 @@ import * as tools from './services/tools'
 import * as sysMonitor from './services/systemMonitor'
 import * as doom from './services/doom'
 import * as tail from './services/tail'
+import * as videoWriter from './services/videoWriter'
 import { planArchive, planTransfer, runTransfer, type TransferControl } from './services/transfer'
 import { applyLanguage } from './services/language'
 import { checkForUpdates } from './services/updater'
@@ -168,6 +169,18 @@ export function registerIpc(deps: {
   handle(IPC.diskRevoke, (_e, p: unknown) => revokeDiskAccess(String(p)))
   handle(IPC.toolsHash, (e, id: unknown, p: unknown) => tools.hashFile(e.sender, id, p))
   handle(IPC.toolsDuplicates, (e, id: unknown, dir: unknown) => tools.findDuplicates(e.sender, id, dir))
+  handle(IPC.toolsImages, (e, id: unknown, dir: unknown) => tools.listImages(e.sender, id, dir))
+  // Speech to text: the service (and its worker) loads on first use.
+  const transcribe = (): Promise<typeof import('./services/transcribe')> => import('./services/transcribe')
+  handle(IPC.transcribeStatus, async () => (await transcribe()).status())
+  handle(IPC.transcribeDownload, async (e, model: unknown) => (await transcribe()).download(e.sender, model))
+  handle(IPC.transcribeBegin, async (e, p: unknown, model: unknown, language: unknown) => (await transcribe()).begin(e.sender, p, model, language))
+  handle(IPC.transcribeChunk, async (e, id: unknown, samples: unknown, offset: unknown) => (await transcribe()).chunk(e.sender, id, samples, offset))
+  handle(IPC.transcribeFinish, async (e, id: unknown, format: unknown) => {
+    const service = await transcribe()
+    return audit.track({ action: 'create', folder: null }, () => service.finish(e.sender, id, format), (saved) => ({ paths: [saved.path], count: 1 }))
+  })
+  handle(IPC.transcribeAbort, async (e, id: unknown) => (await transcribe()).abort(e.sender, id))
   handle(IPC.toolsDiskTree, (e, id: unknown, dir: unknown) => tools.diskTree(e.sender, id, dir))
   ipcMain.on(IPC.toolsCancel, (_e, id: unknown) => tools.cancel(id))
   handle(IPC.doomStatus, () => doom.status())
@@ -264,6 +277,14 @@ export function registerIpc(deps: {
     void recents.touch(saved.path, copy ? 'created' : 'edited')
     return saved
   })
+  handle(IPC.previewVideoBegin, (e, p: string, convertTo: string | null, merged: boolean) => videoWriter.begin(e.sender, p, convertTo, merged))
+  handle(IPC.previewVideoWrite, (e, id: string, position: number, data: Uint8Array) => videoWriter.write(e.sender, id, position, data))
+  handle(IPC.previewVideoFinish, async (e, id: string) => {
+    const saved = await audit.track({ action: 'create', folder: videoWriter.folderOf(id) }, () => videoWriter.finish(e.sender, id), (saved) => ({ paths: [saved.path], count: 1 }))
+    void recents.touch(saved.path, 'created')
+    return saved
+  })
+  handle(IPC.previewVideoAbort, (e, id: string) => videoWriter.abort(e.sender, id))
   handle(IPC.screenshot, async (_e, folder: string | null, mode: unknown) => {
     const shot = await audit.track({ action: 'create', folder }, () => screenshot.capture(folder, mode), (shot) => (shot ? { paths: [shot.path], count: 1 } : { outcome: 'cancelled' }))
     if (shot) void recents.touch(shot.path, 'screenshot')

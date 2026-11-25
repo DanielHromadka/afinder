@@ -132,6 +132,17 @@ body.resizing-col iframe {
   background: #000;
 }
 
+/* A video with the cutter's Edit button under it. */
+.preview-video {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 8px;
+}
+
 .preview-audio {
   flex: 1;
   display: flex;
@@ -335,4 +346,90 @@ body.resizing-col iframe {
   color: var(--muted);
   font-style: italic;
   opacity: 0.8;
+}
+
+/* Photo, video and song details under the preview. */
+.media-info {
+  flex-shrink: 0;
+  max-height: 40%;
+  overflow: auto;
+  margin: 0;
+  padding: 8px 12px;
+  border-top: 1px solid var(--face-dark);
+  display: grid;
+  gap: 4px;
+  user-select: text;
+}
+
+.media-info.loading,
+.media-info.empty {
+  color: var(--muted);
+}
+
+.media-info-row {
+  display: grid;
+  grid-template-columns: minmax(70px, 30%) 1fr;
+  gap: 8px;
+}
+
+.media-info dt {
+  color: var(--muted);
+}
+
+.media-info dd {
+  margin: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-wrap: anywhere;
+}
+
+.media-info-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.preview-media-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.preview-media-saved {
+  color: var(--muted);
+}
+
+/* The song player: cover, tags, a waveform that seeks. */
+.audio-cover {
+  width: min(200px, 60%);
+  aspect-ratio: 1;
+  object-fit: cover;
+  box-shadow: 1px 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.audio-tags {
+  display: grid;
+  gap: 2px;
+  max-width: 100%;
+  text-align: center;
+}
+
+.audio-tags span {
+  color: var(--muted);
+}
+
+.audio-wave {
+  width: 100%;
+  max-width: 520px;
+  height: 56px;
+  cursor: pointer;
+}
+
+.audio-time {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
 }

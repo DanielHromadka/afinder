@@ -14,7 +14,7 @@ import type { FileKind, Listing, Place, ScreenshotMode, ScreenshotResult, Search
 import type { BtcQuote, CompanionStatus, FeedbackDraft, McpStatus, McpView, SystemInfo } from './model/services'
 import type { Settings, WindowHandover } from './model/settings'
 import type { AgentInfo, RunTarget, TerminalData, TerminalExit, TerminalProfile, TerminalProfiles } from './model/terminal'
-import type { ClipboardEntry, DiskNode, DuplicateGroup, FileHashes, SysInfo, SysProcess, SysSample, SysSensors, ToolsProgress } from './model/tools'
+import type { ClipboardEntry, DiskNode, DuplicateGroup, FileHashes, ImageFile, SysInfo, SysProcess, SysSample, SysSensors, ToolsProgress } from './model/tools'
 import type { ArchiveRequest, ConflictPolicy, FileClipboard, TransferPlan, TransferProgress, TransferRequest } from './model/transfer'
 import type { RecentFile } from './recents'
 import type { ReleaseNote } from './releaseNotes'
@@ -28,6 +28,13 @@ export * from './model/settings'
 export * from './model/terminal'
 export * from './model/transfer'
 export * from './model/tools'
+
+/** A stretch of recognised speech, in seconds from the start of the file. */
+export interface TranscriptSegment {
+  start: number
+  end: number
+  text: string
+}
 export * from './model/services'
 export * from './ipcChannels'
 
@@ -176,10 +183,26 @@ export interface AfinderApi {
   }
   /** Mac App Store build: folders the sandbox lets aFinder into (empty elsewhere), asking for one, removing one. */
   diskAccess: { list(): Promise<string[]>; grant(suggested?: string): Promise<string | null>; revoke(path: string): Promise<void> }
+  /**
+   * Offline speech to text (Whisper). The caller decodes the media and sends 30 s windows of 16 kHz mono
+   * audio to chunk(); finish() writes `name.srt` or `name.txt` next to the file.
+   */
+  transcribe: {
+    status(): Promise<Record<'base' | 'small', boolean>>
+    /** Downloads the model's pinned files; progress (0–100) arrives through onProgress. */
+    download(model: 'base' | 'small'): Promise<void>
+    onProgress(callback: (percent: number) => void): () => void
+    begin(path: string, model: 'base' | 'small', language: string | null): Promise<string>
+    chunk(id: string, samples: Float32Array, offset: number): Promise<TranscriptSegment[]>
+    finish(id: string, format: 'srt' | 'txt'): Promise<{ path: string }>
+    abort(id: string): Promise<void>
+  }
   tools: {
     /** Long jobs run in a worker; `id` (from the caller) names the job for progress and cancel. */
     hash(id: string, path: string): Promise<FileHashes>
     duplicates(id: string, dir: string): Promise<DuplicateGroup[]>
+    /** Photos below dir, for the similar photos search (hashed in the renderer). */
+    images(id: string, dir: string): Promise<ImageFile[]>
     diskTree(id: string, dir: string): Promise<DiskNode>
     cancel(id: string): void
     onProgress(callback: (id: string, progress: ToolsProgress) => void): () => void
@@ -297,6 +320,18 @@ export interface AfinderApi {
      * next to it as `name (edited).ext`. Returns where it went and its mtime.
      */
     saveImage(path: string, data: Uint8Array, opts: { modified?: number; force?: boolean; copy?: boolean }): Promise<{ path: string; modified: number }>
+    /**
+     * Writes a video made from the one at path next to it, streamed in positioned chunks while the
+     * renderer encodes it: begin, write…, then finish (or abort, which leaves nothing behind). A cut
+     * lands as `name (cut).ext`; with convertTo (mp4, webm, mov, or m4a, ogg, wav for the sound alone) a
+     * conversion lands as `name.<convertTo>`; `merged` joins several videos into `name (joined).mp4`.
+     */
+    writeVideo: {
+      begin(path: string, convertTo?: string, merged?: boolean): Promise<string>
+      write(id: string, position: number, data: Uint8Array): Promise<void>
+      finish(id: string): Promise<{ path: string; modified: number }>
+      abort(id: string): Promise<void>
+    }
   }
   mcp: {
     /** Server state and the bearer token agents need. */

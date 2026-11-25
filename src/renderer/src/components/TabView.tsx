@@ -26,6 +26,8 @@ import { formatCount, formatSize } from '@renderer/lib/format'
 import { buildRows } from '@renderer/lib/fileRows'
 import { groupByLabel } from '@renderer/lib/grouping'
 import { keys } from '@renderer/lib/keys'
+import { contactSheetJob, gifJob, resizeJob, transcribeJob } from '@renderer/lib/mediaJobs'
+import { cachedTaken, loadTaken } from '@renderer/lib/takenDates'
 import { folderLabel } from '@renderer/lib/places'
 import { remoteMountOf } from '@renderer/lib/remotes'
 import { playSound } from '@renderer/lib/sound'
@@ -33,6 +35,12 @@ import { useThemeInfo } from '@renderer/lib/useThemeInfo'
 import { AddressBar } from './AddressBar'
 import { AskAiDialog } from './AskAiDialog'
 import { BatchRenameDialog, type AiSuggestions } from './BatchRenameDialog'
+import { JobDialog, type Job } from './JobDialog'
+import { ResizeDialog } from './ResizeDialog'
+import { GifDialog } from './GifDialog'
+import { CompareDialog } from './CompareDialog'
+import { ContactSheetDialog } from './ContactSheetDialog'
+import { TranscribeDialog } from './TranscribeDialog'
 import type { MenuItem } from './ContextMenu'
 import { CreateArchiveDialog } from './CreateArchiveDialog'
 import { FileAssistantDialog } from './FileAssistantDialog'
@@ -178,11 +186,25 @@ export function TabView(props: Props): React.JSX.Element | null {
   }, [quickLook])
   /** Items in the batch rename dialog, or null. */
   const [batch, setBatch] = useState<FileEntry[] | null>(null)
+  /** A batch job over images or videos (convert, strip metadata …) in its progress dialog. */
+  const [job, setJob] = useState<Job | null>(null)
+  /** Images waiting for the resize options. */
+  const [resizing, setResizing] = useState<FileEntry[] | null>(null)
+  /** A video waiting for the GIF options. */
+  const [gifFrom, setGifFrom] = useState<FileEntry | null>(null)
+  /** Two images open in the compare dialog. */
+  const [comparing, setComparing] = useState<[FileEntry, FileEntry] | null>(null)
+  /** Pictures waiting for the contact sheet options. */
+  const [sheetOf, setSheetOf] = useState<FileEntry[] | null>(null)
+  /** Audio and video waiting for the transcription options. */
+  const [transcribing, setTranscribing] = useState<FileEntry[] | null>(null)
   /** Items in the create archive dialog with the suggested name and folder, or null. */
   const [archive, setArchive] = useState<{ sources: string[]; name: string; dest: string } | null>(null)
   /** AI rename suggestions for the batch dialog (null = the dialog was opened without AI). */
   const [aiNames, setAiNames] = useState<AiSuggestions | null>(null)
   const aiRequest = useRef(0)
+  /** The selected item pressed without modifiers: it becomes the only selection on mouse up, unless a drag starts. */
+  const collapseOnUp = useRef<string | null>(null)
   /** Items of the "Ask AI…" dialog. */
   const [askAi, setAskAi] = useState<{ path: string; name: string; isDir: boolean }[] | null>(null)
   /** This tab shows the preview pane (each tab decides on its own). */
@@ -272,10 +294,19 @@ export function TabView(props: Props): React.JSX.Element | null {
   // ---- rows (filter + sort + groups) and selection ---------------------------------------------
 
   const visibleEntries = useMemo(() => (listing?.entries ?? []).filter((e) => settings.showHidden || !e.hidden), [listing, settings.showHidden])
+  // "Date taken" grouping: the dates are read in the background and the groups fill in as they come.
+  const [takenVersion, setTakenVersion] = useState(0)
+  const shownEntries = useMemo(() => (searchMode ? (search?.entries ?? []) : visibleEntries), [searchMode, search, visibleEntries])
+  useEffect(() => {
+    if (groupBy !== 'taken') return
+    const ctrl = new AbortController()
+    void loadTaken(shownEntries, ctrl.signal, () => setTakenVersion((v) => v + 1))
+    return () => ctrl.abort()
+  }, [groupBy, shownEntries])
   const { rows, groups } = useMemo(
     () =>
       buildRows({
-        entries: searchMode ? (search?.entries ?? []) : visibleEntries,
+        entries: shownEntries,
         filter,
         fuzzy: settings.fuzzy,
         showHidden: settings.showHidden,
@@ -289,10 +320,11 @@ export function TabView(props: Props): React.JSX.Element | null {
         tree: treeOn,
         expanded,
         subLists,
-        now: Date.now()
+        now: Date.now(),
+        takenOf: cachedTaken
       }),
-    // The language changes group labels, date buckets and the collation.
-    [searchMode, search, visibleEntries, filter, settings.fuzzy, settings.showHidden, sort, sizes, groupBy, virtual, collapsed, path, treeOn, expanded, subLists, getLanguage()]
+    // The language changes group labels, date buckets and the collation; takenVersion: more dates taken read.
+    [takenVersion, searchMode, shownEntries, filter, settings.fuzzy, settings.showHidden, sort, sizes, groupBy, virtual, collapsed, path, treeOn, expanded, subLists, getLanguage()]
   )
   const hasParentRow = !searchMode && !!(listing?.parent || virtual)
   const selection = useFileSelection(rows, hasParentRow)
@@ -300,6 +332,11 @@ export function TabView(props: Props): React.JSX.Element | null {
   const { refresh } = nav
   /** The file the preview shows: the focused row, as long as something is selected. */
   const previewEntry = focusIndex >= 0 && selection.selection.size > 0 ? rows[focusIndex].entry : null
+  /** After a song ends: the next song below the focused row, if any (the preview then plays it). */
+  const nextSong = (): void => {
+    const next = rows.findIndex((r, i) => i > focusIndex && !r.entry.isDir && previewKind(r.entry.name) === 'audio')
+    if (next >= 0) select([rows[next].entry.path])
+  }
 
   /** Re-reads the folder (and re-runs a recursive search), keeping the selection where possible. */
   const reload = useCallback(
@@ -623,6 +660,7 @@ export function TabView(props: Props): React.JSX.Element | null {
   }
 
   const startDrag = (entry: FileEntry): void => {
+    collapseOnUp.current = null
     const paths = selection.selection.has(entry.path) ? selectedEntries.map((e) => e.path) : [entry.path]
     if (!selection.selection.has(entry.path)) select([entry.path])
     dragging.paths = paths
@@ -733,13 +771,21 @@ export function TabView(props: Props): React.JSX.Element | null {
       if (entry.isDir) props.onOpenInNewTab(entry.path)
       return
     }
-    if (e.button === 2) {
+    // Ctrl-click is the right click on macOS; both keep the selection the item belongs to for the menu.
+    if (e.button === 2 || (keys.isMac && e.ctrlKey && !e.metaKey)) {
       if (!selection.selection.has(entry.path)) select([entry.path])
       return
     }
     if (keys.mod(e)) selection.toggle(entry.path)
     else if (e.shiftKey && selection.anchorPath) selection.selectRange(selection.anchorPath, index)
-    else select([entry.path])
+    else if (selection.selection.has(entry.path) && selection.selection.size > 1) {
+      // A press on a selected item may start dragging the whole selection; only a click narrows it.
+      collapseOnUp.current = entry.path
+      window.addEventListener('mouseup', () => {
+        if (collapseOnUp.current === entry.path) select([entry.path])
+        collapseOnUp.current = null
+      }, { once: true })
+    } else select([entry.path])
   }
 
   // ---- what the tab can do (context menu, palette, keyboard) -------------------------------------
@@ -797,12 +843,22 @@ export function TabView(props: Props): React.JSX.Element | null {
     duplicate: () => path && void flow.transfer(selectedEntries.map((e) => e.path), path, 'copy'),
     toOtherPane,
     openArchive,
+    startJob: setJob,
+    resizeImages: setResizing,
+    makeGif: setGifFrom,
+    compareImages: setComparing,
+    contactSheet: setSheetOf,
+    transcribe: setTranscribing,
     copyPath,
     revealSelected,
     reveal: (p) => api.reveal(p).catch(showError),
     openExternal: (p) => api.open(p).catch(showError),
     openWindow: (p) => api.window.open(p),
     setQuickLook,
+    editInQuickLook: (entry) => {
+      select([entry.path], entry.path)
+      editImage()
+    },
     slideshowOf,
     playSlideshow: setSlideshow,
     startTail: (entry) => {
@@ -901,7 +957,7 @@ export function TabView(props: Props): React.JSX.Element | null {
     tail ? (
       <TailView key={tail.path} path={tail.path} name={tail.name} onClose={() => setTail(null)} />
     ) : (
-      <Preview entry={previewEntry} size={previewEntry ? sizes.get(previewEntry.path) : undefined} theme={settings.theme} mode="pane" readOnly={readOnly} onError={showError} onEditImage={() => editImage()} />
+      <Preview entry={previewEntry} size={previewEntry ? sizes.get(previewEntry.path) : undefined} theme={settings.theme} mode="pane" readOnly={readOnly} onError={showError} onEdit={() => editImage()} onNext={nextSong} />
     )
 
   // The chrome renders while the first listing loads too: a tab that mounts focused (a new pane, a tab moved
@@ -1009,6 +1065,14 @@ export function TabView(props: Props): React.JSX.Element | null {
         rows={rows}
         groups={groups}
         showLocation={searchMode}
+        mediaColumns={settings.mediaColumns}
+        onHeaderMenu={(e) =>
+          props.showMenu({
+            x: e.clientX,
+            y: e.clientY,
+            items: [{ label: t('settings.mediaColumns'), checked: settings.mediaColumns, onClick: () => updateSettings({ mediaColumns: !settings.mediaColumns }) }]
+          })
+        }
         sizes={sizes}
         selection={selection.selection}
         focusIndex={focusIndex}
@@ -1096,6 +1160,7 @@ export function TabView(props: Props): React.JSX.Element | null {
             editing={imageEdit !== false}
             editCrop={imageEdit === 'crop'}
             onEditingChange={(on) => setImageEdit(on ? 'draw' : false)}
+            onNext={nextSong}
           />,
           document.body
         )}
@@ -1123,6 +1188,65 @@ export function TabView(props: Props): React.JSX.Element | null {
             onCancel={closeBatch}
             ai={aiNames ?? undefined}
             onAiRequest={(hint) => aiRename(batch, hint)}
+          />,
+          document.body
+        )}
+      {resizing &&
+        createPortal(
+          <ResizeDialog
+            entries={resizing}
+            onStart={(o) => {
+              setResizing(null)
+              setJob(resizeJob(resizing, o))
+            }}
+            onCancel={() => setResizing(null)}
+          />,
+          document.body
+        )}
+      {gifFrom &&
+        createPortal(
+          <GifDialog
+            entry={gifFrom}
+            onStart={(o) => {
+              setGifFrom(null)
+              setJob(gifJob(gifFrom, o))
+            }}
+            onCancel={() => setGifFrom(null)}
+          />,
+          document.body
+        )}
+      {sheetOf &&
+        createPortal(
+          <ContactSheetDialog
+            entries={sheetOf}
+            onStart={(o) => {
+              setSheetOf(null)
+              setJob(contactSheetJob(sheetOf, o))
+            }}
+            onCancel={() => setSheetOf(null)}
+          />,
+          document.body
+        )}
+      {transcribing &&
+        createPortal(
+          <TranscribeDialog
+            entries={transcribing}
+            settings={settings}
+            onStart={(o) => {
+              setTranscribing(null)
+              setJob(transcribeJob(transcribing, o))
+            }}
+            onCancel={() => setTranscribing(null)}
+          />,
+          document.body
+        )}
+      {comparing && createPortal(<CompareDialog entries={comparing} onClose={() => setComparing(null)} onError={showError} />, document.body)}
+      {job &&
+        createPortal(
+          <JobDialog
+            {...job}
+            onDone={(paths) => paths.length > 0 && !searchMode && path && paths.every((p) => dirOf(p) === path) && select(paths, paths[0])}
+            onClose={() => setJob(null)}
           />,
           document.body
         )}

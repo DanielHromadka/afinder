@@ -6,7 +6,7 @@ import { BrowserWindow, clipboard, dialog, nativeImage, net, utilityProcess, typ
 import workerPath from '../../workers/toolsWorker?modulePath'
 import { t } from '@shared/i18n'
 import { CNB_URL, parseCnbRates, type Rates } from '@shared/tools/rates'
-import { IPC, type ClipboardEntry, type DiskNode, type DuplicateGroup, type FileHashes } from '@shared/types'
+import { IPC, type ClipboardEntry, type DiskNode, type DuplicateGroup, type FileHashes, type ImageFile } from '@shared/types'
 import * as files from './fileSystem'
 import * as vfs from './vfs'
 
@@ -72,6 +72,7 @@ function run<T>(sender: WebContents, id: unknown, message: Record<string, unknow
 
 export const hashFile = async (sender: WebContents, id: unknown, p: unknown): Promise<FileHashes> => run(sender, id, { type: 'hash', path: await localPath(p) })
 export const findDuplicates = async (sender: WebContents, id: unknown, dir: unknown): Promise<DuplicateGroup[]> => run(sender, id, { type: 'dupes', dir: await localPath(dir) })
+export const listImages = async (sender: WebContents, id: unknown, dir: unknown): Promise<ImageFile[]> => run(sender, id, { type: 'images', dir: await localPath(dir) })
 export const diskTree = async (sender: WebContents, id: unknown, dir: unknown): Promise<DiskNode> => run(sender, id, { type: 'tree', dir: await localPath(dir) })
 export function cancel(id: unknown): void {
   if (typeof id === 'string' && jobs.has(id)) worker?.postMessage({ type: 'cancel', id })
@@ -110,7 +111,7 @@ export async function decodeImage(p: unknown): Promise<Uint8Array> {
   return new Uint8Array(image.toPNG())
 }
 
-const IMAGE_EXT = /\.(png|jpe?g|webp)$/i
+const IMAGE_EXT = /\.(png|jpe?g|webp|gif)$/i
 const MAX_IMAGE_BYTES = 200 * 1024 * 1024
 
 /** Writes a converted image into dir under a free name; returns its path. */

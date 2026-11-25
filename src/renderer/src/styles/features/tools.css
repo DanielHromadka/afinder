@@ -686,3 +686,16 @@ textarea.tool-input,
   color: inherit;
   opacity: 0.8;
 }
+
+.dupe-thumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 90px;
+}
+
+.dupe-thumb img {
+  max-width: 48px;
+  max-height: 36px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}

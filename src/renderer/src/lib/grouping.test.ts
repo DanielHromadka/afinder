@@ -67,3 +67,16 @@ describe('groupOf', () => {
     expect(compareGroups(small, big)).toBeLessThan(0)
   })
 })
+
+describe('date taken groups', () => {
+  it('groups by the month taken, with undated files and folders apart', () => {
+    const size = (): number => 0
+    const taken = (e: FileEntry): string | null | undefined => ({ 'a.jpg': '2024-05-01T10:00:00', 'b.jpg': null })[e.name]
+    const a = groupOf(entry('a.jpg', 0), 'taken', 0, size, taken)
+    expect(a.key).toBe('t2024-4')
+    expect(a.order).toBe(2024 * 12 + 4)
+    expect(groupOf(entry('b.jpg', 0), 'taken', 0, size, taken).key).toBe('t-')
+    expect(groupOf(entry('c.jpg', 0), 'taken', 0, size, taken).key).toBe('t?')
+    expect(groupOf(entry('dir', 0, { isDir: true }), 'taken', 0, size, taken).pinned).toBe(true)
+  })
+})

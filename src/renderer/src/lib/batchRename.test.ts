@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_OPTIONS, newNames, problems, splitName, type RenameOptions } from './batchRename'
+import { localIso } from '@shared/media'
+import { dateName, DEFAULT_OPTIONS, newNames, problems, splitName, type RenameOptions } from './batchRename'
 
 const files = (...names: string[]): { name: string; isDir: boolean }[] => names.map((name) => ({ name, isDir: false }))
 const opts = (o: Partial<RenameOptions>): RenameOptions => ({ ...DEFAULT_OPTIONS, ...o })
@@ -58,5 +59,16 @@ describe('batch rename', () => {
     const ai = opts({ mode: 'ai' })
     expect(newNames(files('IMG_1.JPG', 'scan.pdf', 'x.txt'), ai, 'cs', ['Lisabon 2026.jpeg', 'Smlouva.pdf'])).toEqual(['Lisabon 2026.JPG', 'Smlouva.pdf', 'x.txt'])
     expect(newNames(files('IMG_1.JPG'), { ...ai, keepExtension: false }, 'cs', ['Lisabon.jpeg'])).toEqual(['Lisabon.jpeg'])
+  })
+
+  it('names by the date taken, numbering the same second and falling back to the modification date', () => {
+    expect(dateName('YYYY-MM-DD HH.mm.ss {name}', '2024-05-01T14:03:22', 'IMG_1')).toBe('2024-05-01 14.03.22 IMG_1')
+    expect(dateName('YYMMDD', '2024-05-01T14:03:22', 'x')).toBe('240501')
+    const date = opts({ mode: 'date', datePattern: 'YYYY-MM-DD' })
+    const modified = new Date(2023, 0, 2, 3, 4, 5).getTime()
+    const items = [...files('a.jpg', 'b.jpg', 'c.JPG'), { name: 'd.png', isDir: false, modified }]
+    expect(newNames(items, date, 'cs', undefined, ['2024-05-01T10:00:00', '2024-05-01T11:00:00', null, null])).toEqual(['2024-05-01.jpg', '2024-05-01-2.jpg', 'c.JPG', '2023-01-02.png'])
+    expect(newNames(items, { ...date, dateFallback: false }, 'cs', undefined, [null, null, null, null])).toEqual(['a.jpg', 'b.jpg', 'c.JPG', 'd.png'])
+    expect(localIso(modified)).toBe('2023-01-02T03:04:05')
   })
 })

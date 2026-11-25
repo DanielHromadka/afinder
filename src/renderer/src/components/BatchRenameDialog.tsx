@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { locale, t, type MessageKey } from '@shared/i18n'
 import type { FileEntry } from '@shared/types'
 import { compileFind, DEFAULT_OPTIONS, newNames, problems, type RenameOptions } from '../lib/batchRename'
+import { loadTaken } from '../lib/takenDates'
 import { Dialog } from './Dialog'
 import { Icon } from './Icon'
 
@@ -49,9 +50,19 @@ export function BatchRenameDialog({ entries, otherNames, platform, onRename, onC
       regexError = true
     }
   }
+  // Dates taken are read from the files (EXIF, video metadata) the first time the date mode is chosen.
+  const [dates, setDates] = useState<(string | null)[] | null>(null)
+  const wantDates = o.mode === 'date'
+  useEffect(() => {
+    if (!wantDates || dates) return
+    const ctrl = new AbortController()
+    void loadTaken(entries, ctrl.signal, () => {}).then((list) => !ctrl.signal.aborted && setDates(list))
+    return () => ctrl.abort()
+  }, [wantDates, dates, entries])
   const suggested = ai?.state === 'done' ? ai.names : undefined
-  const names = useMemo(() => newNames(entries, o, locale(), suggested), [entries, o, suggested])
-  const aiWaiting = o.mode === 'ai' && ai?.state !== 'done'
+  const names = useMemo(() => newNames(entries, o, locale(), suggested, dates ?? undefined), [entries, o, suggested, dates])
+  const datesWaiting = wantDates && !dates
+  const aiWaiting = (o.mode === 'ai' && ai?.state !== 'done') || datesWaiting
   const issues = useMemo(() => problems(entries.map((e) => e.name), names, otherNames, platform), [entries, names, otherNames, platform])
   const changed = names.filter((n, i) => n !== entries[i].name).length
   const blocked = regexError || aiWaiting || issues.some((p) => p !== null)
@@ -70,6 +81,7 @@ export function BatchRenameDialog({ entries, otherNames, platform, onRename, onC
               <option value="replace">{t('batch.mode.replace')}</option>
               <option value="add">{t('batch.mode.add')}</option>
               <option value="format">{t('batch.mode.format')}</option>
+              <option value="date">{t('batch.mode.date')}</option>
               {ai && <option value="ai">{t('batch.mode.ai')}</option>}
             </select>
           </label>
@@ -151,6 +163,22 @@ export function BatchRenameDialog({ entries, otherNames, platform, onRename, onC
             </>
           )}
 
+          {o.mode === 'date' && (
+            <>
+              <label>
+                <span>{t('batch.datePattern')}</span>
+                <input ref={first} value={o.datePattern} spellCheck={false} onChange={(e) => set({ datePattern: e.target.value })} />
+              </label>
+              <p className="batch-hint">{t('batch.dateHint')}</p>
+              <div className="batch-checks">
+                <label>
+                  <input type="checkbox" checked={o.dateFallback} onChange={(e) => set({ dateFallback: e.target.checked })} />
+                  {t('batch.dateFallback')}
+                </label>
+              </div>
+            </>
+          )}
+
           <label>
             <span>{t('batch.case')}</span>
             <select value={o.caseChange} onChange={(e) => set({ caseChange: e.target.value as RenameOptions['caseChange'] })}>
@@ -200,7 +228,9 @@ export function BatchRenameDialog({ entries, otherNames, platform, onRename, onC
           >
             {regexError
               ? t('batch.problem.regex')
-              : o.mode === 'ai' && ai?.state === 'loading'
+              : datesWaiting
+                ? t('batch.dateReading')
+                : o.mode === 'ai' && ai?.state === 'loading'
                 ? t('batch.aiThinking')
                 : o.mode === 'ai' && ai?.state === 'error'
                   ? ai.message

@@ -1,4 +1,4 @@
-// Grouping of file list rows into "virtual folders" by date, kind, extension or size.
+// Grouping of file list rows into "virtual folders" by date, date taken, kind, extension or size.
 
 import { t, type MessageKey } from '@shared/i18n'
 import type { FileEntry, FileKind, GroupBy } from '@shared/types'
@@ -22,6 +22,7 @@ export const GROUP_SORT_KEY: Record<GroupBy, 'modified' | 'kind' | 'size' | null
   month: 'modified',
   week: 'modified',
   day: 'modified',
+  taken: null,
   kind: 'kind',
   extension: 'kind',
   size: 'size'
@@ -34,6 +35,7 @@ export const GROUP_DEFAULT_ASC: Record<GroupBy, boolean> = {
   month: false,
   week: false,
   day: false,
+  taken: false,
   kind: true,
   extension: true,
   size: false
@@ -76,8 +78,9 @@ function isoWeek(ms: number): { monday: Date; week: number; year: number } {
 /**
  * Returns the group an entry belongs to. `sizeOf` gives the (possibly computed) size; folders are
  * kept in their own group for size and extension grouping since their size may still be changing.
+ * `takenOf` gives the date taken (`YYYY-MM-DDTHH:MM:SS`; null: none, undefined: not read yet).
  */
-export function groupOf(entry: FileEntry, by: GroupBy, now: number, sizeOf: (e: FileEntry) => number): Group {
+export function groupOf(entry: FileEntry, by: GroupBy, now: number, sizeOf: (e: FileEntry) => number, takenOf: (e: FileEntry) => string | null | undefined = () => null): Group {
   const time = entry.modified
   switch (by) {
     case 'none':
@@ -104,6 +107,15 @@ export function groupOf(entry: FileEntry, by: GroupBy, now: number, sizeOf: (e: 
       const today = startOfDay(now).getTime()
       const label = day === today ? t('group.today') : day === today - DAY_MS ? t('group.yesterday') : dayFmt().format(day)
       return { key: `d${day}`, label: capitalize(label), order: day }
+    }
+    case 'taken': {
+      if (entry.isDir) return { key: 't/', label: t('group.folders'), order: Infinity, pinned: true }
+      const taken = takenOf(entry)
+      // Without a date (or still being read): one group, always last.
+      if (!taken) return taken === undefined ? { key: 't?', label: t('group.takenReading'), order: -1 } : { key: 't-', label: t('group.noTaken'), order: -2 }
+      const y = Number(taken.slice(0, 4))
+      const m = Number(taken.slice(5, 7)) - 1
+      return { key: `t${y}-${m}`, label: capitalize(monthFmt().format(new Date(y, m, 1))), order: y * 12 + m }
     }
     case 'kind': {
       const kind: FileKind = entry.isDir ? 'folder' : entry.kind

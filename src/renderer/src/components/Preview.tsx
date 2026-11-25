@@ -1,15 +1,19 @@
 import { useEffect, useRef, useState } from 'react'
 import { t } from '@shared/i18n'
-import { dirOf, joinPath } from '@shared/paths'
+import { baseName, dirOf, joinPath } from '@shared/paths'
 import { canEditImage } from '@shared/imageEdit'
+import { canCutVideo } from '@shared/videoCut'
+import { timeForName } from '@shared/media'
 import { extensionOf, looksLikeText, MAX_MODEL_BYTES, previewKind, previewUrl, sniffable, textLanguage, type PreviewKind } from '@shared/preview'
 import { THEMES, type FileEntry, type SheetPreview, type SizeUpdate, type ThemeId } from '@shared/types'
 import { formatDate, formatSize, numberFormat } from '../lib/format'
 import { kindLabel } from '../lib/kinds'
 import { keys } from '../lib/keys'
 import { cssColorToHex, loadMonaco, luminance, type MonacoApi } from '../lib/monaco'
+import { AudioPlayer } from './AudioPlayer'
 import { onLookChange } from '@renderer/lib/look'
 import { Icon } from './Icon'
+import { hasMediaInfo, MediaInfo } from './MediaInfo'
 import { useBlame, useChangeBars, useDiffView, useGitBase } from './previewGit'
 
 const api = window.api
@@ -31,11 +35,13 @@ interface Props {
   /** Errors that happen after the viewer is gone (saving on the way out). */
   onError(err: unknown): void
   /** Pane only: opens the image editor (in Quick Look – the pane is too small for it). */
-  onEditImage?(): void
+  onEdit?(): void
+  /** Selects the next song in the folder when one ends. */
+  onNext?(): void
 }
 
 /** Header with the file's name and details, and the viewer that fits its type. */
-export function Preview({ entry, size, theme, mode, readOnly = false, onError, onEditImage }: Props): React.JSX.Element {
+export function Preview({ entry, size, theme, mode, readOnly = false, onError, onEdit, onNext }: Props): React.JSX.Element {
   // Arrowing through a folder should not start a dozen loads – the pane waits for the selection to settle.
   const shown = useSettled(entry, mode === 'pane' ? 140 : 0)
   if (!shown) return <div className={`preview ${mode}`}><p className="preview-note center">{t('preview.empty')}</p></div>
@@ -55,7 +61,8 @@ export function Preview({ entry, size, theme, mode, readOnly = false, onError, o
           </div>
         </div>
       )}
-      <Viewer key={shown.path} entry={shown} theme={theme} mode={mode} readOnly={readOnly} onError={onError} onEditImage={onEditImage} />
+      <Viewer key={shown.path} entry={shown} theme={theme} mode={mode} readOnly={readOnly} onError={onError} onEdit={onEdit} onNext={onNext} />
+      {mode === 'pane' && hasMediaInfo(shown) && <MediaInfo key={`${shown.path}|${shown.modified}`} entry={shown} readOnly={readOnly} onError={onError} />}
     </div>
   )
 }
@@ -70,7 +77,7 @@ function useSettled<T>(value: T, delay: number): T {
   return delay === 0 ? value : settled
 }
 
-function Viewer({ entry, theme, mode, readOnly, onError, onEditImage }: Pick<Props, 'theme' | 'mode' | 'onError' | 'onEditImage'> & { entry: FileEntry; readOnly: boolean }): React.JSX.Element {
+function Viewer({ entry, theme, mode, readOnly, onError, onEdit, onNext }: Pick<Props, 'theme' | 'mode' | 'onError' | 'onEdit' | 'onNext'> & { entry: FileEntry; readOnly: boolean }): React.JSX.Element {
   // Remount viewers when the file changes on disk (an agent rewrote it); the text editor syncs itself.
   const stamp = `${entry.modified}|${entry.size}`
   const [kind, setKind] = useState<PreviewKind | 'none' | null>(() => (entry.isDir ? 'none' : null))
@@ -96,19 +103,14 @@ function Viewer({ entry, theme, mode, readOnly, onError, onEditImage }: Pick<Pro
   if (kind === null) return <Note text={t('preview.loading')} />
   switch (kind) {
     case 'image':
-      return <ImageView key={stamp} entry={entry} onEdit={!readOnly && canEditImage(entry.name) ? onEditImage : undefined} />
+      return <ImageView key={stamp} entry={entry} onEdit={!readOnly && canEditImage(entry.name) ? onEdit : undefined} />
     case 'pdf':
       // Chromium's own PDF viewer, with its toolbar only where there is room for it.
       return <iframe key={stamp} className="preview-frame" src={`${previewUrl(entry.path)}#toolbar=${mode === 'overlay' ? 1 : 0}&view=FitH`} title={entry.name} />
     case 'video':
-      return <video key={stamp} className="preview-media" src={previewUrl(entry.path)} controls preload="metadata" />
+      return <VideoView key={stamp} entry={entry} readOnly={readOnly} onError={onError} onEdit={!readOnly && canCutVideo(entry.name) ? onEdit : undefined} />
     case 'audio':
-      return (
-        <div className="preview-audio">
-          <Icon name="audio" size={96} />
-          <audio src={previewUrl(entry.path)} controls preload="metadata" />
-        </div>
-      )
+      return <AudioPlayer key={stamp} entry={entry} onNext={onNext} />
     case 'text':
       return <TextView entry={entry} language={language} theme={theme} mode={mode} readOnly={readOnly} onError={onError} />
     case 'docx':
@@ -156,6 +158,45 @@ function ImageView({ entry, onEdit }: { entry: FileEntry; onEdit?: () => void })
           {t('preview.edit')}
         </button>
       )}
+    </div>
+  )
+}
+
+function VideoView({ entry, onEdit, readOnly, onError }: { entry: FileEntry; onEdit?: () => void; readOnly: boolean; onError(err: unknown): void }): React.JSX.Element {
+  const video = useRef<HTMLVideoElement>(null)
+  const [saved, setSaved] = useState<string | null>(null)
+  // The frame on screen as a PNG next to the video, named after the time it shows.
+  const saveFrame = async (): Promise<void> => {
+    const v = video.current
+    if (!v || !v.videoWidth) return
+    try {
+      const canvas = new OffscreenCanvas(v.videoWidth, v.videoHeight)
+      canvas.getContext('2d')!.drawImage(v, 0, 0)
+      const data = new Uint8Array(await (await canvas.convertToBlob({ type: 'image/png' })).arrayBuffer())
+      const stem = entry.name.replace(/\.[^.]+$/, '')
+      const path = await api.tools.saveImage(dirOf(entry.path), `${stem} (${t('frame.suffix')} ${timeForName(v.currentTime)}).png`, data)
+      setSaved(baseName(path))
+    } catch (err) {
+      onError(err)
+    }
+  }
+  return (
+    <div className="preview-video">
+      {/* crossOrigin: the preview protocol sends CORS headers, and the canvas must stay readable for snapshots. */}
+      <video ref={video} className="preview-media" src={previewUrl(entry.path)} controls preload="metadata" crossOrigin="anonymous" />
+      <div className="preview-media-actions">
+        {!readOnly && (
+          <button className="xp-button" title={t('frame.saveTitle')} onClick={() => void saveFrame()}>
+            {t('frame.save')}
+          </button>
+        )}
+        {onEdit && (
+          <button className="xp-button preview-image-edit" title={t('videoEditor.editTitle')} onClick={onEdit}>
+            {t('preview.edit')}
+          </button>
+        )}
+        {saved && <span className="preview-media-saved">{t('frame.saved', { name: saved })}</span>}
+      </div>
     </div>
   )
 }

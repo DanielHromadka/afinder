@@ -2,10 +2,16 @@ import { ASSISTANT_MODES } from '@shared/fileAssistant'
 import { plural, t, tos } from '@shared/i18n'
 import { isBrowsableArchive } from '@shared/archive'
 import { dirOf } from '@shared/paths'
+import { AUDIO_TARGETS, convertKind, convertTargets } from '@shared/convert'
+import { canStripMetadata } from '@shared/exif'
+import { canEditImage } from '@shared/imageEdit'
+import { TURNS } from '@shared/orientation'
 import { previewKind } from '@shared/preview'
+import { canCutVideo } from '@shared/videoCut'
 import type { FileEntry, RunTarget } from '@shared/types'
 import { keys } from '@renderer/lib/keys'
 import { folderLabel } from '@renderer/lib/places'
+import { convertJob, extractJob, mergeJob, stripJob, turnJob } from '@renderer/lib/mediaJobs'
 import type { MenuItem } from '../ContextMenu'
 import type { TabContext } from './actions'
 
@@ -88,17 +94,97 @@ export function buildContextMenu(
       ? [{ label: picked ? plural('slideshow.playSelected', show.images.length, { n: show.images.length }) : t('slideshow.playFolder', { n: show.images.length }), icon: 'image', onClick: () => ctx.playSlideshow(show) }]
       : []
   }
+  // The image editor or video cutter, for one file the editor can open in a writable folder.
+  const editItems = (e: FileEntry): MenuItem[] => {
+    const single = !selection.has(e.path) || selection.size <= 1
+    const kind = previewKind(e.name)
+    const editable = (kind === 'image' && canEditImage(e.name)) || (kind === 'video' && canCutVideo(e.name))
+    return single && editable && !e.isDir && !listing?.readOnly ? [{ label: t('preview.edit'), icon: kind, onClick: () => ctx.editInQuickLook(e) }] : []
+  }
+  // Images and videos to another format; only for a selection of one kind, and not in read-only listings.
+  const convertItems = (e: FileEntry): MenuItem[] => {
+    const targets = targetsOf(ctx, e)
+    const offer = !listing?.readOnly && targets.every((x) => !x.isDir) ? convertTargets(targets.map((x) => x.name)) : null
+    if (!offer) return []
+    return [{ label: t('convert.menu'), icon: offer.kind === 'image' ? 'image' : 'video', items: offer.targets.map((ext) => ({ label: t(`convert.format.${ext}`), onClick: () => ctx.startJob(convertJob(targets, offer.kind, ext)) })) }]
+  }
+  // Smaller copies of photos (or the photos themselves made smaller); any image the converter can read.
+  const resizeItems = (e: FileEntry): MenuItem[] => {
+    const targets = targetsOf(ctx, e)
+    if (listing?.readOnly || !targets.every((x) => !x.isDir && convertKind(x.name) === 'image')) return []
+    return [{ label: t('resize.menu'), icon: 'image', onClick: () => ctx.resizeImages(targets) }]
+  }
+  // Turning and mirroring photos in place (JPEG losslessly).
+  const turnItems = (e: FileEntry): MenuItem[] => {
+    const targets = targetsOf(ctx, e)
+    if (listing?.readOnly || !targets.every((x) => !x.isDir && canStripMetadata(x.name))) return []
+    return [{ label: t('turn.menu'), icon: 'image', items: TURNS.map((turn): MenuItem => ({ label: t(`turn.${turn}`), onClick: () => ctx.startJob(turnJob(targets, turn)) })) }]
+  }
+  // What can be made of videos: a GIF of a stretch of one, their sound alone, several joined into one.
+  const videoItems = (e: FileEntry): MenuItem[] => {
+    const targets = targetsOf(ctx, e)
+    if (listing?.readOnly || !targets.every((x) => !x.isDir && convertKind(x.name) === 'video')) return []
+    return [
+      ...(targets.length === 1 ? [{ label: t('gif.menu'), icon: 'video' as const, onClick: () => ctx.makeGif(e) }] : []),
+      { label: t('extract.menu'), icon: 'audio', items: AUDIO_TARGETS.map((ext): MenuItem => ({ label: t(`extract.format.${ext}`), onClick: () => ctx.startJob(extractJob(targets, ext)) })) },
+      ...(targets.length > 1 ? [{ label: t('merge.menu', { n: targets.length }), icon: 'video' as const, onClick: () => ctx.startJob(mergeJob(targets)) }] : [])
+    ]
+  }
+  // Several photos or videos: a contact sheet of them.
+  const sheetItems = (e: FileEntry): MenuItem[] => {
+    const targets = targetsOf(ctx, e)
+    if (listing?.readOnly || targets.length < 2 || !targets.every((x) => !x.isDir && convertKind(x.name) !== null)) return []
+    return [{ label: t('contact.menu'), icon: 'image', onClick: () => ctx.contactSheet(targets) }]
+  }
+  // Speech to text, when turned on in Settings.
+  const transcribeItems = (e: FileEntry): MenuItem[] => {
+    const targets = targetsOf(ctx, e)
+    if (!settings.transcribeEnabled || listing?.readOnly || !targets.every((x) => !x.isDir && (previewKind(x.name) === 'audio' || previewKind(x.name) === 'video'))) return []
+    return [{ label: t('transcribe.menu'), icon: 'text', onClick: () => ctx.transcribe(targets) }]
+  }
+  // Exactly two images: compare them.
+  const compareItems = (e: FileEntry): MenuItem[] => {
+    const targets = targetsOf(ctx, e)
+    if (targets.length !== 2 || !targets.every((x) => !x.isDir && convertKind(x.name) === 'image')) return []
+    return [{ label: t('compare.menu'), icon: 'image', onClick: () => ctx.compareImages([targets[0], targets[1]]) }]
+  }
+  // Removing the location or all metadata from photos, in place; only for JPEG, PNG and WebP.
+  const metadataItems = (e: FileEntry): MenuItem[] => {
+    const targets = targetsOf(ctx, e)
+    if (listing?.readOnly || !targets.every((x) => !x.isDir && canStripMetadata(x.name))) return []
+    return [
+      {
+        label: t('strip.menu'),
+        icon: 'image',
+        items: [
+          { label: t('strip.gps'), onClick: () => ctx.startJob(stripJob(targets, 'gps')) },
+          { label: t('strip.all'), onClick: () => ctx.startJob(stripJob(targets, 'all')) }
+        ]
+      }
+    ]
+  }
+  // One item opens as a double click would; several open side by side: folders in new tabs, files in their apps.
+  const openTargets = (e: FileEntry): void => {
+    const targets = targetsOf(ctx, e)
+    if (targets.length === 1) return ctx.openEntry(e)
+    for (const x of targets) {
+      if (x.isDir) ctx.openInNewTab(x.path)
+      else ctx.openExternal(x.path)
+    }
+  }
   const items: MenuItem[] = entry
     ? [
-        { label: t('action.open'), icon: 'open', bold: true, shortcut: keys.isMac ? keys.label('open') : 'Enter', onClick: () => ctx.openEntry(entry) },
+        { label: t('action.open'), icon: 'open', bold: true, shortcut: keys.isMac ? keys.label('open') : 'Enter', onClick: () => openTargets(entry) },
         {
           label: t('action.quickLook'),
           shortcut: keys.label('quickLook'),
           onClick: () => {
-            ctx.select([entry.path])
+            // Keeps the selection; Quick Look starts on the clicked item.
+            ctx.select(selection.has(entry.path) ? [...selection] : [entry.path], entry.path)
             ctx.setQuickLook(true)
           }
         },
+        ...editItems(entry),
         ...slideshowItems(entry),
         ...(!entry.isDir && !listing?.readOnly ? [{ label: t('action.tail'), icon: 'console' as const, onClick: () => ctx.startTail(entry) }] : []),
         ...(entry.isDir
@@ -113,7 +199,7 @@ export function buildContextMenu(
         { label: t('action.systemTerminal'), onClick: () => ctx.openSystemTerminal(entry.isDir ? entry.path : dirOf(entry.path)) },
         { label: tos('action.reveal'), icon: 'reveal', onClick: () => ctx.reveal(entry.path) },
         ctx.favoriteItem(favoriteOf(entry)),
-        { label: t('action.addTodo'), icon: 'todo', onClick: () => ctx.addTodo({ path: entry.path, isDir: entry.isDir }) },
+        { label: t('action.addTodo'), icon: 'todo', onClick: () => targetsOf(ctx, entry).forEach((x) => ctx.addTodo({ path: x.path, isDir: x.isDir })) },
         { label: t('action.editNote'), icon: 'note', onClick: () => ctx.editNote(entry, info.x, info.y) },
         ...runItems(),
         ...consoleItems(entry.isDir ? entry.path : dirOf(entry.path)),
@@ -124,6 +210,14 @@ export function buildContextMenu(
         ...(entry.isDir ? [pasteItem] : []),
         { label: t('action.duplicate'), shortcut: keys.label('duplicate'), onClick: ctx.duplicate },
         ...(ctx.canArchive ? [{ label: t('action.compress'), icon: 'archive' as const, onClick: () => ctx.openArchive(selection.has(entry.path) ? selectedEntries : [entry]) }] : []),
+        ...compareItems(entry),
+        ...sheetItems(entry),
+        ...convertItems(entry),
+        ...resizeItems(entry),
+        ...turnItems(entry),
+        ...videoItems(entry),
+        ...transcribeItems(entry),
+        ...metadataItems(entry),
         ...otherPaneItems,
         'separator',
         selection.has(entry.path) && selection.size > 1

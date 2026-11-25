@@ -44,6 +44,9 @@ const DEFAULTS: StoredState = {
   cleanLook: true,
   workspaceBar: false,
   lineNumbers: true,
+  mediaColumns: false,
+  transcribeEnabled: false,
+  transcribeModel: 'base',
   expandFolders: true,
   autoUpdate: true,
   fileAssistantEnabled: false,
@@ -140,9 +143,9 @@ export function updateState(patch: Partial<StoredState>): Error | null {
 }
 
 export function publicSettings(): Settings {
-  const { lastPath, showHidden, fuzzy, recursive, theme, columnWidths, layout, language, workspaces, activeWorkspace, consoleSidebar, consoleHistory, favorites, previewWidth, shortcuts, themeInfo, cleanLook, workspaceBar, lineNumbers, expandFolders, autoUpdate, uiScale, iconSet, fileIconSet, activityEnabled, semanticEnabled, activityRetentionDays, fileAssistantEnabled, fileAssistantReadContent, sounds, soundVolume, music, musicVolume, mcpEnabled, mcpAllowWrite, recentFiles, companionEnabled, computersEnabled, companionRelay, stocks, clipboardHistory, tourOffered } =
+  const { lastPath, showHidden, fuzzy, recursive, theme, columnWidths, layout, language, workspaces, activeWorkspace, consoleSidebar, consoleHistory, favorites, previewWidth, shortcuts, themeInfo, cleanLook, workspaceBar, lineNumbers, mediaColumns, transcribeEnabled, transcribeModel, expandFolders, autoUpdate, uiScale, iconSet, fileIconSet, activityEnabled, semanticEnabled, activityRetentionDays, fileAssistantEnabled, fileAssistantReadContent, sounds, soundVolume, music, musicVolume, mcpEnabled, mcpAllowWrite, recentFiles, companionEnabled, computersEnabled, companionRelay, stocks, clipboardHistory, tourOffered } =
     loadState()
-  return { lastPath, showHidden, fuzzy, recursive, theme, columnWidths, layout, language, workspaces, activeWorkspace, consoleSidebar, consoleHistory, favorites, previewWidth, shortcuts, themeInfo, cleanLook, workspaceBar, lineNumbers, expandFolders, autoUpdate, uiScale, iconSet, fileIconSet, activityEnabled, semanticEnabled, activityRetentionDays, fileAssistantEnabled, fileAssistantReadContent, sounds, soundVolume, music, musicVolume, mcpEnabled, mcpAllowWrite, recentFiles, companionEnabled, computersEnabled, companionRelay, stocks, clipboardHistory, tourOffered }
+  return { lastPath, showHidden, fuzzy, recursive, theme, columnWidths, layout, language, workspaces, activeWorkspace, consoleSidebar, consoleHistory, favorites, previewWidth, shortcuts, themeInfo, cleanLook, workspaceBar, lineNumbers, mediaColumns, transcribeEnabled, transcribeModel, expandFolders, autoUpdate, uiScale, iconSet, fileIconSet, activityEnabled, semanticEnabled, activityRetentionDays, fileAssistantEnabled, fileAssistantReadContent, sounds, soundVolume, music, musicVolume, mcpEnabled, mcpAllowWrite, recentFiles, companionEnabled, computersEnabled, companionRelay, stocks, clipboardHistory, tourOffered }
 }
 
 /** Only known keys with the right types may come from the renderer. */
@@ -158,6 +161,9 @@ export function sanitizeSettings(patch: unknown): Partial<Settings> {
   if (typeof p.cleanLook === 'boolean') out.cleanLook = p.cleanLook
   if (typeof p.workspaceBar === 'boolean') out.workspaceBar = p.workspaceBar
   if (typeof p.lineNumbers === 'boolean') out.lineNumbers = p.lineNumbers
+  if (typeof p.mediaColumns === 'boolean') out.mediaColumns = p.mediaColumns
+  if (typeof p.transcribeEnabled === 'boolean') out.transcribeEnabled = p.transcribeEnabled
+  if (p.transcribeModel === 'base' || p.transcribeModel === 'small') out.transcribeModel = p.transcribeModel
   if (typeof p.expandFolders === 'boolean') out.expandFolders = p.expandFolders
   if (typeof p.fileAssistantEnabled === 'boolean') out.fileAssistantEnabled = p.fileAssistantEnabled
   if (typeof p.fileAssistantReadContent === 'boolean') out.fileAssistantReadContent = p.fileAssistantReadContent

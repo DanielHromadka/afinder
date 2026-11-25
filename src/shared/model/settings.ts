@@ -28,7 +28,7 @@ export type IconSetId = (typeof ICON_SETS)[number]
 /** File and place icons can follow the UI set ('match') or use their own. */
 export type FileIconSetting = IconSetId | 'match'
 
-export const GROUP_BY = ['none', 'year', 'month', 'week', 'day', 'kind', 'extension', 'size'] as const
+export const GROUP_BY = ['none', 'year', 'month', 'week', 'day', 'taken', 'kind', 'extension', 'size'] as const
 export type GroupBy = (typeof GROUP_BY)[number]
 
 /** How a tab lays out its files: the detail columns, names flowing in columns, or big icons. */
@@ -118,6 +118,11 @@ export interface Settings {
   workspaceBar: boolean
   /** The file list shows a row number column on the left. */
   lineNumbers: boolean
+  /** The details view adds Duration and Dimensions columns for photos, videos and songs. */
+  mediaColumns: boolean
+  /** Offline speech to text for audio and video (Whisper); off by default, the model downloads from a button. */
+  transcribeEnabled: boolean
+  transcribeModel: 'base' | 'small'
   /** Folders in the details view open in place (a chevron before the name) without navigating. */
   expandFolders: boolean
   /** Look for a new version at startup and once a day. */

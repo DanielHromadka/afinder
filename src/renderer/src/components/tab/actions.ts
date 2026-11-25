@@ -2,6 +2,7 @@ import type { AssistantMode } from '@shared/fileAssistant'
 import type { Favorite, FileEntry, GroupBy, Listing, Place, RunTarget, ScreenshotMode, Settings, TerminalProfile, TerminalProfiles, TransferMode, ViewMode } from '@shared/types'
 import type { RemoteMount } from '@shared/remote'
 import type { MenuItem } from '../ContextMenu'
+import type { Job } from '../JobDialog'
 import type { Row } from '../FileList'
 import type { History } from './useDirectoryNavigation'
 
@@ -70,6 +71,18 @@ export interface TabContext {
   duplicate(): void
   toOtherPane(mode: TransferMode): void
   openArchive(entries: FileEntry[] | null): void
+  /** Runs a batch job over images or videos (convert, strip metadata …) in a progress dialog. */
+  startJob(job: Job): void
+  /** Asks for the size and format, then resizes the images. */
+  resizeImages(entries: FileEntry[]): void
+  /** Asks for the stretch and size, then makes a GIF of the video. */
+  makeGif(entry: FileEntry): void
+  /** Opens two images side by side, under a slider or as a difference. */
+  compareImages(entries: [FileEntry, FileEntry]): void
+  /** Asks for the grid, then draws the photos and videos into one contact sheet image. */
+  contactSheet(entries: FileEntry[]): void
+  /** Asks for the language and format, then turns the speech in audio or video files into text. */
+  transcribe(entries: FileEntry[]): void
   copyPath(): void
   revealSelected(): void
   reveal(path: string): void
@@ -78,6 +91,8 @@ export interface TabContext {
 
   // views and tools
   setQuickLook(on: boolean): void
+  /** Selects the file and opens Quick Look straight in the image editor or video cutter. */
+  editInQuickLook(entry: FileEntry): void
   slideshowOf(entry: FileEntry | null): { images: FileEntry[]; start: number } | null
   playSlideshow(show: { images: FileEntry[]; start: number }): void
   startTail(entry: FileEntry): void

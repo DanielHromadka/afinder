@@ -2,11 +2,15 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import type { GitState } from '@shared/git'
 import { t, type MessageKey } from '@shared/i18n'
+import { formatDuration } from '@shared/media'
 import { relativeDir } from '@shared/paths'
+import { previewKind } from '@shared/preview'
 import type { FileEntry, SizeUpdate, ViewMode } from '@shared/types'
 import { dropTargetProps } from '@renderer/lib/dnd'
 import { formatDate, formatSize } from '@renderer/lib/format'
 import { kindLabel } from '@renderer/lib/kinds'
+import { cachedThumbnail, thumbnail, thumbnailable } from '@renderer/lib/thumbnails'
+import { cachedFacts, hasMediaFacts, mediaFacts } from '@renderer/lib/mediaFacts'
 import { memoOf, MemoBadge, type FileMemo } from './FileMemo'
 import { Highlight } from './Highlight'
 import { Icon } from './Icon'
@@ -44,7 +48,9 @@ export interface ListGroup {
   rowCount: number
 }
 
-type Column = { key: SortKey; defaultWidth: number; align?: 'right' }
+type ColumnKey = SortKey | 'duration' | 'dimensions'
+/** `fixed`: not sortable (the media columns are read lazily, row by row). */
+type Column = { key: ColumnKey; defaultWidth: number; align?: 'right'; fixed?: true }
 const COLUMNS: Column[] = [
   { key: 'name', defaultWidth: 320 },
   { key: 'size', defaultWidth: 110, align: 'right' },
@@ -52,6 +58,10 @@ const COLUMNS: Column[] = [
   { key: 'modified', defaultWidth: 150 }
 ]
 const LOCATION: Column = { key: 'location', defaultWidth: 260 }
+const MEDIA: Column[] = [
+  { key: 'duration', defaultWidth: 80, align: 'right', fixed: true },
+  { key: 'dimensions', defaultWidth: 110, align: 'right', fixed: true }
+]
 
 /** A line of tiles (list and icon views) holds the rows `from` to `to` (exclusive). */
 type Item =
@@ -87,6 +97,10 @@ interface Props {
   groups: ListGroup[] | null
   /** Recursive search results: show where each item lives, skip folder sizes. */
   showLocation: boolean
+  /** Duration and Dimensions columns for photos, videos and songs. */
+  mediaColumns: boolean
+  /** Right click on the column headers (which columns to show). */
+  onHeaderMenu(e: React.MouseEvent): void
   /** Git state of rows that have one. */
   git: Map<string, GitState>
   /** To-dos and notes pinned to files, shown as a badge that opens them. */
@@ -109,7 +123,7 @@ interface Props {
   onContextMenu(entry: FileEntry | null, e: React.MouseEvent): void
   onRenameDone(entry: FileEntry, newName: string | null): void
   onSort(key: SortKey): void
-  onColumnResize(key: SortKey, width: number): void
+  onColumnResize(key: ColumnKey, width: number): void
   onBackgroundClick(): void
 }
 
@@ -215,7 +229,7 @@ export function FileList(p: Props): React.JSX.Element {
     return memo && <MemoBadge memo={memo} onOpen={(anchor) => p.onMemo(entry, anchor)} />
   }
 
-  const columns = p.showLocation ? [COLUMNS[0], LOCATION, ...COLUMNS.slice(1)] : COLUMNS
+  const columns = [...(p.showLocation ? [COLUMNS[0], LOCATION, ...COLUMNS.slice(1)] : COLUMNS), ...(p.mediaColumns ? MEDIA : [])]
   const widths = columns.map((c) => p.columnWidths[c.key] ?? c.defaultWidth)
   // Wide enough for the largest number plus the cell padding.
   const gutter = p.lineNumbers ? String(Math.max(p.rows.length, 1)).length * 7 + 14 : 0
@@ -243,13 +257,20 @@ export function FileList(p: Props): React.JSX.Element {
         }}
       >
         {!tile && (
-          <div className="list-header" style={{ gridTemplateColumns: template, minWidth: totalWidth }}>
+          <div
+            className="list-header"
+            style={{ gridTemplateColumns: template, minWidth: totalWidth }}
+            onContextMenu={(e) => {
+              e.preventDefault()
+              p.onHeaderMenu(e)
+            }}
+          >
             {p.lineNumbers && <div className="col-header line-number">#</div>}
             {columns.map((c, i) => (
               <div
                 key={c.key}
                 className={`col-header${c.align === 'right' ? ' right' : ''}${p.sort.key === c.key ? ' sorted' : ''}`}
-                onClick={() => p.onSort(c.key)}
+                onClick={() => !c.fixed && p.onSort(c.key as SortKey)}
               >
                 <span>{t(`columns.${c.key}` as MessageKey)}</span>
                 {p.sort.key === c.key && <span className="sort-arrow">{p.sort.asc ? '▲' : '▼'}</span>}
@@ -288,7 +309,7 @@ export function FileList(p: Props): React.JSX.Element {
                     return (
                       <div key={entry.path} {...entryProps(index, `tile ${p.view}-tile`)} title={entry.name}>
                         <span className="icon-wrap">
-                          <Icon name={entry.kind} size={tile!.icon} />
+                          {p.view === 'icons' && thumbnailable(entry) ? <TileThumb key={`${entry.modified}|${entry.size}`} entry={entry} size={tile!.icon} /> : <Icon name={entry.kind} size={tile!.icon} />}
                           {entry.isSymlink && <span className="shortcut-arrow">↗</span>}
                         </span>
                         {nameOf(index)}
@@ -406,6 +427,7 @@ export function FileList(p: Props): React.JSX.Element {
                 </div>
                 <div className="cell">{kindLabel(entry)}</div>
                 <div className="cell">{formatDate(entry.modified)}</div>
+                {p.mediaColumns && (hasMediaFacts(entry) ? <MediaCells key={`${entry.modified}|${entry.size}`} entry={entry} /> : <><div className="cell" /><div className="cell" /></>)}
               </div>
             )
           })}
@@ -417,6 +439,43 @@ export function FileList(p: Props): React.JSX.Element {
 }
 
 /** Content width of the scroll area, kept up to date as the pane resizes. */
+/** The Duration and Dimensions cells of a media file, filled in when its headers have been read. */
+function MediaCells({ entry }: { entry: FileEntry }): React.JSX.Element {
+  const [facts, setFacts] = useState(() => cachedFacts(entry))
+  // Keyed by the file's version, so this runs once per row; rows scrolled away drop out of the queue.
+  useEffect(() => {
+    if (facts !== undefined) return
+    const ctrl = new AbortController()
+    void mediaFacts(entry, ctrl.signal).then((f) => !ctrl.signal.aborted && setFacts(f))
+    return () => ctrl.abort()
+  }, [])
+  return (
+    <>
+      <div className="cell right">{facts?.duration !== undefined ? formatDuration(facts.duration) : ''}</div>
+      <div className="cell right">{facts?.width && facts.height ? `${facts.width} × ${facts.height}` : ''}</div>
+    </>
+  )
+}
+
+/** A photo or a video frame in place of the icon; the icon until it is ready, or when none can be made. */
+function TileThumb({ entry, size }: { entry: FileEntry; size: number }): React.JSX.Element {
+  const [url, setUrl] = useState(() => cachedThumbnail(entry))
+  // Keyed by the file's version, so this runs once per tile; scrolled-away tiles drop out of the queue.
+  useEffect(() => {
+    if (url !== undefined) return
+    const ctrl = new AbortController()
+    void thumbnail(entry, ctrl.signal).then((u) => !ctrl.signal.aborted && setUrl(u))
+    return () => ctrl.abort()
+  }, [])
+  if (!url) return <Icon name={entry.kind} size={size} />
+  return (
+    <span className="tile-thumb">
+      <img src={url} alt="" draggable={false} />
+      {previewKind(entry.name) === 'video' && <span className="tile-thumb-play">▶</span>}
+    </span>
+  )
+}
+
 function useWidth(ref: React.RefObject<HTMLDivElement | null>): number {
   const [width, setWidth] = useState(0)
   useEffect(() => {

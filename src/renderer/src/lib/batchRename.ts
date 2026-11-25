@@ -1,7 +1,9 @@
 // Batch rename: new names from a pattern, and what is wrong with them – before anything is touched.
 
-/** 'ai': names suggested by an AI agent, passed to newNames(). */
-export type RenameMode = 'replace' | 'add' | 'format' | 'ai'
+import { localIso } from '@shared/media'
+
+/** 'ai': names suggested by an AI agent, passed to newNames(); 'date': from the date taken (or modified). */
+export type RenameMode = 'replace' | 'add' | 'format' | 'date' | 'ai'
 export type CaseChange = 'none' | 'lower' | 'upper' | 'title'
 
 export interface RenameOptions {
@@ -18,6 +20,9 @@ export interface RenameOptions {
   base: string
   start: number
   digits: number
+  /** date: tokens YYYY YY MM DD HH mm ss and {name}; files without a date taken use the modification date when dateFallback is on. */
+  datePattern: string
+  dateFallback: boolean
   /** Applied last, to the name without the extension when it is kept. */
   caseChange: CaseChange
   keepExtension: boolean
@@ -34,6 +39,8 @@ export const DEFAULT_OPTIONS: RenameOptions = {
   base: '',
   start: 1,
   digits: 2,
+  datePattern: 'YYYY-MM-DD HH.mm.ss',
+  dateFallback: true,
   caseChange: 'none',
   keepExtension: true
 }
@@ -67,7 +74,19 @@ export function compileFind(o: RenameOptions): RegExp | null {
   return new RegExp(source, o.matchCase ? 'g' : 'gi')
 }
 
-export function newNames(items: { name: string; isDir: boolean }[], o: RenameOptions, locale?: string, suggested?: readonly string[]): string[] {
+/** Fills the pattern's date tokens from `YYYY-MM-DDTHH:MM:SS` and {name} with the original name. */
+export function dateName(pattern: string, iso: string, stem: string): string {
+  const [Y, M, D, h, m, sec] = [iso.slice(0, 4), iso.slice(5, 7), iso.slice(8, 10), iso.slice(11, 13), iso.slice(14, 16), iso.slice(17, 19)]
+  const tokens: Record<string, string> = { YYYY: Y, YY: Y.slice(2), MM: M, DD: D, HH: h, mm: m, ss: sec }
+  return pattern.replace(/\{name\}|YYYY|YY|MM|DD|HH|mm|ss/g, (x) => (x === '{name}' ? stem : tokens[x]))
+}
+
+/**
+ * New names for the items. `suggested` are the AI's names; `dates` the dates taken (`YYYY-MM-DDTHH:MM:SS`
+ * or null) in item order for the date mode, where photos taken in the same second get `-2`, `-3` …
+ */
+export function newNames(items: { name: string; isDir: boolean; modified?: number }[], o: RenameOptions, locale?: string, suggested?: readonly string[], dates?: readonly (string | null)[]): string[] {
+  const used = new Map<string, number>()
   let find: RegExp | null = null
   if (o.mode === 'replace') {
     try {
@@ -88,6 +107,15 @@ export function newNames(items: { name: string; isDir: boolean }[], o: RenameOpt
     } else if (o.mode === 'format') {
       const n = String(Math.max(0, Math.floor(o.start)) + index).padStart(Math.max(1, Math.min(9, Math.floor(o.digits))), '0')
       name = o.base === '' ? n : o.position === 'before' ? `${n} ${o.base}` : `${o.base} ${n}`
+    } else if (o.mode === 'date') {
+      const iso = dates?.[index] ?? (o.dateFallback && item.modified ? localIso(item.modified) : null)
+      if (iso && o.datePattern.trim()) {
+        name = dateName(o.datePattern, iso, stem)
+        const key = (name + ext).toLowerCase()
+        const n = (used.get(key) ?? 0) + 1
+        used.set(key, n)
+        if (n > 1) name = `${name}-${n}`
+      }
     }
     return changeCase(name, o.caseChange, locale) + ext
   })

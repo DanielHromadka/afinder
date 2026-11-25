@@ -10,6 +10,14 @@ export interface FileHashes {
   sha512: string
 }
 
+/** A photo found below a folder, for the similar photos search. */
+export interface ImageFile {
+  path: string
+  size: number
+  /** Modification time in ms. */
+  modified: number
+}
+
 /** Files with the same content (same size and SHA-256). */
 export interface DuplicateGroup {
   size: number

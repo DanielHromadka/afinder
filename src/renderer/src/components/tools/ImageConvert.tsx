@@ -1,24 +1,11 @@
 import { useState } from 'react'
 import { t } from '@shared/i18n'
 import { baseName, dirOf } from '@shared/paths'
-import { previewUrl } from '@shared/preview'
+import { decodeImage, encodeImage } from '../../lib/imageConvert'
 import { api, ToolError, useStored } from './common'
 
 type Format = 'png' | 'jpeg' | 'webp'
-const MIME: Record<Format, string> = { png: 'image/png', jpeg: 'image/jpeg', webp: 'image/webp' }
 const EXT: Record<Format, string> = { png: 'png', jpeg: 'jpg', webp: 'webp' }
-
-/** Chromium decodes most formats itself; HEIC, TIFF and the like go through the system (main). */
-async function decode(path: string): Promise<ImageBitmap> {
-  try {
-    const res = await fetch(previewUrl(path))
-    if (!res.ok) throw new Error(String(res.status))
-    return await createImageBitmap(await res.blob())
-  } catch {
-    const png = await api.tools.decodeImage(path)
-    return createImageBitmap(new Blob([png as BlobPart], { type: 'image/png' }))
-  }
-}
 
 /** Fits w×h into the limits (0 = no limit), keeping the aspect ratio and never enlarging. */
 function fit(w: number, h: number, maxW: number, maxH: number): [number, number] {
@@ -41,21 +28,12 @@ export default function ImageConvert(): React.JSX.Element {
     setDone([])
     for (const file of files) {
       try {
-        const bitmap = await decode(file)
+        const bitmap = await decodeImage(file)
         const [w, h] = fit(bitmap.width, bitmap.height, maxW, maxH)
-        const canvas = new OffscreenCanvas(w, h)
-        const ctx = canvas.getContext('2d')!
-        // JPEG has no transparency: white instead of black.
-        if (format === 'jpeg') {
-          ctx.fillStyle = '#fff'
-          ctx.fillRect(0, 0, w, h)
-        }
-        ctx.imageSmoothingQuality = 'high'
-        ctx.drawImage(bitmap, 0, 0, w, h)
+        const data = await encodeImage(bitmap, w, h, EXT[format], quality / 100)
         bitmap.close()
-        const blob = await canvas.convertToBlob({ type: MIME[format], quality: quality / 100 })
         const name = `${baseName(file).replace(/\.[^.]+$/, '')}.${EXT[format]}`
-        const to = await api.tools.saveImage(dirOf(file), name, new Uint8Array(await blob.arrayBuffer()))
+        const to = await api.tools.saveImage(dirOf(file), name, data)
         setDone((d) => [...d, { from: file, to }])
       } catch (err) {
         setDone((d) => [...d, { from: file, error: (err as Error).message }])

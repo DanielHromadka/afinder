@@ -1,6 +1,7 @@
 import { FileAssistantSettings } from './FileAssistantSettings'
 import { DiskAccessSettings } from './DiskAccess'
 import { ActivitySettings } from './ActivitySettings'
+import { TranscribeSettings } from './TranscribeSettings'
 import { McpSettings } from './McpSettings'
 import { CompanionSettings } from './CompanionSettings'
 import { ReleaseNotesDialog } from './ReleaseNotesDialog'
@@ -220,6 +221,10 @@ export function SettingsDialog({ settings, onChange, onLanguageChange, onOpenAct
                   {t('settings.lineNumbers')}
                 </label>
                 <label className="settings-check">
+                  <input type="checkbox" checked={settings.mediaColumns} onChange={(e) => onChange({ mediaColumns: e.target.checked })} />
+                  {t('settings.mediaColumns')}
+                </label>
+                <label className="settings-check">
                   <input type="checkbox" checked={settings.expandFolders} onChange={(e) => onChange({ expandFolders: e.target.checked })} />
                   {t('settings.expandFolders')}
                 </label>
@@ -244,6 +249,7 @@ export function SettingsDialog({ settings, onChange, onLanguageChange, onOpenAct
           {section === 'ai' && (
             <>
               <FileAssistantSettings settings={settings} onChange={onChange} />
+              <TranscribeSettings settings={settings} onChange={onChange} />
               <ActivitySettings settings={settings} onChange={onChange} onOpen={onOpenActivity} />
               <McpSettings settings={settings} onChange={onChange} />
             </>

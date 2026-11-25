@@ -7,7 +7,7 @@ const shared = { '@shared': resolve(__dirname, 'src/shared') }
 export default defineConfig({
   main: {
     resolve: { alias: shared },
-    build: { rollupOptions: { input: { index: resolve(__dirname, 'src/main/index.ts'), activityEmbeddingWorker: resolve(__dirname, 'src/main/services/activityEmbeddingWorker.ts'), fileAssistantWorker: resolve(__dirname, 'src/main/services/fileAssistantWorker.ts') } } }
+    build: { rollupOptions: { input: { index: resolve(__dirname, 'src/main/index.ts'), activityEmbeddingWorker: resolve(__dirname, 'src/main/services/activityEmbeddingWorker.ts'), fileAssistantWorker: resolve(__dirname, 'src/main/services/fileAssistantWorker.ts'), transcribeWorker: resolve(__dirname, 'src/main/services/transcribeWorker.ts') } } }
   },
   preload: {
     resolve: { alias: shared },

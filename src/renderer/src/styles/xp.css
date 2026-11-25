@@ -1339,3 +1339,33 @@ svg {
   background: #cfe0fc;
   outline: 1px solid var(--selection);
 }
+
+/* Photo and video thumbnails in the icon view, in the 48 px icon's height. */
+.tile-thumb {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  max-width: 88px;
+}
+
+.tile-thumb img {
+  max-width: 88px;
+  max-height: 48px;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  background: #fff;
+}
+
+.tile-thumb-play {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  padding: 0 3px;
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 8px;
+  line-height: 12px;
+}

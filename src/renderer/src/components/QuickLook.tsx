@@ -3,6 +3,7 @@ import { lazy, Suspense, useCallback, useEffect, useRef } from 'react'
 import { t } from '@shared/i18n'
 import { canEditImage } from '@shared/imageEdit'
 import { previewKind } from '@shared/preview'
+import { canCutVideo } from '@shared/videoCut'
 import type { FileEntry, SizeUpdate, ThemeId } from '@shared/types'
 import { formatSize } from '../lib/format'
 import { kindLabel } from '../lib/kinds'
@@ -11,6 +12,7 @@ import { Preview } from './Preview'
 
 // Loaded on first use, like Monaco and three.js.
 const ImageEditor = lazy(() => import('./ImageEditor'))
+const VideoEditor = lazy(() => import('./VideoEditor'))
 
 interface Props {
   entry: FileEntry
@@ -22,11 +24,13 @@ interface Props {
   onClose(): void
   onError(err: unknown): void
   readOnly: boolean
-  /** The image editor is open instead of the preview. */
+  /** The image editor or video cutter is open instead of the preview. */
   editing: boolean
   /** Open the editor with the crop tool (screenshots of a whole display). */
   editCrop?: boolean
   onEditingChange(editing: boolean): void
+  /** Selects the next song in the folder when one ends. */
+  onNext?(): void
 }
 
 /** Whether Quick Look offers the image editor for this entry. */
@@ -34,12 +38,17 @@ export function imageEditable(entry: FileEntry, readOnly: boolean): boolean {
   return !readOnly && !entry.isDir && previewKind(entry.name) === 'image' && canEditImage(entry.name)
 }
 
+/** Whether Quick Look offers the video cutter for this entry. */
+export function videoEditable(entry: FileEntry, readOnly: boolean): boolean {
+  return !readOnly && !entry.isDir && previewKind(entry.name) === 'video' && canCutVideo(entry.name)
+}
+
 /** Space-bar preview in a large window, like Quick Look: Space or Esc closes, arrows walk the list. */
-export function QuickLook({ entry, size, theme, position, onStep, onOpen, onClose, onError, readOnly, editing, editCrop, onEditingChange }: Props): React.JSX.Element {
+export function QuickLook({ entry, size, theme, position, onStep, onOpen, onClose, onError, readOnly, editing, editCrop, onEditingChange, onNext }: Props): React.JSX.Element {
   const dirty = useRef(false)
   const onDirtyChange = useCallback((d: boolean) => void (dirty.current = d), [])
   const close = (): void => {
-    if (editing && dirty.current && !window.confirm(t('imageEditor.discard'))) return
+    if (editing && dirty.current && !window.confirm(t(videoEditable(entry, readOnly) ? 'videoEditor.discard' : 'imageEditor.discard'))) return
     onClose()
   }
 
@@ -88,7 +97,7 @@ export function QuickLook({ entry, size, theme, position, onStep, onOpen, onClos
             {kindLabel(entry)}
             {bytes != null ? ` · ${formatSize(bytes)}` : ''} · {position.index + 1} / {position.count}
           </span>
-          {imageEditable(entry, readOnly) && !editing && (
+          {(imageEditable(entry, readOnly) || videoEditable(entry, readOnly)) && !editing && (
             <button className="xp-button" onClick={() => onEditingChange(true)}>
               {t('preview.edit')}
             </button>
@@ -102,8 +111,12 @@ export function QuickLook({ entry, size, theme, position, onStep, onOpen, onClos
             <Suspense fallback={<p className="preview-note center">{t('preview.loading')}</p>}>
               <ImageEditor key={entry.path} entry={entry} onExit={() => onEditingChange(false)} onDirtyChange={onDirtyChange} startWithCrop={editCrop} />
             </Suspense>
+          ) : editing && videoEditable(entry, readOnly) ? (
+            <Suspense fallback={<p className="preview-note center">{t('preview.loading')}</p>}>
+              <VideoEditor key={entry.path} entry={entry} onExit={() => onEditingChange(false)} onDirtyChange={onDirtyChange} />
+            </Suspense>
           ) : (
-            <Preview entry={entry} size={size} theme={theme} mode="overlay" readOnly={readOnly} onError={onError} />
+            <Preview entry={entry} size={size} theme={theme} mode="overlay" readOnly={readOnly} onError={onError} onNext={onNext} />
           )}
         </div>
       </div>

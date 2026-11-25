@@ -156,15 +156,25 @@ export async function saveImage(p: unknown, data: unknown, expectedModified: unk
     const modified = await saveBytes(file, data, force !== true && typeof expectedModified === 'number' ? expectedModified : null)
     return { path: file, modified }
   }
-  const dir = path.dirname(file)
+  const target = await freeCopyPath(file, out.ext, t('imageEditor.copySuffix'))
+  return { path: target, modified: await createBytes(target, data) }
+}
+
+/** The first free `name (suffix).ext` next to file, in a folder that must be writable. */
+export function freeCopyPath(file: string, ext: string, suffix: string): Promise<string> {
+  return freePath(path.dirname(file), (taken) => editedCopyName(path.basename(file), ext, suffix, taken))
+}
+
+/** The first name from pick that does not exist in dir (local or remote), which must be writable. */
+export async function freePath(dir: string, pick: (taken: (name: string) => boolean) => string): Promise<string> {
   await vfs.assertWritable(dir)
   const dirLoc = await vfs.locate(dir)
   const taken = new Set<string>()
   // Remote folders cannot be probed synchronously, so each candidate is checked in turn.
   for (let n = 0; n < 100; n++) {
-    const target = path.join(dir, editedCopyName(path.basename(file), out.ext, t('imageEditor.copySuffix'), (c) => taken.has(c)))
+    const target = path.join(dir, pick((c) => taken.has(c)))
     const exists = dirLoc.kind === 'remote' ? await remote.exists(remote.locate(target) as remote.Located) : await stat(target).then(() => true, () => false)
-    if (!exists) return { path: target, modified: await createBytes(target, data) }
+    if (!exists) return target
     taken.add(path.basename(target))
   }
   throw new Error(t('error.invalidOption'))
@@ -181,7 +191,7 @@ async function saveBytes(file: string, data: Uint8Array, expectedModified: numbe
   return (await stat(file)).mtimeMs
 }
 
-async function createBytes(target: string, data: Uint8Array): Promise<number> {
+export async function createBytes(target: string, data: Uint8Array): Promise<number> {
   const loc = await vfs.locate(target)
   if (loc.kind !== 'remote') {
     await writeFile(target, data, { flag: 'wx' })
