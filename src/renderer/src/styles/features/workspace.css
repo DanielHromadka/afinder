@@ -325,3 +325,51 @@ body.dragging-area * {
   border-top: 1px solid var(--face-dark);
   border-bottom: 1px solid var(--face-dark);
 }
+
+/* Switching workspaces (and Development mode) is a view transition (lib/viewTransition.ts): every area is
+   named after its editor, so it glides from its old box to its new one; areas that come or go fade and
+   scale, and the rest of the window (colours of a new look) cross-fades. */
+::view-transition-group(*) {
+  animation-duration: 0.48s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  overflow: clip;
+}
+
+::view-transition-group(root) {
+  animation-duration: 0.36s;
+}
+
+/* Snapshots fill the moving box instead of keeping their old aspect ratio. */
+::view-transition-old(*),
+::view-transition-new(*) {
+  height: 100%;
+  object-fit: cover;
+  object-position: left top;
+}
+
+::view-transition-new(*):only-child {
+  animation: area-enter 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+::view-transition-old(*):only-child {
+  animation: area-leave 0.3s ease-in both;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.36s;
+}
+
+@keyframes area-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+@keyframes area-leave {
+  to {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}

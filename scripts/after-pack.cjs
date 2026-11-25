@@ -4,6 +4,7 @@
 const fs = require('node:fs')
 const path = require('node:path')
 const { Arch } = require('electron-builder')
+const { fixPtyHelpers } = require('./pty-helper-exec.cjs')
 
 exports.default = async function afterPack(context) {
   const platform = context.electronPlatformName
@@ -12,6 +13,7 @@ exports.default = async function afterPack(context) {
     ? path.join(context.appOutDir, `${context.packager.appInfo.productFilename}.app`, 'Contents', 'Resources')
     : path.join(context.appOutDir, 'resources')
   addInputHelper(platform, arch, resources)
+  fixPtyHelpers(path.join(resources, 'app.asar.unpacked', 'node_modules'))
   const bin = path.join(resources, 'app.asar.unpacked', 'node_modules', 'onnxruntime-node', 'bin', 'napi-v6')
   if (!fs.existsSync(bin)) return
   for (const os of fs.readdirSync(bin)) {

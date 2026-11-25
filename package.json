@@ -23,7 +23,7 @@
     "dist:win": "npm run build && npm run build:input && electron-builder --win",
     "dist:linux": "npm run build && npm run build:input && electron-builder --linux",
     "icons": "electron scripts/make-icons.cjs",
-    "postinstall": "electron-builder install-app-deps",
+    "postinstall": "electron-builder install-app-deps && node scripts/pty-helper-exec.cjs",
     "test:workspace": "npm run build && electron scripts/smoke-workspace.cjs",
     "test:activity": "npm run build && electron scripts/smoke-activity.cjs",
     "test:file-assistant": "npm run build && electron scripts/smoke-file-assistant.cjs",

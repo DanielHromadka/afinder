@@ -87,7 +87,7 @@ app.whenReady().then(async () => {
 
     win.setSize(1280, 820)
     await sleep(200)
-    assert.equal(await js(`[...document.querySelectorAll('.ws-tab')].map(t => t.textContent).join()`), 'Files,Commander,Agent,Preview')
+    assert.equal(await js(`[...document.querySelectorAll('.ws-tab')].map(t => t.textContent).join()`), 'Files,Commander,Agent,Preview,Development')
     assert.equal(await editors(), 'tasks,files')
     await shot('1-files')
 
@@ -127,7 +127,22 @@ app.whenReady().then(async () => {
       if (name === 'Preview') await shot('4-preview')
     }
     assert.equal(await js('document.querySelectorAll(".panes > .pane").length'), 1, 'Agent workspace should show one pane')
-    assert.equal(await js(`[...document.querySelectorAll('.ws-tab')].map(t => t.textContent).join()`), 'Files,Commander,Agent,Preview', 'Clicking workspace tabs reordered them')
+    assert.equal(await js(`[...document.querySelectorAll('.ws-tab')].map(t => t.textContent).join()`), 'Files,Commander,Agent,Preview,Development', 'Clicking workspace tabs reordered them')
+
+    // Development mode: the toolbar button glides into the code editor layout and look, the shortcut goes back.
+    await js(`[...document.querySelectorAll('.toolbar .tool-btn')].find(b => b.textContent.includes('Develop')).click()`)
+    await sleep(120)
+    await shot('4b-dev-transition')
+    await until(async () => (await editors()) === 'folders,files,preview,console', 'Development mode did not lay out explorer, editor and agent')
+    assert.equal(await js(`document.documentElement.hasAttribute('data-dev')`), true, 'Development look missing')
+    assert.equal(await js(`getComputedStyle(document.querySelector('.toolbar')).backgroundColor`), 'rgb(20, 20, 20)', 'Development look not applied over the theme')
+    assert.equal(await js('window.smokeTerminal === document.querySelector(".xterm")'), true, 'Terminal remounted entering Development mode')
+    assert.equal(await js(`[...document.querySelectorAll('.toolbar .tool-btn.pressed')].some(b => b.textContent.includes('Develop'))`), true, 'Develop button not pressed')
+    await sleep(600)
+    await shot('4c-dev')
+    await js(`window.dispatchEvent(new KeyboardEvent('keydown', {key: 'E', code: 'KeyE', ${process.platform === 'darwin' ? 'metaKey' : 'ctrlKey'}: true, shiftKey: true, bubbles: true}))`)
+    await until(async () => (await editors()) === 'folders,files,console', 'Development mode did not return to the Agent workspace')
+    assert.equal(await js(`document.documentElement.hasAttribute('data-dev')`), false, 'Development look stayed')
 
     // Drag the folder tree to the right edge of the console: the areas rearrange.
     const header = await rect('.area-folders .area-header')

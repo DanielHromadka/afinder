@@ -1,5 +1,5 @@
 // Reads what an agent in the console is doing from the transcript it writes itself: Claude Code to
-// ~/.claude/projects/<folder>/<session>.jsonl, Codex to ~/.codex/sessions/YYYY/MM/DD/rollout-*.jsonl.
+// <config>/projects/<folder>/<session>.jsonl (see claudeRoots), Codex to ~/.codex/sessions/YYYY/MM/DD/rollout-*.jsonl.
 // OpenCode keeps a database instead (opencodeStore.ts).
 // Nothing here talks to the agents or the network – the files are only read, a few new bytes at a time.
 
@@ -11,6 +11,22 @@ import { MAX_AGENT_TURNS, type AgentState, type AgentTurn } from '@shared/types'
 import { claudeProjectDir, type AgentKind } from '@shared/agentSessions'
 
 export { claudeProjectDir, type AgentKind }
+
+/**
+ * Claude Code's config folders: ~/.claude, CLAUDE_CONFIG_DIR and ~/.claude-* (several accounts are often
+ * switched by setting CLAUDE_CONFIG_DIR per launch in a shell function, which aFinder's own environment
+ * never sees). Only folders that hold sessions or transcripts count.
+ */
+export async function claudeRoots(home = os.homedir()): Promise<string[]> {
+  const names = (await readdir(home).catch(() => [] as string[])).filter((n) => n === '.claude' || n.startsWith('.claude-'))
+  const env = process.env.CLAUDE_CONFIG_DIR
+  const all = [...new Set([path.join(home, '.claude'), ...(env && home === os.homedir() ? [path.resolve(env)] : []), ...names.map((n) => path.join(home, n))])]
+  const ok = await Promise.all(all.map(async (root) => {
+    const subs = await Promise.all(['projects', 'sessions'].map((d) => stat(path.join(root, d)).then((st) => st.isDirectory(), () => false)))
+    return subs.some(Boolean)
+  }))
+  return all.filter((_, i) => ok[i])
+}
 
 /** What one transcript says so far. */
 export interface TranscriptState {
@@ -230,7 +246,10 @@ export interface Candidate {
 
 /** Transcript files written since `since` that may belong to an agent started in `cwd`. */
 export async function candidates(kind: Exclude<AgentKind, 'opencode'>, cwd: string, since: number, home = os.homedir()): Promise<Candidate[]> {
-  if (kind === 'claude') return fresh(path.join(home, '.claude', 'projects', claudeProjectDir(cwd)), since)
+  if (kind === 'claude') {
+    const roots = await claudeRoots(home)
+    return (await Promise.all(roots.map((root) => fresh(path.join(root, 'projects', claudeProjectDir(cwd)), since)))).flat()
+  }
   // Codex sorts rollouts by day; an agent started before midnight keeps writing into yesterday's folder.
   const days = [...new Set([since, Date.now()].map((t) => {
     const d = new Date(t)

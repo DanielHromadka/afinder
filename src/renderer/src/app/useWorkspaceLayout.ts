@@ -23,6 +23,7 @@ import {
   type Workspace
 } from '@shared/workspace'
 import { keys } from '@renderer/lib/keys'
+import { animateLayout } from '@renderer/lib/viewTransition'
 import type { MenuItem } from '../components/ContextMenu'
 import { editorName, useAreaDrag, workspaceName, type DockTarget } from '../components/Workspace'
 
@@ -85,13 +86,38 @@ export function useWorkspaceLayout(options: {
   const editWorkspace = (fn: (w: Workspace) => Workspace, id = wsRef.current?.id): void => editWorkspaces((list) => list.map((w) => (w.id === id ? fn(w) : w)))
   const editTree = (fn: (root: AreaNode) => AreaNode): void => editWorkspace((w) => ({ ...w, root: fn(w.root) }))
 
+  /** Animated: the areas glide from the old layout into the new one (lib/viewTransition.ts). */
   const switchWorkspace = (id: string): void => {
     const target = settingsRef.current?.workspaces.find((w) => w.id === id)
     if (!target || target.id === wsRef.current?.id) return
-    setActiveWs(id)
-    setMaximized(null)
-    onSwitch.current(target)
-    if (options.remember) updateSettings({ activeWorkspace: id })
+    animateLayout(() => {
+      setActiveWs(id)
+      setMaximized(null)
+      onSwitch.current(target)
+      if (options.remember) updateSettings({ activeWorkspace: id })
+    })
+  }
+
+  /** Development mode is the "dev" built-in workspace: a code editor's layout and look (data-dev on <html>). */
+  const devMode = ws?.preset === 'dev'
+  /** Where Development mode returns to. */
+  const beforeDev = useRef<string | null>(null)
+  const toggleDevMode = (): void => {
+    const list = settingsRef.current?.workspaces ?? []
+    if (devMode) {
+      const back = list.find((w) => w.id === beforeDev.current) ?? list.find((w) => w.preset !== 'dev')
+      if (back) switchWorkspace(back.id)
+      return
+    }
+    beforeDev.current = wsRef.current?.id ?? null
+    let dev = list.find((w) => w.preset === 'dev')
+    if (!dev) {
+      // Settings from before the mode existed have no such workspace; it is added back like a restored preset.
+      if (list.length >= MAX_WORKSPACES) return
+      dev = presetWorkspace('dev')
+      editWorkspaces((l) => [...l, dev!])
+    }
+    switchWorkspace(dev.id)
   }
 
   const cycleWorkspace = (step: number): void => {
@@ -290,6 +316,8 @@ export function useWorkspaceLayout(options: {
     setRatio: (path: string, ratio: number) => editTree((root) => setRatio(root, path, ratio)),
     switchWorkspace,
     cycleWorkspace,
+    devMode,
+    toggleDevMode,
     moveWorkspace,
     duplicateCurrent,
     showEditor,

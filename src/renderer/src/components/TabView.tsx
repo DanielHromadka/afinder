@@ -121,6 +121,9 @@ interface Props {
   /** Installed console profiles (null until known). */
   consoleProfiles: TerminalProfiles | null
   consoleOpen: boolean
+  /** Development mode is on (the toolbar's Develop button). */
+  devMode: boolean
+  onToggleDevMode(): void
   /** The workspace shows the folder tree (the toolbar's Folders button). */
   foldersShown: boolean
   onToggleFolders(): void
@@ -919,6 +922,8 @@ export function TabView(props: Props): React.JSX.Element | null {
           grouped={groupBy !== 'none'}
           paneCount={props.paneCount}
           consoleOpen={props.consoleOpen}
+          devMode={props.devMode}
+          onToggleDevMode={props.onToggleDevMode}
           previewPane={preview}
           onTogglePreview={togglePreview}
           onBack={nav.goBack}

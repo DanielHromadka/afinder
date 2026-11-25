@@ -1,7 +1,7 @@
 // Watches the agent sessions of the console and tells their window what each agent is doing: its state,
 // the thread name, the last step and how full the context is. Polls only while an agent session exists.
 //
-// Claude Code registers every running instance in ~/.claude/sessions/<pid>.json (session id, status), so
+// Claude Code registers every running instance in <config>/sessions/<pid>.json (session id, status), so
 // the agent found in the terminal's process tree leads straight to its transcript. Codex has no such
 // registry; its rollout is the one created in the same folder after the agent started. OpenCode's sessions
 // live in its database (opencodeStore.ts) and are matched the same way, by folder and time.
@@ -12,7 +12,7 @@ import os from 'node:os'
 import path from 'node:path'
 import type { WebContents } from 'electron'
 import { IPC, type AgentInfo, type AgentState } from '@shared/types'
-import { candidates, claudeProjectDir, codexThreadName, TranscriptTail, type AgentKind, type AgentTail, type Candidate } from './agentTranscripts'
+import { candidates, claudeProjectDir, claudeRoots, codexThreadName, TranscriptTail, type AgentKind, type AgentTail, type Candidate } from './agentTranscripts'
 import { opencodeCandidates, OpencodeTail } from './opencodeStore'
 
 const POLL_MS = 2000
@@ -81,7 +81,7 @@ export class AgentMonitor {
         const pid = procs ? agentPid(procs, w.shellPid, w.kind) : null
         const reg = pid && w.kind === 'claude' ? await claudeRegistration(pid) : null
         if (reg) {
-          const file = path.join(os.homedir(), '.claude', 'projects', claudeProjectDir(reg.cwd), `${reg.sessionId}.jsonl`)
+          const file = path.join(reg.root, 'projects', claudeProjectDir(reg.cwd), `${reg.sessionId}.jsonl`)
           if (w.tail?.file !== file) w.tail = new TranscriptTail(file, 'claude')
           w.exact = true
         }
@@ -146,7 +146,7 @@ export class AgentMonitor {
       model: s?.model ?? null,
       contextTokens: s?.contextTokens ?? null,
       turns: s?.turns ?? [],
-      contextWindow: s?.contextWindow && w.kind === 'claude' && s.model && (await claudeLongContext(s.model)) ? Math.max(s.contextWindow, LONG_WINDOW) : (s?.contextWindow ?? null)
+      contextWindow: s?.contextWindow && w.kind === 'claude' && s.model && (await claudeLongContext(s.model, w.tail?.file)) ? Math.max(s.contextWindow, LONG_WINDOW) : (s?.contextWindow ?? null)
     }
     const key = JSON.stringify(info)
     if (key === w.last || !this.watched.has(w.id)) return
@@ -195,24 +195,29 @@ export function agentPid(procs: Map<number, Proc>, shellPid: number, kind: Agent
   return null
 }
 
-/** What a running Claude Code wrote about itself into ~/.claude/sessions/<pid>.json. */
-async function claudeRegistration(pid: number): Promise<{ sessionId: string; cwd: string; state: AgentState | null } | null> {
-  try {
-    const r = JSON.parse(await readFile(path.join(os.homedir(), '.claude', 'sessions', `${pid}.json`), 'utf8')) as Record<string, unknown>
-    if (typeof r.sessionId !== 'string' || !/^[\w-]+$/.test(r.sessionId) || typeof r.cwd !== 'string') return null
-    return { sessionId: r.sessionId, cwd: r.cwd, state: claudeState(r.status) }
-  } catch {
-    return null
+/** What a running Claude Code wrote about itself into <config>/sessions/<pid>.json, in whichever config folder it uses. */
+async function claudeRegistration(pid: number): Promise<{ root: string; sessionId: string; cwd: string; state: AgentState | null } | null> {
+  for (const root of await claudeRoots()) {
+    try {
+      const r = JSON.parse(await readFile(path.join(root, 'sessions', `${pid}.json`), 'utf8')) as Record<string, unknown>
+      if (typeof r.sessionId !== 'string' || !/^[\w-]+$/.test(r.sessionId) || typeof r.cwd !== 'string') continue
+      return { root, sessionId: r.sessionId, cwd: r.cwd, state: claudeState(r.status) }
+    } catch {
+      // not this config folder
+    }
   }
+  return null
 }
 
 /**
  * Transcripts name the API model without the "[1m]" of the million-token variant; the user's default model
- * in ~/.claude/settings.json (e.g. "opus[1m]") tells whether the session runs with it.
+ * in settings.json (e.g. "opus[1m]") tells whether the session runs with it. The config folder is the one
+ * the transcript lives in (<config>/projects/<folder>/<session>.jsonl).
  */
-async function claudeLongContext(model: string): Promise<boolean> {
+async function claudeLongContext(model: string, transcript: string | undefined): Promise<boolean> {
+  const root = transcript ? path.dirname(path.dirname(path.dirname(transcript))) : path.join(os.homedir(), '.claude')
   try {
-    const { model: chosen } = JSON.parse(await readFile(path.join(os.homedir(), '.claude', 'settings.json'), 'utf8')) as { model?: unknown }
+    const { model: chosen } = JSON.parse(await readFile(path.join(root, 'settings.json'), 'utf8')) as { model?: unknown }
     if (typeof chosen !== 'string' || !/\[1m\]$/i.test(chosen)) return false
     const base = chosen.replace(/\[1m\]$/i, '').toLowerCase()
     return base !== '' && model.toLowerCase().includes(base)

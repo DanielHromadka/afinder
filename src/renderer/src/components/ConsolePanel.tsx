@@ -9,6 +9,7 @@ import { register } from '@renderer/lib/consoleHistory'
 import { attach, lastOutputAt, quotePaths, takeRedraw } from '@renderer/lib/consoleStream'
 import { dragging } from '@renderer/lib/dnd'
 import { keys, withShortcut } from '@renderer/lib/keys'
+import { onLookChange } from '@renderer/lib/look'
 import { ConsoleHistory } from './ConsoleHistory'
 import { ConsoleSidebar } from './ConsoleSidebar'
 
@@ -257,6 +258,13 @@ const XtermView = memo(function XtermView({ id, exitCode, visible, theme }: { id
   useEffect(() => {
     if (termRef.current) termRef.current.options.theme = readTheme()
   }, [theme])
+  useEffect(
+    () =>
+      onLookChange(() => {
+        if (termRef.current) termRef.current.options.theme = readTheme()
+      }),
+    []
+  )
 
   useEffect(() => {
     if (exitCode !== null) termRef.current?.write(`\r\n\x1b[2m${t('console.exited', { code: exitCode })}\x1b[0m\r\n`)

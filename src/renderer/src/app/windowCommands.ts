@@ -24,6 +24,8 @@ export interface WindowCommandContext {
   closeTab(): void
   newWindow(): void
   switchWorkspace(id: string): void
+  devMode: boolean
+  toggleDevMode(): void
   duplicateWorkspace(): void
   toggleMaximize(): void
   toggleArea(editor: Editor): void
@@ -64,6 +66,16 @@ export function windowCommands(c: WindowCommandContext): PaletteCommand[] {
       checked: w.id === c.activeWorkspace,
       run: () => c.switchWorkspace(w.id)
     })),
+    {
+      id: 'devMode',
+      group: g.workspace,
+      label: t(c.devMode ? 'devMode.off' : 'devMode.on'),
+      icon: 'code' as const,
+      checked: c.devMode,
+      shortcut: keys.label('devMode'),
+      keywords: 'development dev vývoj cursor editor code kód ide',
+      run: c.toggleDevMode
+    },
     {
       id: 'workspaceBar',
       group: g.workspace,

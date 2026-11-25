@@ -69,8 +69,14 @@ describe('validation', () => {
 
   it('keeps valid workspaces and fixes their fields', () => {
     const list = sanitizeWorkspaces([...defaultWorkspaces(), { id: 'files', root: { editor: 'files' } }, { id: 'x y', root: { editor: 'files' } }, { id: 'mine', name: '  Mine  ', root: { editor: 'files' }, panes: 9, paneAxis: 'up' }])
-    expect(list?.map((w) => w.id)).toEqual(['files', 'commander', 'agent', 'preview', 'mine'])
+    expect(list?.map((w) => w.id)).toEqual(['files', 'commander', 'agent', 'preview', 'dev', 'mine'])
     expect(list?.at(-1)).toEqual({ id: 'mine', name: 'Mine', root: { editor: 'files' }, panes: 4, paneAxis: 'row' })
     expect(sanitizeWorkspaces([])).toBeNull()
+  })
+
+  it('lays Development mode out like a code editor: explorer, editor, agent', () => {
+    const dev = presetWorkspace('dev')
+    expect(editorsOf(dev.root)).toEqual(['folders', 'files', 'preview', 'console'])
+    expect(sanitizeTree(dev.root)).toEqual(dev.root)
   })
 })

@@ -8,6 +8,7 @@ import { formatDate, formatSize, numberFormat } from '../lib/format'
 import { kindLabel } from '../lib/kinds'
 import { keys } from '../lib/keys'
 import { cssColorToHex, loadMonaco, luminance, type MonacoApi } from '../lib/monaco'
+import { onLookChange } from '@renderer/lib/look'
 import { Icon } from './Icon'
 import { useBlame, useChangeBars, useDiffView, useGitBase } from './previewGit'
 
@@ -401,6 +402,18 @@ function TextView(props: {
   const saveRef = useRef(doSave)
   saveRef.current = doSave
 
+  // Monaco's theme is global: re-reading the colours here also recolours an open git diff.
+  useEffect(
+    () =>
+      onLookChange(() => {
+        if (!editorRef.current) return
+        void loadMonaco().then((monaco) => {
+          if (host.current) monaco.editor.setTheme(editorTheme(monaco, host.current, theme))
+        })
+      }),
+    [theme]
+  )
+
   // Create the editor once per file (and theme / size class); content changes are synced below.
   useEffect(() => {
     const ctrl = new AbortController()
@@ -592,7 +605,8 @@ export function editorTheme(monaco: MonacoApi, el: HTMLElement, theme: ThemeId):
   const bg = own ?? '#00000000'
   const fg = cssColorToHex(getComputedStyle(el).color)
   const dark = luminance(own ?? backdrop(el, theme)) < 0.35
-  const name = `afinder-${theme}`
+  // Development mode restyles the page without changing the theme, so it needs a theme of its own.
+  const name = `afinder-${theme}${document.documentElement.hasAttribute('data-dev') ? '-dev' : ''}`
   monaco.editor.defineTheme(name, {
     base: dark ? 'vs-dark' : 'vs',
     inherit: true,

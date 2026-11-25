@@ -2,7 +2,7 @@ import { appendFile, mkdir, mkdtemp, rm, utimes, writeFile } from 'node:fs/promi
 import os from 'node:os'
 import path from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
-import { applyClaude, applyCodex, candidates, claudeProjectDir, claudeTool, codexThreadName, emptyTranscript, oneLine, promptText, TranscriptTail } from './agentTranscripts'
+import { applyClaude, applyCodex, candidates, claudeProjectDir, claudeRoots, claudeTool, codexThreadName, emptyTranscript, oneLine, promptText, TranscriptTail } from './agentTranscripts'
 
 const assistant = (content: unknown[], usage = {}, extra = {}) => ({
   type: 'assistant',
@@ -139,6 +139,13 @@ describe('files', () => {
     await writeFile(path.join(claudeDir, 'new.jsonl'), '{}\n')
     const since = Date.now() - 60_000
     expect((await candidates('claude', cwd, since, dir)).map((c) => path.basename(c.file))).toEqual(['new.jsonl'])
+    // A second account's config folder (CLAUDE_CONFIG_DIR=~/.claude-work) is found as well; one without sessions is not.
+    const workDir = path.join(dir, '.claude-work', 'projects', claudeProjectDir(cwd))
+    await mkdir(workDir, { recursive: true })
+    await mkdir(path.join(dir, '.claude-switch'))
+    await writeFile(path.join(workDir, 'work.jsonl'), '{}\n')
+    expect(await claudeRoots(dir)).toEqual([path.join(dir, '.claude'), path.join(dir, '.claude-work')])
+    expect((await candidates('claude', cwd, since, dir)).map((c) => path.basename(c.file)).sort()).toEqual(['new.jsonl', 'work.jsonl'])
 
     const d = new Date()
     const day = path.join(dir, '.codex', 'sessions', String(d.getFullYear()), String(d.getMonth() + 1).padStart(2, '0'), String(d.getDate()).padStart(2, '0'))

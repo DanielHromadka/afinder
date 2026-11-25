@@ -6,7 +6,7 @@
 export const EDITORS = ['files', 'folders', 'tasks', 'preview', 'git', 'todo', 'games', 'stocks', 'tools', 'monitor', 'docker', 'console'] as const
 export type Editor = (typeof EDITORS)[number]
 
-export const WORKSPACE_PRESETS = ['files', 'commander', 'agent', 'preview'] as const
+export const WORKSPACE_PRESETS = ['files', 'commander', 'agent', 'preview', 'dev'] as const
 export type WorkspacePreset = (typeof WORKSPACE_PRESETS)[number]
 
 export type Axis = 'row' | 'column'
@@ -132,6 +132,7 @@ export function visibleTree(root: AreaNode): AreaNode | null {
 // ---- presets ----------------------------------------------------------------------------------
 
 const row = (ratio: number, a: AreaNode, b: AreaNode): AreaSplit => ({ split: 'row', ratio, a, b })
+const column = (ratio: number, a: AreaNode, b: AreaNode): AreaSplit => ({ split: 'column', ratio, a, b })
 
 /** The built-in workspaces; `side` is the editor the old single side pane showed (folders or tasks). */
 export function presetWorkspace(preset: WorkspacePreset, side: 'folders' | 'tasks' = 'tasks'): Workspace {
@@ -147,6 +148,10 @@ export function presetWorkspace(preset: WorkspacePreset, side: 'folders' | 'task
       return { ...base, panes: 1, root: row(0.18, { editor: 'folders' }, row(0.56, files, { editor: 'console' })) }
     case 'preview':
       return { ...base, panes: 1, root: row(0.18, sidebar, row(0.6, files, { editor: 'preview' })) }
+    case 'dev':
+      // A code editor's layout (Development mode): the explorer (folder tree over the file list) on the left,
+      // the opened file in the middle and the AI agent's console on the right.
+      return { ...base, panes: 1, root: row(0.24, column(0.42, { editor: 'folders' }, files), row(0.58, { editor: 'preview' }, { editor: 'console' })) }
   }
 }
 

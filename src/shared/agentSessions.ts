@@ -112,3 +112,15 @@ export function parseCodex(head: string): Omit<AgentSession, 'updated'> | null {
   }
   return id && cwd && prompt && SESSION_ID.test(id) ? { agent: 'codex', id, cwd, title: prompt } : null
 }
+
+/**
+ * Whether `command -v` (where.exe on Windows) found an agent. Besides a path, a POSIX shell prints just the
+ * name for a shell function and `alias name=…` for an alias: a `claude()` wrapper in .zshrc (switching
+ * accounts through CLAUDE_CONFIG_DIR) is what the user types too, and the console types into that shell.
+ */
+export function commandFound(output: string, name: string, windows: boolean): boolean {
+  return output
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .some((l) => (windows ? l.toLowerCase().includes(`\\${name}`) : (l.startsWith('/') && l.endsWith(`/${name}`)) || l === name || l.startsWith(`alias ${name}=`)))
+}

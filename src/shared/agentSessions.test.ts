@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { claudeProjectDir, parseClaude, parseCodex, resumeCommand } from './agentSessions'
+import { claudeProjectDir, commandFound, parseClaude, parseCodex, resumeCommand } from './agentSessions'
 
 const ID = '89cffb51-2f09-4a87-a3b4-1f0393db4f6a'
 const jsonl = (...rows: unknown[]): string => rows.map((r) => JSON.stringify(r)).join('\n') + '\n'
@@ -56,5 +56,16 @@ describe('agentSessions', () => {
     expect(() => resumeCommand('opencode', ID)).toThrow()
     expect(() => resumeCommand('opencode', 'ses_abc$(id)')).toThrow()
     expect(() => resumeCommand('claude', 'ses_ee36c3a4cffeYHrmvDe9pXVDG9')).toThrow()
+  })
+})
+
+describe('commandFound', () => {
+  it('accepts a path, a shell function and an alias, nothing else', () => {
+    const out = 'claude\n/Users/me/.local/bin/codex\nalias opencode=/opt/oc/bin/opencode\n'
+    expect(commandFound(out, 'claude', false)).toBe(true)
+    expect(commandFound(out, 'codex', false)).toBe(true)
+    expect(commandFound(out, 'opencode', false)).toBe(true)
+    expect(commandFound('/usr/bin/claude-helper\nclaudex', 'claude', false)).toBe(false)
+    expect(commandFound('C:\\Users\\me\\AppData\\Roaming\\npm\\claude.cmd', 'claude', true)).toBe(true)
   })
 })

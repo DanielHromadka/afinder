@@ -49,6 +49,8 @@ const MAC: Bindings = {
   prevWorkspace: ['Ctrl+Mod+BracketLeft'],
   // Blender's Ctrl+Space (macOS uses it to switch input sources).
   maximizeArea: ['Mod+Shift+Enter'],
+  // VS Code's "show explorer"; the mode switches to a code editor's layout.
+  devMode: ['Mod+Shift+KeyE'],
   // ⇧⌘3/4/5 belong to the system screenshot tool.
   screenshot: ['Mod+Shift+KeyS'],
   // The usual help key (fn+F1 on Mac keyboards).

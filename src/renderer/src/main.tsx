@@ -32,6 +32,8 @@ import './styles/theme-matrix.css'
 import './styles/theme-dos.css'
 import './styles/theme-apple.css'
 import './styles/theme-apple-clean.css'
+// Development mode's look goes over every theme, so it comes last.
+import './styles/features/dev-mode.css'
 
 // Themes that follow platform conventions (the Apple theme's native traffic lights) style by it.
 document.documentElement.dataset.platform = window.api.platform

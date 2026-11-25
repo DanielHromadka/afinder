@@ -16,6 +16,8 @@ interface Props {
   grouped: boolean
   paneCount: number
   consoleOpen: boolean
+  devMode: boolean
+  onToggleDevMode(): void
   previewPane: boolean
   onTogglePreview(): void
   onBack(): void
@@ -115,6 +117,7 @@ export const Toolbar = forwardRef<HTMLInputElement, Props>(function Toolbar(p, f
         pressed={p.consoleOpen}
         onClick={p.onConsoleMenu}
       />
+      <ToolButton icon="code" tour="devMode" label={t('devMode.button')} title={withKey(t('devMode.title'), 'devMode')} pressed={p.devMode} onClick={p.onToggleDevMode} />
       <ToolButton icon="automation" tour="automations" label={t('automation.title')} title={t('automation.title')} onClick={p.onAutomations} />
       <div className="toolbar-spacer" />
       <div className="filter-box">

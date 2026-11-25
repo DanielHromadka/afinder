@@ -13,6 +13,7 @@ export interface AppKeyActions {
   openPalette(): void
   toggleConsole(): void
   cycleWorkspace(step: number): void
+  toggleDevMode(): void
   toggleMaximize(): void
   newTab(): void
   closeTab(): void
@@ -49,6 +50,7 @@ export function useAppKeyboard(actions: AppKeyActions): void {
       if (keys.is(e, 'nextWorkspace')) return take(() => a.cycleWorkspace(1))
       if (keys.is(e, 'prevWorkspace')) return take(() => a.cycleWorkspace(-1))
       if (keys.is(e, 'maximizeArea')) return take(a.toggleMaximize)
+      if (keys.is(e, 'devMode')) return take(a.toggleDevMode)
       // Everything else typed into the integrated console belongs to the shell or agent running there.
       if (target.closest?.('.console')) return
       const inInput = target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement || target.isContentEditable

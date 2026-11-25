@@ -1,0 +1,431 @@
+/* Development mode (the "dev" workspace, data-dev on <html>): the look of an AI code editor in the style of
+   Cursor – near-black panels, hairline borders, flat controls, editor-style tabs – laid over whichever theme
+   is chosen. Imported after every theme: the extra [data-theme] in each selector outweighs a theme's own
+   `[data-theme='x'] .part` rules, and equal weights fall to the later file. Only colours, borders and
+   shapes change here, never sizes that the window buttons depend on (the Apple theme's traffic lights). */
+
+:root[data-dev][data-theme] {
+  --dv-editor: #181818;
+  --dv-side: #141414;
+  --dv-raised: #1f1f1f;
+  --dv-line: #2a2a2a;
+  --dv-hover: #262626;
+  --dv-text: #d8d8d8;
+  --dv-muted: #8b8b8b;
+  --dv-accent: #3b82f6;
+  --dv-select: #2b3d5c;
+
+  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, system-ui, sans-serif;
+  --font-size: 12px;
+
+  --face: var(--dv-side);
+  --face-light: var(--dv-raised);
+  --face-dark: var(--dv-line);
+  --border-dark: var(--dv-line);
+  --text: var(--dv-text);
+  --muted: var(--dv-muted);
+  --link: #8ab4ff;
+  --link-hover: #b3ceff;
+  --window-border: var(--dv-line);
+  --title-gradient: var(--dv-side);
+  --title-btn: transparent;
+  --title-btn-close: transparent;
+  --taskpane-bg: var(--dv-side);
+  --task-header: var(--dv-raised);
+  --task-body: var(--dv-side);
+  --task-header-text: var(--dv-text);
+  --list-bg: var(--dv-editor);
+  --header-bg: var(--dv-side);
+  --header-hover: var(--dv-accent);
+  --selection: var(--dv-select);
+  --selection-text: #ffffff;
+  --hit-bg: rgba(59, 130, 246, 0.3);
+  --hit-text: #ffffff;
+  --menu-bg: var(--dv-raised);
+  --menu-border: var(--dv-line);
+  --focus-ring: var(--dv-accent);
+
+  --row-hover: var(--dv-hover);
+  --row-current: var(--dv-select);
+  --row-current-text: #ffffff;
+  --row-radius: 4px;
+
+  --term-bg: var(--dv-side);
+  --term-fg: #cccccc;
+  --term-cursor: #e6e6e6;
+  --term-selection: rgba(59, 130, 246, 0.35);
+
+  --check-bg: var(--dv-raised);
+  --check-border: #3a3a3a;
+  --check-on: var(--dv-accent);
+  --check-mark: #fff;
+  --check-radius: 3px;
+  --check-glow: none;
+}
+
+:root[data-dev][data-theme] body {
+  background: var(--dv-side);
+  color: var(--dv-text);
+}
+
+/* Theme decoration has no place in an editor. */
+:root[data-dev][data-theme] .matrix-rain,
+:root[data-dev][data-theme] .titlebar > svg {
+  display: none;
+}
+
+:root[data-dev][data-theme] .xp-window.app {
+  background: var(--dv-side);
+  border-color: var(--dv-line);
+  box-shadow: none;
+}
+
+:root[data-dev][data-theme] .titlebar {
+  background: var(--dv-side);
+  color: var(--dv-muted);
+  border-bottom: 1px solid var(--dv-line);
+  box-shadow: none;
+}
+
+:root[data-dev][data-theme] .titlebar-text {
+  font-weight: 500;
+  font-size: 12px;
+  text-shadow: none;
+  text-align: center;
+  color: var(--dv-muted);
+}
+
+:root[data-dev][data-theme] .tb-btn {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  color: var(--dv-muted);
+}
+
+:root[data-dev][data-theme] .tb-btn:hover {
+  background: var(--dv-hover);
+  color: var(--dv-text);
+}
+
+:root[data-dev][data-theme] .tb-btn.tb-close:hover {
+  background: #c42b1c;
+  color: #fff;
+}
+
+/* ---- toolbar, address bar, workspace tabs ---- */
+
+:root[data-dev][data-theme] .toolbar,
+:root[data-dev][data-theme] .addressbar,
+:root[data-dev][data-theme] .workspace-bar {
+  background: var(--dv-side);
+  border-color: var(--dv-line);
+  border-image: none;
+  box-shadow: none;
+  color: var(--dv-text);
+}
+
+:root[data-dev][data-theme] .toolbar {
+  border-bottom: 1px solid var(--dv-line);
+}
+
+:root[data-dev][data-theme] .tool-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  box-shadow: none;
+  color: var(--dv-muted);
+  text-shadow: none;
+}
+
+:root[data-dev][data-theme] .tool-btn:hover:not(:disabled) {
+  background: var(--dv-hover);
+  border-color: transparent;
+  color: var(--dv-text);
+}
+
+:root[data-dev][data-theme] .tool-btn.pressed {
+  background: rgba(59, 130, 246, 0.16);
+  border-color: rgba(59, 130, 246, 0.35);
+  color: #cfe0ff;
+}
+
+:root[data-dev][data-theme] .tool-sep {
+  background: var(--dv-line);
+  border-color: var(--dv-line);
+}
+
+:root[data-dev][data-theme] .address-input,
+:root[data-dev][data-theme] .filter-box,
+:root[data-dev][data-theme] input[type='text'],
+:root[data-dev][data-theme] input[type='search'] {
+  background: var(--dv-raised);
+  border: 1px solid var(--dv-line);
+  border-radius: 6px;
+  color: var(--dv-text);
+  box-shadow: none;
+}
+
+:root[data-dev][data-theme] .address-input:focus-within,
+:root[data-dev][data-theme] .filter-box:focus-within {
+  border-color: var(--dv-accent);
+}
+
+:root[data-dev][data-theme] .address-label,
+:root[data-dev][data-theme] .go-btn {
+  color: var(--dv-muted);
+  background: transparent;
+  border-color: transparent;
+}
+
+:root[data-dev][data-theme] .ws-tab {
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  color: var(--dv-muted);
+  box-shadow: none;
+}
+
+:root[data-dev][data-theme] .ws-tab:hover {
+  color: var(--dv-text);
+}
+
+:root[data-dev][data-theme] .ws-tab.current {
+  background: transparent;
+  color: var(--dv-text);
+  border-bottom-color: var(--dv-accent);
+}
+
+/* ---- areas ---- */
+
+:root[data-dev][data-theme] .workspace-body,
+:root[data-dev][data-theme] .area {
+  background: var(--dv-editor);
+  border-color: var(--dv-line);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+:root[data-dev][data-theme] .area-folders,
+:root[data-dev][data-theme] .area-files,
+:root[data-dev][data-theme] .area-tasks,
+:root[data-dev][data-theme] .area-console {
+  background: var(--dv-side);
+}
+
+:root[data-dev][data-theme] .area-divider {
+  background: var(--dv-line);
+  border: 0;
+  box-shadow: none;
+}
+
+:root[data-dev][data-theme] .area-divider.split-row {
+  width: 1px;
+}
+
+:root[data-dev][data-theme] .area-divider.split-column {
+  height: 1px;
+}
+
+:root[data-dev][data-theme] .area-divider:hover,
+:root[data-dev][data-theme] .area-divider:focus-visible {
+  background: var(--dv-accent);
+}
+
+/* Panel headers as in a code editor: small capitals on the sidebar colour. */
+:root[data-dev][data-theme] .area-header {
+  background: var(--dv-side);
+  border-bottom: 1px solid var(--dv-line);
+  color: var(--dv-muted);
+  box-shadow: none;
+}
+
+:root[data-dev][data-theme] .area-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--dv-muted);
+  text-shadow: none;
+}
+
+:root[data-dev][data-theme] .area-btn,
+:root[data-dev][data-theme] .area-editor,
+:root[data-dev][data-theme] .area-grip {
+  background: transparent;
+  border-color: transparent;
+  color: var(--dv-muted);
+  box-shadow: none;
+}
+
+:root[data-dev][data-theme] .area-btn:hover,
+:root[data-dev][data-theme] .area-editor:hover {
+  background: var(--dv-hover);
+  color: var(--dv-text);
+}
+
+/* ---- file tabs as editor tabs ---- */
+
+:root[data-dev][data-theme] .tabstrip {
+  background: var(--dv-side);
+  border-color: var(--dv-line);
+  box-shadow: none;
+}
+
+:root[data-dev][data-theme] .tab {
+  background: transparent;
+  border: 0;
+  border-right: 1px solid var(--dv-line);
+  border-radius: 0;
+  color: var(--dv-muted);
+  box-shadow: none;
+}
+
+:root[data-dev][data-theme] .tab:hover {
+  background: var(--dv-hover);
+  color: var(--dv-text);
+}
+
+:root[data-dev][data-theme] .tab.current {
+  background: var(--dv-editor);
+  color: var(--dv-text);
+  font-weight: normal;
+  box-shadow: inset 0 1px 0 var(--dv-accent);
+}
+
+/* ---- lists and the folder tree ---- */
+
+:root[data-dev][data-theme] .filelist,
+:root[data-dev][data-theme] .filelist-scroll,
+:root[data-dev][data-theme] .foldertree,
+:root[data-dev][data-theme] .tree-scroll,
+:root[data-dev][data-theme] .taskpane {
+  background: var(--dv-side);
+  color: var(--dv-text);
+  border-color: var(--dv-line);
+  background-image: none;
+}
+
+:root[data-dev][data-theme] .list-header,
+:root[data-dev][data-theme] .col-header {
+  background: var(--dv-side);
+  border-color: var(--dv-line);
+  color: var(--dv-muted);
+  text-shadow: none;
+  box-shadow: none;
+}
+
+:root[data-dev][data-theme] .col-header:hover {
+  background: var(--dv-hover);
+  color: var(--dv-text);
+}
+
+:root[data-dev][data-theme] .row:hover,
+:root[data-dev][data-theme] .tree-row:hover {
+  background: var(--dv-hover);
+}
+
+:root[data-dev][data-theme] .row.selected,
+:root[data-dev][data-theme] .tree-row.current .tree-label {
+  background: var(--dv-select);
+  color: #fff;
+}
+
+/* ---- preview, console, status bar, menus ---- */
+
+:root[data-dev][data-theme] .preview,
+:root[data-dev][data-theme] .preview-pane,
+:root[data-dev][data-theme] .preview-editor {
+  background: var(--dv-editor);
+  color: var(--dv-text);
+}
+
+:root[data-dev][data-theme] .preview-head,
+:root[data-dev][data-theme] .console-bar {
+  background: var(--dv-side);
+  border-color: var(--dv-line);
+  color: var(--dv-muted);
+  box-shadow: none;
+}
+
+:root[data-dev][data-theme] .console,
+:root[data-dev][data-theme] .console-body,
+:root[data-dev][data-theme] .console-side {
+  background: var(--dv-side);
+  border-color: var(--dv-line);
+}
+
+:root[data-dev][data-theme] .console-tab {
+  background: transparent;
+  border-color: transparent;
+  border-radius: 6px;
+  color: var(--dv-muted);
+}
+
+:root[data-dev][data-theme] .console-tab.current,
+:root[data-dev][data-theme] .console-tab.active {
+  background: var(--dv-raised);
+  color: var(--dv-text);
+}
+
+:root[data-dev][data-theme] .statusbar {
+  background: var(--dv-side);
+  border-top: 1px solid var(--dv-line);
+  color: var(--dv-muted);
+  box-shadow: none;
+}
+
+:root[data-dev][data-theme] .status-field {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  color: var(--dv-muted);
+}
+
+:root[data-dev][data-theme] .context-menu {
+  background: var(--dv-raised);
+  border: 1px solid var(--dv-line);
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  color: var(--dv-text);
+}
+
+:root[data-dev][data-theme] .menu-item:hover:not(.disabled) {
+  background: var(--dv-accent);
+  color: #fff;
+}
+
+:root[data-dev][data-theme] .xp-button {
+  background: var(--dv-raised);
+  border: 1px solid var(--dv-line);
+  border-radius: 6px;
+  color: var(--dv-text);
+  box-shadow: none;
+  text-shadow: none;
+}
+
+:root[data-dev][data-theme] .xp-button:hover:not(:disabled) {
+  background: var(--dv-hover);
+}
+
+:root[data-dev][data-theme] ::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+  background: transparent;
+}
+
+:root[data-dev][data-theme] ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border: 2px solid transparent;
+  border-radius: 6px;
+  background-clip: padding-box;
+}
+
+:root[data-dev][data-theme] ::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.22);
+}
+
+:root[data-dev][data-theme] ::-webkit-scrollbar-track,
+:root[data-dev][data-theme] ::-webkit-scrollbar-corner {
+  background: transparent;
+}

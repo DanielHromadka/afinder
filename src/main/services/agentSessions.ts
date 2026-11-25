@@ -5,6 +5,7 @@ import { open, readdir, readFile, stat } from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
 import { claudeProjectDir, parseClaude, parseCodex, SESSION_ID, type AgentSession } from '@shared/agentSessions'
+import { claudeRoots } from './agentTranscripts'
 import { opencodeSessions } from './opencodeStore'
 
 /** Enough for the metadata and the first prompts; transcripts themselves can be tens of MB. */
@@ -14,7 +15,6 @@ const MAX_FILES = 150
 const MAX_RESULTS = 200
 
 // Same locations as the agent monitor (agentTranscripts.ts) watches.
-const claudeRoot = (): string => path.join(os.homedir(), '.claude')
 const codexRoot = (): string => path.join(os.homedir(), '.codex')
 
 async function head(file: string): Promise<string> {
@@ -36,18 +36,24 @@ async function newest(files: string[]): Promise<{ file: string; mtime: number }[
 }
 
 async function claudeSessions(folder: string | null): Promise<AgentSession[]> {
-  const projects = path.join(claudeRoot(), 'projects')
-  const dirs = folder ? [claudeProjectDir(folder)] : await entries(projects)
   const files: string[] = []
-  for (const dir of dirs) {
-    for (const name of await entries(path.join(projects, dir))) {
-      if (name.endsWith('.jsonl') && SESSION_ID.test(name.slice(0, -6))) files.push(path.join(projects, dir, name))
+  for (const root of await claudeRoots()) {
+    const projects = path.join(root, 'projects')
+    const dirs = folder ? [claudeProjectDir(folder)] : await entries(projects)
+    for (const dir of dirs) {
+      for (const name of await entries(path.join(projects, dir))) {
+        if (name.endsWith('.jsonl') && SESSION_ID.test(name.slice(0, -6))) files.push(path.join(projects, dir, name))
+      }
     }
   }
   const out: AgentSession[] = []
+  const seen = new Set<string>()
+  // Newest first, so a session resumed under another account keeps its latest copy.
   for (const { file, mtime } of await newest(files)) {
     const parsed = parseClaude(await head(file).catch(() => ''), path.basename(file, '.jsonl'))
-    if (parsed) out.push({ ...parsed, updated: mtime })
+    if (!parsed || seen.has(parsed.id)) continue
+    seen.add(parsed.id)
+    out.push({ ...parsed, updated: mtime })
   }
   return out
 }

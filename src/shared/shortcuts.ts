@@ -40,6 +40,7 @@ export const COMMANDS = [
   'nextWorkspace',
   'prevWorkspace',
   'maximizeArea',
+  'devMode',
   'screenshot',
   'tour'
 ] as const

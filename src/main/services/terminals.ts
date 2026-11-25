@@ -8,7 +8,7 @@ import os from 'node:os'
 import { spawn, type IPty } from 'node-pty'
 import type { WebContents } from 'electron'
 import { IPC, TERMINAL_PROFILES, type TerminalProfile, type TerminalProfiles } from '@shared/types'
-import { AGENT_KINDS, resumeCommand, type AgentKind } from '@shared/agentSessions'
+import { AGENT_KINDS, commandFound, resumeCommand, type AgentKind } from '@shared/agentSessions'
 import { AgentMonitor } from './agentMonitor'
 import type { SshTarget } from './remote'
 
@@ -214,9 +214,7 @@ export class TerminalService {
     const names = Object.values(AGENT_COMMANDS)
     return new Promise((resolve) => {
       const done = (out: string): void => {
-        const lines = out.split(/\r?\n/).map((l) => l.trim())
-        const has = (name: string): boolean =>
-          lines.some((l) => (isWindows ? l.toLowerCase().includes(`\\${name}`) : l.startsWith('/') && l.endsWith(`/${name}`)))
+        const has = (name: string): boolean => commandFound(out, name, isWindows)
         const profiles = { shell: true } as TerminalProfiles
         for (const agent of AGENT_KINDS) profiles[agent] = has(AGENT_COMMANDS[agent])
         resolve(profiles)

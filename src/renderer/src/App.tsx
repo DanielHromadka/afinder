@@ -6,6 +6,7 @@ import { dirOf, samePath } from '@shared/paths'
 import type { RemoteConnection, RemoteMount, RemoteType } from '@shared/remote'
 import { MAX_PANES, type Place, type TerminalProfile, type WindowHandover } from '@shared/types'
 import { EDITORS, type Editor } from '@shared/workspace'
+import { lookChanged } from '@renderer/lib/look'
 import {
   activateTab,
   addTab as addTabTo,
@@ -281,6 +282,13 @@ export function App(): React.JSX.Element {
   useEffect(() => {
     document.documentElement.toggleAttribute('data-clean', settings?.cleanLook === true)
   }, [settings?.cleanLook])
+  // Development mode's look (styles/features/dev-mode.css) over any theme. A layout effect, so the switch
+  // lands in the same frame as the new layout and the view transition animates both together.
+  useLayoutEffect(() => {
+    if (document.documentElement.hasAttribute('data-dev') === layout.devMode) return
+    document.documentElement.toggleAttribute('data-dev', layout.devMode)
+    lookChanged()
+  }, [layout.devMode])
 
   // Music plays in the main window only, so more windows do not play it over each other.
   useEffect(() => {
@@ -368,7 +376,8 @@ export function App(): React.JSX.Element {
   }
 
   const renderArea = (editor: Editor): React.ReactNode => (
-    <div key={editor} className={`area area-${editor}${layout.areaDrag.dragging === editor ? ' dragging' : ''}`} data-editor={editor}>
+    // The name lets a view transition move the area between layouts (lib/viewTransition.ts); each editor shows once.
+    <div key={editor} className={`area area-${editor}${layout.areaDrag.dragging === editor ? ' dragging' : ''}`} data-editor={editor} style={{ viewTransitionName: `area-${editor}` }}>
       {editor !== 'files' && editor !== 'console' && (
         <AreaHeader
           editor={editor}
@@ -492,6 +501,8 @@ export function App(): React.JSX.Element {
         closeTab: () => closeTab(model.activePane, pane.active),
         newWindow: () => api.window.open(focusedPath),
         switchWorkspace: layout.switchWorkspace,
+        devMode: layout.devMode,
+        toggleDevMode: layout.toggleDevMode,
         duplicateWorkspace: layout.duplicateCurrent,
         toggleMaximize: () => layout.toggleMaximize(),
         toggleArea: layout.toggleArea,
@@ -520,6 +531,7 @@ export function App(): React.JSX.Element {
     openPalette,
     toggleConsole: () => setConsoleOpen(!consoleOpen),
     cycleWorkspace: layout.cycleWorkspace,
+    toggleDevMode: layout.toggleDevMode,
     toggleMaximize: () => layout.toggleMaximize(),
     newTab: () => openInActivePane(focusedPath),
     closeTab: () => model && activePane && closeTab(model.activePane, activePane.active),
@@ -634,6 +646,8 @@ export function App(): React.JSX.Element {
                             onAddTodo={addTodo}
                             consoleProfiles={consoles.profiles}
                             consoleOpen={consoleOpen}
+                            devMode={layout.devMode}
+                            onToggleDevMode={layout.toggleDevMode}
                             foldersShown={isShown('folders')}
                             onToggleFolders={layout.toggleFolders}
                             onOpenConsole={openConsoleIn}
